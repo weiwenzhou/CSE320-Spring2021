@@ -757,7 +757,7 @@ number 1 and the leaf node with value 0 receives serial number 2.
 Besides the '@' opcode, which builds a leaf node, the format may include
 instructions with single-byte opcodes `A`, `B`, ... `Z`, `[`, `\`, `]`,
 `^`, `_`, and `` ` ``, which have ASCII codes 65, 66, ..., 96.  These define
-instructions for building a BDD node at level 1, 2, ..., 31, respectively.
+instructions for building a BDD node at level 1, 2, ..., 32, respectively.
 Following such an opcode will be two sets of four bytes (there is no
 delimiter between the two sets), which give the serial numbers of the
 children of the node.  The first four bytes give the serial number of
