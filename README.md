@@ -621,7 +621,7 @@ because now a child node can be "shared" among many parent nodes,
 but from the point of view of tracing paths from the root to a leaf
 it behaves just like a tree.
 
-To make things more concrete, consider the following 16x16 image,
+To make things more concrete, consider the following 8x8 image,
 which can be found in the `rsrc/checker.pgm` file distributed with the
 base code:
 
