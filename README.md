@@ -1206,8 +1206,8 @@ correctly when the `-b` flag is passed.
 - `help_system_test` uses the `system` syscall to execute your program through
 Bash and checks to see that your program returns with `EXIT_SUCCESS`.
 
-- `goertzel_basic_test` performs a basic (but by no means exhaustive) test of
-the output of the Goertzel algorithm.
+- `birp_basic_test` performs a basic test of the transformation from PGM
+to BIRP format.
 
 ### Compiling and Running Tests
 
