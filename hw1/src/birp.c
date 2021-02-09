@@ -98,7 +98,7 @@ int validargs(int argc, char **argv) {
     // }
 
     // Placeholder for the checking value
-    printf("%X\n", global_options);
+    debug("0x%X",global_options);
 
     return -1;
 }
