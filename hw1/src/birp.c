@@ -6,6 +6,7 @@
 #include "bdd.h"
 #include "const.h"
 #include "debug.h"
+#include "custom_functions.h"
 
 int pgm_to_birp(FILE *in, FILE *out) {
     // TO BE IMPLEMENTED
@@ -50,17 +51,20 @@ int birp_to_ascii(FILE *in, FILE *out) {
 int validargs(int argc, char **argv) {
     // TO BE IMPLEMENTED
     // check if there are flags (argc > 1)
-
+    if (argc <= 1)
+        return -1;
     // check if the first flag is -h 
-    global_options = HELP_OPTION;
     // global_options: bit 31 is 1 -> 0x80000000 (1000...0000)
-
-    // loop through the flags to check
+    if (compare(*(argv+1), "-h") == 0) {
+        global_options = HELP_OPTION;
+        return 0;
+    }
     // if the first flag is not -h then the max # of flags is 6
-    // ex. bin/birp -i birp -i birp -t 64
-
-    // certain conditional to watch
-    
+    // ex. bin/birp -i birp -i birp -t 64 (argc <= 7)
+    if (argc > 7)
+        return -1;
+    // loop through the flags to check
+    // certain conditional to watch    
     // -i and -o can appear in either order
     // -i and -o can only appear at most once each
     // -i pgm|birp default birp
@@ -96,9 +100,6 @@ int validargs(int argc, char **argv) {
     // for (int index = 0; index < argc; index++) {
         // 
     // }
-
-    // Placeholder for the checking value
-    debug("0x%X",global_options);
 
     return -1;
 }
