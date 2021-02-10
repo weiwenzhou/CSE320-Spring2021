@@ -138,12 +138,53 @@ int validargs(int argc, char **argv) {
                 if (equal(flag, "-n"))
                     global_options = (global_options & 0xFFFFF0FF) + 0x100;
                 else if (equal(flag, "-t")) {
-                    global_options = (global_options & 0xFFFFF0FF) + 0x200;                   
+                    global_options = (global_options & 0xFFFFF0FF) + 0x200;
+                    index++;
+                    flag = *(argv+index);  
+                    debug("transform: index %i ,%s", index, flag);
+                    if (len(flag) > 3) {
+                        global_options = 0;
+                        return -1;
+                    }
+                    int flag_value = string_to_int(flag, 0, 255);
+                    if (flag_value != -1) {
+                        global_options =  (global_options & 0xFF00FFFF) + (flag_value << 16);
+                    } else {
+                        global_options = 0;
+                        return -1;
+                    }    
                 } else if (equal(flag,"-z")) {
                     global_options = (global_options & 0xFFFFF0FF) + 0x300;
+                    index++;
+                    flag = *(argv+index);
                     debug("transform: index %i ,%s", index, flag);
+                    if (len(flag) > 2) {
+                        global_options = 0;
+                        return -1;
+                    }
+                    int flag_value = string_to_int(flag, 0, 16);
+                    if (flag_value != -1) {
+                        global_options =  ((global_options & 0xFF00FFFF) + (-flag_value << 16)) & 0xFFFFFF;
+                    } else {
+                        global_options = 0;
+                        return -1;
+                    }
                 } else if (equal(flag, "-Z")) {
                     global_options = (global_options & 0xFFFFF0FF) + 0x300;
+                    index++;
+                    flag = *(argv+index);
+                    debug("transform: index %i ,%s", index, flag);
+                    if (len(flag) > 2) {
+                        global_options = 0;
+                        return -1;
+                    }
+                    int flag_value = string_to_int(flag, 0, 16);
+                    if (flag_value != -1) {
+                        global_options =  (global_options & 0xFF00FFFF) + (flag_value << 16);
+                    } else {
+                        global_options = 0;
+                        return -1;
+                    }
                 } else if (equal(flag, "-r"))
                     global_options = (global_options & 0xFFFFF0FF) + 0x400;
                 else {
@@ -151,8 +192,8 @@ int validargs(int argc, char **argv) {
                     return -1;
                 }
                 // value for transformation is bits 16-23 0x12__5678
-                    // negative for -z (twos complement)
-                    // positive for -Z (twos complement)
+                    // negative for -z (twos complement) [0,16]
+                    // positive for -Z (twos complement) [0,16]
                     // positive for -t (unsigned) [0,255]
             } else {
                 global_options = 0;
