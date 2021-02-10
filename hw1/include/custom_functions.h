@@ -23,3 +23,13 @@ int compare(char *str1, char *str2);
  * @return True (1) if equal, otherwise False (0).
  */
 int equal(char *str1, char *str2);
+
+/**
+ * Converts a non-negative decimal integer encoded string to a non-negative decimal integer between min and max, inclusive.
+ * 
+ * @param str The string to be converted
+ * @param min The min value of the resulting integer (greater than or equal to 0)
+ * @param max The max value of the resulting integer 
+ * @return The resulting integer if between min and max, inclusive, otherwise -1.
+ */
+int string_to_int(char *str, int min, int max);

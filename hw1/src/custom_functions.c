@@ -27,3 +27,19 @@ int compare(char *str1, char *str2) {
 int equal(char *str1, char *str2) {
     return compare(str1, str2) == 0;
 }
+
+int string_to_int(char *str, int min, int max) {
+    int result = 0;
+    int length = len(str);
+    for (int index = 0; index < length; index++) {
+        char digit = *(str+index);
+        if (digit >= '0' && digit <= '9')
+            result = result * 10 + (digit - '0'); 
+        else 
+            return -1;
+    }
+    if (result >= min && result <= max)
+        return result;
+    else
+        return -1;
+}
