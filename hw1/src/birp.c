@@ -119,26 +119,48 @@ int validargs(int argc, char **argv) {
                     // 0001 (0x1) for pgm
                     // 0010 (0x2) for birp
                     // 0011 (0x3) for ascii 
+        } else {
+            io_search_done = 1;
+            if (global_options == 0x22) {
+                // if input and output format are both birp
+                    // global option is 0x00000022 
+                // at most one of following is allow
+                // -n|-r|-t|-z|-Z 
+                // for -t the next flag must be an integer in the range [0,255]
+                // for -z & -Z the next flag must be an integer in the range [0,16]
+
+                // transformation is bits 8-11 0x12345_78
+                    // 0000 (0x0) is no transformation
+                    // 0001 (0x1) is -n 
+                    // 0010 (0x2) is -t
+                    // 0011 (0x3) is -z/-Z
+                    // 0100 (0x4) is -r
+                if (equal(flag, "-n"))
+                    global_options = (global_options & 0xFFFFF0FF) + 0x100;
+                else if (equal(flag, "-t")) {
+                    global_options = (global_options & 0xFFFFF0FF) + 0x200;                   
+                } else if (equal(flag,"-z")) {
+                    global_options = (global_options & 0xFFFFF0FF) + 0x300;
+                    debug("transform: index %i ,%s", index, flag);
+                } else if (equal(flag, "-Z")) {
+                    global_options = (global_options & 0xFFFFF0FF) + 0x300;
+                } else if (equal(flag, "-r"))
+                    global_options = (global_options & 0xFFFFF0FF) + 0x400;
+                else {
+                    global_options = 0;
+                    return -1;
+                }
+                // value for transformation is bits 16-23 0x12__5678
+                    // negative for -z (twos complement)
+                    // positive for -Z (twos complement)
+                    // positive for -t (unsigned) [0,255]
+            } else {
+                global_options = 0;
+                return -1;
+            }
         }
     }
 
-    // if input and output format are both birp
-        // global option is 0x00000022 
-    // at most one of following is allow
-    // -n|-r|-t|-z|-Z 
-    // for -t the next flag must be an integer in the range [0,255]
-    // for -z & -Z the next flag must be an integer in the range [0,16]
-
-    // transformation is bits 8-11 0x12345_78
-        // 0000 (0x0) is no transformation
-        // 0001 (0x1) is -n 
-        // 0010 (0x2) is -t
-        // 0011 (0x3) is -z/-Z
-        // 0100 (0x4) is -r
-    // value for transformation is bits 16-23 0x12__5678
-        // negative for -z (twos complement)
-        // positive for -Z (twos complement)
-        // positive for -t (unsigned) [0,255]
 
     return 0;
 }
