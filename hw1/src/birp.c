@@ -64,34 +64,51 @@ int validargs(int argc, char **argv) {
     if (argc > 7)
         return -1;
     // loop through the flags to check
+    int io_search_done = 0;
     int input = 0;
     int output = 0;
-
+    // set default global_option 0x00000022 (birp birp)
+    global_options = 0x00000022; 
     for (int index = 1; index < argc; index++) {
         char *flag = *(argv+index);
         debug("index %i ,%s", index, flag);
         // certain conditional to watch    
         // -i and -o can appear in either order
         // -i and -o can only appear at most once each
-        if (equal(flag, "-i")) {
-            if (input) 
+        if (equal(flag, "-i") &&) {
+            if (input || io_search_done) 
                 return -1; 
             input = 1;
             index++;
             flag = *(argv+index);
             debug("input: index %i ,%s", index, flag);
+            if (equal(flag, "pgm")) 
+                global_options = (global_options & 0xFFFFFFF0) + 0x1;
+            else if (equal(flag, "birp")) 
+                global_options = (global_options & 0xFFFFFFF0) + 0x2;
+            else 
+                return -1;
+            
             // -i pgm|birp default birpx
                 // -i is bits 0-3 0x1234567_ 
                     // 0000 (0x0) is not allowed
                     // 0001 (0x1) for pgm
                     // 0010 (0x2) for birp
         } else if (equal(flag, "-o")) {
-            if (output)
+            if (output || io_search_done)
                 return -1;
             output = 1;
             index++;
             flag = *(argv+index);
             debug("input: index %i ,%s", index, flag);
+            if (equal(flag, "pgm")) 
+                global_options = (global_options & 0xFFFFFF0F) + 0x10;
+            else if (equal(flag, "birp")) 
+                global_options = (global_options & 0xFFFFFF0F) + 0x20;
+            else if (equal(flag, "ascii"))
+                global_options = (global_options & 0xFFFFFF0F) + 0x30;
+            else 
+                return -1;
             // -o pgm|birp|ascii default birp
                 // -o is bits 4-8 0x123456_8
                     // 0000 (0x0) is not allowed
@@ -119,9 +136,5 @@ int validargs(int argc, char **argv) {
         // positive for -Z (twos complement)
         // positive for -t (unsigned) [0,255]
 
-    // for (int index = 0; index < argc; index++) {
-        // 
-    // }
-
-    return -1;
+    return 0;
 }
