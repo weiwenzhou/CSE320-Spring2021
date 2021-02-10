@@ -75,7 +75,7 @@ int validargs(int argc, char **argv) {
         // certain conditional to watch    
         // -i and -o can appear in either order
         // -i and -o can only appear at most once each
-        if (equal(flag, "-i") &&) {
+        if (equal(flag, "-i")) {
             if (input || io_search_done) 
                 return -1; 
             input = 1;
