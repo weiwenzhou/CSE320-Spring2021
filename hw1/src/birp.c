@@ -52,7 +52,7 @@ int validargs(int argc, char **argv) {
     // TO BE IMPLEMENTED
     // check if there are flags (argc > 1)
     if (argc <= 1)
-        return -1;
+        return invalidargs_return();
     // check if the first flag is -h 
     // global_options: bit 31 is 1 -> 0x80000000 (1000...0000)
     if (equal(*(argv+1), "-h")) {
@@ -62,7 +62,7 @@ int validargs(int argc, char **argv) {
     // if the first flag is not -h then the max # of flags is 6
     // ex. bin/birp -i birp -i birp -t 64 (argc <= 7)
     if (argc > 7)
-        return -1;
+        return invalidargs_return();
     // loop through the flags to check
     int io_search_done = 0;
     int input = 0;
@@ -77,8 +77,7 @@ int validargs(int argc, char **argv) {
         // -i and -o can only appear at most once each
         if (equal(flag, "-i")) {
             if (input || io_search_done) {
-                global_options = 0;
-                return -1; 
+                return invalidargs_return();
             }
             input = 1;
             index++;
@@ -89,7 +88,7 @@ int validargs(int argc, char **argv) {
             else if (equal(flag, "birp")) 
                 global_options = (global_options & 0xFFFFFFF0) + 0x2;
             else 
-                return -1;
+                return invalidargs_return();
             
             // -i pgm|birp default birpx
                 // -i is bits 0-3 0x1234567_ 
@@ -98,8 +97,7 @@ int validargs(int argc, char **argv) {
                     // 0010 (0x2) for birp
         } else if (equal(flag, "-o")) {
             if (output || io_search_done) {
-                global_options = 0;
-                return -1;
+                return invalidargs_return();
             }
             output = 1;
             index++;
@@ -112,7 +110,7 @@ int validargs(int argc, char **argv) {
             else if (equal(flag, "ascii"))
                 global_options = (global_options & 0xFFFFFF0F) + 0x30;
             else 
-                return -1;
+                return invalidargs_return();
             // -o pgm|birp|ascii default birp
                 // -o is bits 4-8 0x123456_8
                     // 0000 (0x0) is not allowed
@@ -143,15 +141,13 @@ int validargs(int argc, char **argv) {
                     flag = *(argv+index);  
                     debug("transform: index %i ,%s", index, flag);
                     if (len(flag) > 3) {
-                        global_options = 0;
-                        return -1;
+                        return invalidargs_return();
                     }
                     int flag_value = string_to_int(flag, 0, 255);
                     if (flag_value != -1) {
                         global_options =  (global_options & 0xFF00FFFF) + (flag_value << 16);
                     } else {
-                        global_options = 0;
-                        return -1;
+                        return invalidargs_return();
                     }    
                 } else if (equal(flag,"-z")) {
                     global_options = (global_options & 0xFFFFF0FF) + 0x300;
@@ -159,15 +155,13 @@ int validargs(int argc, char **argv) {
                     flag = *(argv+index);
                     debug("transform: index %i ,%s", index, flag);
                     if (len(flag) > 2) {
-                        global_options = 0;
-                        return -1;
+                        return invalidargs_return();
                     }
                     int flag_value = string_to_int(flag, 0, 16);
                     if (flag_value != -1) {
                         global_options =  ((global_options & 0xFF00FFFF) + (-flag_value << 16)) & 0xFFFFFF;
                     } else {
-                        global_options = 0;
-                        return -1;
+                        return invalidargs_return();
                     }
                 } else if (equal(flag, "-Z")) {
                     global_options = (global_options & 0xFFFFF0FF) + 0x300;
@@ -175,29 +169,25 @@ int validargs(int argc, char **argv) {
                     flag = *(argv+index);
                     debug("transform: index %i ,%s", index, flag);
                     if (len(flag) > 2) {
-                        global_options = 0;
-                        return -1;
+                        return invalidargs_return();
                     }
                     int flag_value = string_to_int(flag, 0, 16);
                     if (flag_value != -1) {
                         global_options =  (global_options & 0xFF00FFFF) + (flag_value << 16);
                     } else {
-                        global_options = 0;
-                        return -1;
+                        return invalidargs_return();
                     }
                 } else if (equal(flag, "-r"))
                     global_options = (global_options & 0xFFFFF0FF) + 0x400;
                 else {
-                    global_options = 0;
-                    return -1;
+                    return invalidargs_return();
                 }
                 // value for transformation is bits 16-23 0x12__5678
                     // negative for -z (twos complement) [0,16]
                     // positive for -Z (twos complement) [0,16]
                     // positive for -t (unsigned) [0,255]
             } else {
-                global_options = 0;
-                return -1;
+                return invalidargs_return();
             }
         }
     }

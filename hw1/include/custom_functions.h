@@ -1,4 +1,11 @@
 /**
+ * Modifies global_option to be 0 and returns -1.
+ * 
+ * @return -1
+ */
+int invalidargs_return();
+
+/**
  * Returns the length of a string
  * 
  * @param str the string

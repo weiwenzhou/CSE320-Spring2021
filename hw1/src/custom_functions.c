@@ -1,4 +1,10 @@
+#include "const.h"
 #include "custom_functions.h"
+
+int invalidargs_return() {
+    global_options = 0;
+    return -1;
+}
 
 int len(char *str) {
     int size = 0;
