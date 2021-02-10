@@ -95,10 +95,10 @@ int validargs(int argc, char **argv) {
     for (int index = 1; index < argc; index++) {
         char *flag = *(argv+index);
         if (equal(flag, "-i")) {
-            if (input || io_search_done) 
+            index++;
+            if (input || io_search_done || index == argc) 
                 return invalidargs_return();
             input = 1;
-            index++;
             flag = *(argv+index);
             if (equal(flag, "pgm")) 
                 global_options = (global_options & 0xFFFFFFF0) + 0x1;
@@ -107,10 +107,10 @@ int validargs(int argc, char **argv) {
             else 
                 return invalidargs_return();
         } else if (equal(flag, "-o")) {
-            if (output || io_search_done) 
+            index++;
+            if (output || io_search_done || index == argc) 
                 return invalidargs_return();
             output = 1;
-            index++;
             flag = *(argv+index);
             if (equal(flag, "pgm")) 
                 global_options = (global_options & 0xFFFFFF0F) + 0x10;
@@ -130,6 +130,8 @@ int validargs(int argc, char **argv) {
             else if (equal(flag, "-t")) {
                 global_options = (global_options & 0xFFFFF0FF) + 0x200;
                 index++;
+                if (index == argc)
+                    return invalidargs_return();
                 flag = *(argv+index);
                 if (len(flag) > 3) 
                     return invalidargs_return();
@@ -141,6 +143,8 @@ int validargs(int argc, char **argv) {
             } else if (equal(flag,"-z")) {
                 global_options = (global_options & 0xFFFFF0FF) + 0x300;
                 index++;
+                if (index == argc)
+                    return invalidargs_return();
                 flag = *(argv+index);
                 if (len(flag) > 2) 
                     return invalidargs_return();
@@ -152,6 +156,8 @@ int validargs(int argc, char **argv) {
             } else if (equal(flag, "-Z")) {
                 global_options = (global_options & 0xFFFFF0FF) + 0x300;
                 index++;
+                if (index == argc)
+                    return invalidargs_return();
                 flag = *(argv+index);
                 if (len(flag) > 2) 
                     return invalidargs_return();
