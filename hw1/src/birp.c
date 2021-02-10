@@ -25,7 +25,33 @@ int birp_to_birp(FILE *in, FILE *out) {
 
 int pgm_to_ascii(FILE *in, FILE *out) {
     // TO BE IMPLEMENTED
-    return -1;
+    int width, height;
+    int code = img_read_pgm(in, &width, &height, raster_data, RASTER_SIZE_MAX);
+    if (code)
+        return -1;
+    unsigned char *currentChar = raster_data;
+    for (int row = 0; row < height; row++) {
+        for (int col = 0; col < width; col++) {
+            char c = 0;
+            switch (*currentChar) {
+                case 0 ... 63:
+                    printf("%c", ' ');
+                    break;
+                case 64 ... 127:
+                    printf("%c", '.');
+                    break;
+                case 128 ... 191:
+                    printf("%c", '*');
+                    break;
+                case 192 ... 255:
+                    printf("%c", '@');
+            }
+            currentChar++;
+        }
+        printf("\n");
+    }
+    printf("\n");
+    return 0;
 }
 
 int birp_to_ascii(FILE *in, FILE *out) {
