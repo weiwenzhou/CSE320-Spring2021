@@ -76,8 +76,10 @@ int validargs(int argc, char **argv) {
         // -i and -o can appear in either order
         // -i and -o can only appear at most once each
         if (equal(flag, "-i")) {
-            if (input || io_search_done) 
+            if (input || io_search_done) {
+                global_options = 0;
                 return -1; 
+            }
             input = 1;
             index++;
             flag = *(argv+index);
@@ -95,8 +97,10 @@ int validargs(int argc, char **argv) {
                     // 0001 (0x1) for pgm
                     // 0010 (0x2) for birp
         } else if (equal(flag, "-o")) {
-            if (output || io_search_done)
+            if (output || io_search_done) {
+                global_options = 0;
                 return -1;
+            }
             output = 1;
             index++;
             flag = *(argv+index);
