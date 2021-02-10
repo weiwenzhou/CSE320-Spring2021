@@ -64,20 +64,42 @@ int validargs(int argc, char **argv) {
     if (argc > 7)
         return -1;
     // loop through the flags to check
-    // certain conditional to watch    
-    // -i and -o can appear in either order
-    // -i and -o can only appear at most once each
-    // -i pgm|birp default birp
-    // -o pgm|birp|ascii default birp
-        // -i is bits 0-3 0x1234567_ 
-            // 0000 (0x0) is not allowed
-            // 0001 (0x1) for pgm
-            // 0010 (0x2) for birp
-        // -i is bits 4-8 0x123456_8
-            // 0000 (0x0) is not allowed
-            // 0001 (0x1) for pgm
-            // 0010 (0x2) for birp
-            // 0011 (0x3) for ascii 
+    int input = 0;
+    int output = 0;
+
+    for (int index = 1; index < argc; index++) {
+        char *flag = *(argv+index);
+        debug("index %i ,%s", index, flag);
+        // certain conditional to watch    
+        // -i and -o can appear in either order
+        // -i and -o can only appear at most once each
+        if (compare(flag, "-i") == 0) {
+            if (input) 
+                return -1; 
+            input = 1;
+            index++;
+            flag = *(argv+index);
+            debug("input: index %i ,%s", index, flag);
+            // -i pgm|birp default birpx
+                // -i is bits 0-3 0x1234567_ 
+                    // 0000 (0x0) is not allowed
+                    // 0001 (0x1) for pgm
+                    // 0010 (0x2) for birp
+        } else if (compare(flag, "-o") == 0) {
+            if (output)
+                return -1;
+            output = 1;
+            index++;
+            flag = *(argv+index);
+            debug("input: index %i ,%s", index, flag);
+            // -o pgm|birp|ascii default birp
+                // -o is bits 4-8 0x123456_8
+                    // 0000 (0x0) is not allowed
+                    // 0001 (0x1) for pgm
+                    // 0010 (0x2) for birp
+                    // 0011 (0x3) for ascii 
+        }
+    }
 
     // if input and output format are both birp
         // global option is 0x00000022 
