@@ -55,7 +55,7 @@ int validargs(int argc, char **argv) {
         return -1;
     // check if the first flag is -h 
     // global_options: bit 31 is 1 -> 0x80000000 (1000...0000)
-    if (compare(*(argv+1), "-h") == 0) {
+    if (equal(*(argv+1), "-h")) {
         global_options = HELP_OPTION;
         return 0;
     }
@@ -73,7 +73,7 @@ int validargs(int argc, char **argv) {
         // certain conditional to watch    
         // -i and -o can appear in either order
         // -i and -o can only appear at most once each
-        if (compare(flag, "-i") == 0) {
+        if (equal(flag, "-i")) {
             if (input) 
                 return -1; 
             input = 1;
@@ -85,7 +85,7 @@ int validargs(int argc, char **argv) {
                     // 0000 (0x0) is not allowed
                     // 0001 (0x1) for pgm
                     // 0010 (0x2) for birp
-        } else if (compare(flag, "-o") == 0) {
+        } else if (equal(flag, "-o")) {
             if (output)
                 return -1;
             output = 1;

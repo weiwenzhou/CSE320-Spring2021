@@ -23,3 +23,7 @@ int compare(char *str1, char *str2) {
     }
     return 0;
 }
+
+int equal(char *str1, char *str2) {
+    return compare(str1, str2) == 0;
+}
