@@ -40,3 +40,16 @@ int equal(char *str1, char *str2);
  * @return The resulting integer if between min and max, inclusive, otherwise -1.
  */
 int string_to_int(char *str, int min, int max);
+
+/**
+ * Returns a hash using level and indices of left and right bdd_nodes
+ * 
+ * @param level  The level number, in the range [0, BDD_LEVELS_MAX], of the
+ * BDD node to be looked up.
+ * @param left  The index, in the bdd_nodes array, of the left (i.e. "0") child
+ * of the BDD node to be looked up.
+ * @param right  The index, in the bdd_nodes array, of the right (i.e. "1") child
+ * of the BDD node to be looked up.
+ * @return 
+ */
+int hash(int level, int left, int right);

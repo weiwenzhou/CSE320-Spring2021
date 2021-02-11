@@ -49,3 +49,13 @@ int string_to_int(char *str, int min, int max) {
     else
         return -1;
 }
+
+int hash(int level, int left, int right) {
+    // 1<<21 = 2097152 
+    // hash (21 bits approximately) 
+        // use level as the first 5 bits (bits 20-16)
+        // 16 bits remaining (left and right are indices so they will trend towards 0-255)
+            // attempt 1 : 8 bits left 8 bits right (doing this first)
+            // attempt 2 : sum and take 16 bits
+            // attempt 3 : ???
+}
