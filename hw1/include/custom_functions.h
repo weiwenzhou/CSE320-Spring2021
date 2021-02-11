@@ -77,3 +77,11 @@ int equal_node(BDD_NODE *node1, BDD_NODE *node2);
  * @return 1 if found, otherwise 0.
  */
 int search_node_map(BDD_NODE *node);
+
+/**
+ * Checks if a node with level, left, and right values of 0.
+ * 
+ * @param node The BDD node.
+ * @return 1 if True, otherwise 0.
+ */
+int null_node(BDD_NODE *node);

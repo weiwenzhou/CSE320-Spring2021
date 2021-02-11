@@ -80,9 +80,12 @@ int search_node_map(BDD_NODE *node) {
     int start = hash(node->left, node->right);
     int index = start;
     do {
-        BDD_NODE *current = *bdd_hash_map;
-        if (current == NULL) {
+        BDD_NODE *current = *(bdd_hash_map+index);
+        if (null_node(current)) {
             // insert and break
+            current->level = node-> level;
+            current->left = node->left;
+            current->right = node->right;
             return 0;
         } else if (equal_node_children(node, current)) {
             return 1;
@@ -90,4 +93,8 @@ int search_node_map(BDD_NODE *node) {
         index = (index+1) % BDD_HASH_SIZE;
     } while (index != start);
     return 0;
+}
+
+int null_node(BDD_NODE *node) {
+    return node->level == 0 && node->left == 0 && node->right == 0;
 }
