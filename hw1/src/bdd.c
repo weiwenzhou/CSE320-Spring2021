@@ -27,7 +27,13 @@ int bdd_lookup(int level, int left, int right) {
     // TO BE IMPLEMENTED
     // Check if arguments are in range
     // level [0, BDD_LEVELS_MAX] 32
-    // left/right [0, BDD_NODES_MAX] 1<<20
+    // left/right [0, BDD_NODES_MAX) 1<<20
+    if (level < 0 || level > BDD_LEVELS_MAX)
+        return -1;
+    if (left < 0 || left >= BDD_NODES_MAX)
+        return -1;
+    if (right < 0 || right >= BDD_NODES_MAX)
+        return -1;
 
     // Check if BDD node with specified level and children exists bdd_hash_map (2097169)
 
