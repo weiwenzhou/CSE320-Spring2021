@@ -50,20 +50,25 @@ int string_to_int(char *str, int min, int max) {
         return -1;
 }
 
-int hash(int level, int left, int right) {
+int hash(int left, int right) {
     // 1<<21 = 2097152 
     // hash (21 bits approximately) 
-        // use level as the first 5 bits (bits 20-16)
-        // 16 bits remaining (left and right are indices so they will trend towards 0-255)
+        // bits(15-0) (left and right are indices so they will trend towards 0-255)
             // attempt 1 : 8 bits left 8 bits right (doing this first)
             // attempt 2 : sum and take 16 bits
             // attempt 3 : ???
+        // bits(20-16)
+            // use bits(4-0) of the product of left%256 and right%256
     int result = 0;
-    result += (level & 0x1f) << 16;
     result += (left % (1<<8)) << 8;
     result += (right % (1<<8));
+    result += (((left % (1<<8)) * right % (1<<8)) & 0x1f) << 16;
 
     return result;
+}
+
+int equal_node_children(BDD_NODE *node1, BDD_NODE *node2) {
+    return node1->left == node2->left && node1->right == node2->right;
 }
 
 int equal_node(BDD_NODE *node1, BDD_NODE *node2) {

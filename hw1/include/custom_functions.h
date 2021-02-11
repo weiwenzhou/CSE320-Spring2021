@@ -44,15 +44,22 @@ int string_to_int(char *str, int min, int max);
 /**
  * Returns a hash using level and indices of left and right bdd_nodes
  * 
- * @param level  The level number, in the range [0, BDD_LEVELS_MAX], of the
- * BDD node to be looked up.
  * @param left  The index, in the bdd_nodes array, of the left (i.e. "0") child
  * of the BDD node to be looked up.
  * @param right  The index, in the bdd_nodes array, of the right (i.e. "1") child
  * of the BDD node to be looked up.
  * @return 
  */
-int hash(int level, int left, int right);
+int hash(int left, int right);
+
+/**
+ * Checks if two BDD node have the same left and right values.
+ * 
+ * @param node1  The first BDD node.
+ * @param node2  The second BDD node.
+ * @return 1 if equal, otherwise 0.
+ */
+int equal_node_children(BDD_NODE *node1, BDD_NODE *node2);
 
 /**
  * Checks if two BDD node have the same level, left, and right values.
