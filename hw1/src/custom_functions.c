@@ -1,4 +1,5 @@
 #include "const.h"
+#include "bdd.h"
 #include "custom_functions.h"
 
 int invalidargs_return() {
@@ -73,4 +74,20 @@ int equal_node_children(BDD_NODE *node1, BDD_NODE *node2) {
 
 int equal_node(BDD_NODE *node1, BDD_NODE *node2) {
     return node1->level == node2->level && node1->left == node2->left && node1->right == node2->right;
+}
+
+int search_node_map(BDD_NODE *node) {
+    int start = hash(node->left, node->right);
+    int index = start;
+    do {
+        BDD_NODE *current = *bdd_hash_map;
+        if (current == NULL) {
+            // insert and break
+            return 0;
+        } else if (equal_node_children(node, current)) {
+            return 1;
+        }
+        index = (index+1) % BDD_HASH_SIZE;
+    } while (index != start);
+    return 0;
 }
