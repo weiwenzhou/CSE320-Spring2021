@@ -1,6 +1,7 @@
 #include "const.h"
 #include "bdd.h"
 #include "custom_functions.h"
+#include "debug.h"
 
 int invalidargs_return() {
     global_options = 0;
@@ -81,11 +82,9 @@ int search_node_map(BDD_NODE *node) {
     int index = start;
     do {
         BDD_NODE *current = *(bdd_hash_map+index);
-        if (null_node(current)) {
+        if (current == NULL) {
             // insert and break
-            current->level = node-> level;
-            current->left = node->left;
-            current->right = node->right;
+            current = node;
             return 0;
         } else if (equal_node_children(node, current)) {
             return 1;

@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "bdd.h"
+#include "custom_functions.h"
 #include "debug.h"
 
 /*
@@ -35,11 +36,48 @@ int bdd_lookup(int level, int left, int right) {
     if (right < 0 || right >= BDD_NODES_MAX)
         return -1;
 
+    BDD_NODE node = {level, left, right};
     // Check if BDD node with specified level and children exists bdd_hash_map (2097169)
+    int start = hash(node.left, node.right);
+    int hash_index = start;
+    do {
+        BDD_NODE *hash_current = *(bdd_hash_map+hash_index);
+        if (hash_current == NULL) {
+            // insert and break
+            for (int index = BDD_NUM_LEAVES; index < BDD_NODES_MAX; index++) {
+                BDD_NODE *current = bdd_nodes+index;
+                if (null_node(current)) {
+                    current->level = level;
+                    current->left = left;
+                    current->right = right;
+                    *(bdd_hash_map+hash_index) = current;
+                    return index;
+                }
+            }
+        } else if (equal_node_children(&node, hash_current)) {
+            return hash_current - (bdd_nodes+BDD_NUM_LEAVES);
+        }
+        hash_index = (hash_index+1) % BDD_HASH_SIZE;
+    } while (hash_index != start);
 
-    // If exists search for it in bdd_nodes and return index
+    // if (search_node_map(&node)) {
+    //     // If exists search for it in bdd_nodes and return index
+    //     for (int index = BDD_NUM_LEAVES; index < BDD_NODES_MAX; index++) {
+    //         BDD_NODE *current = bdd_nodes+index;
+    //         if (equal_node(&node, current))
+    //             return index;
+    //     }
+    // } else {
+    //     // else (doesn't exist) find the next open spot in bdd nodes
+    //     for (int index = BDD_NUM_LEAVES; index < BDD_NODES_MAX; index++) {
+    //         BDD_NODE *current = bdd_nodes+index;
+    //         if (null_node(current)) {
+    //             *current = node;
+    //             return index;
+    //         }
+    //     }
+    // }
 
-    // else (doesn't exist) find the next open spot in bdd nodes
     return -1;
 }
 
