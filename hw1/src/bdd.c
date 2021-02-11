@@ -55,7 +55,7 @@ int bdd_lookup(int level, int left, int right) {
                 }
             }
         } else if (equal_node_children(&node, hash_current)) {
-            return hash_current - (bdd_nodes+BDD_NUM_LEAVES);
+            return hash_current - bdd_nodes;
         }
         hash_index = (hash_index+1) % BDD_HASH_SIZE;
     } while (hash_index != start);
