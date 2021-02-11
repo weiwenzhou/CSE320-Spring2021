@@ -53,3 +53,12 @@ int string_to_int(char *str, int min, int max);
  * @return 
  */
 int hash(int level, int left, int right);
+
+/**
+ * Checks if two BDD node have the same level, left, and right values.
+ * 
+ * @param node1  The first BDD node.
+ * @param node2  The second BDD node.
+ * @return 1 if equal, otherwise 0.
+ */
+int equal_node(BDD_NODE *node1, BDD_NODE *node2);

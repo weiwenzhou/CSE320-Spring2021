@@ -65,3 +65,7 @@ int hash(int level, int left, int right) {
 
     return result;
 }
+
+int equal_node(BDD_NODE *node1, BDD_NODE *node2) {
+    return node1->level == node2->level && node1->left == node2->left && node1->right == node2->right;
+}
