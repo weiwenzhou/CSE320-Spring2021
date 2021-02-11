@@ -25,6 +25,22 @@
  */
 int bdd_lookup(int level, int left, int right) {
     // TO BE IMPLEMENTED
+    // Check if arguments are in range
+    // level [0, BDD_LEVELS_MAX] 32
+    // left/right [0, BDD_NODES_MAX] 1<<20
+
+    // Check if BDD node with specified level and children exists bdd_hash_map (2097169)
+    // 1<<21 = 2097152 
+    // hash (21 bits approximately) 
+        // use level as the first 5 bits (bits 20-16)
+        // 16 bits remaining (left and right are indices so they will trend towards 0-255)
+            // attempt 1 : 8 bits left 8 bits right (doing this first)
+            // attempt 2 : sum and take 16 bits
+            // attempt 3 : ???
+
+    // If exists search for it in bdd_nodes and return index
+
+    // else (doesn't exist) find the next open spot in bdd nodes
     return -1;
 }
 
