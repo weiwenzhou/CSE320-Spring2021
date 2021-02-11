@@ -58,4 +58,10 @@ int hash(int level, int left, int right) {
             // attempt 1 : 8 bits left 8 bits right (doing this first)
             // attempt 2 : sum and take 16 bits
             // attempt 3 : ???
+    int result = 0;
+    result += (level & 0x1f) << 16;
+    result += (left % (1<<8)) << 8;
+    result += (right % (1<<8));
+
+    return result;
 }
