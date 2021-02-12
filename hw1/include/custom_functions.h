@@ -77,3 +77,5 @@ int equal_node(BDD_NODE *node1, BDD_NODE *node2);
  * @return 1 if True, otherwise 0.
  */
 int null_node(BDD_NODE *node);
+
+int split_raster_data(int start_width, int end_width, int start_height, int end_height, int w, int h, unsigned char *raster);

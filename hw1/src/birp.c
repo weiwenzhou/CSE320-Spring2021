@@ -10,6 +10,14 @@
 
 int pgm_to_birp(FILE *in, FILE *out) {
     // TO BE IMPLEMENTED
+    int width, height;
+    int code = img_read_pgm(in, &width, &height, raster_data, RASTER_SIZE_MAX);
+    if (code)
+        return -1;
+    // raster to bdd
+    bdd_from_raster(width, height, raster_data);
+    
+    // img_write_birp
     return -1;
 }
 

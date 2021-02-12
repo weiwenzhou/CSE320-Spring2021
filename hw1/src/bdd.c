@@ -71,6 +71,10 @@ int bdd_lookup(int level, int left, int right) {
 
 BDD_NODE *bdd_from_raster(int w, int h, unsigned char *raster) {
     // TO BE IMPLEMENTED
+    int nodeIndex = split_raster_data(0, w, 0, h, w, h, raster);
+    info("%i", nodeIndex);
+    if (nodeIndex != 0) 
+        return bdd_nodes+nodeIndex;
     return NULL;
 }
 
