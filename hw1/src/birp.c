@@ -14,11 +14,11 @@ int pgm_to_birp(FILE *in, FILE *out) {
     int code = img_read_pgm(in, &width, &height, raster_data, RASTER_SIZE_MAX);
     if (code)
         return -1;
-    // raster to bdd
-    bdd_from_raster(width, height, raster_data);
-    
-    // img_write_birp
-    return -1;
+    BDD_NODE* node = bdd_from_raster(width, height, raster_data);
+    if (node == NULL)
+        return -1;
+    img_write_birp(node, width, height, out);
+    return 0;
 }
 
 int birp_to_pgm(FILE *in, FILE *out) {
