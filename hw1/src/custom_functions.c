@@ -81,25 +81,28 @@ int null_node(BDD_NODE *node) {
 int split_raster_data(int start_width, int end_width, int start_height, int end_height, int w, int h, unsigned char *raster) {
     int width = end_width-start_width;
     int height = end_height-start_height;
-    int level;
+    int level = bdd_min_level(width, height);
+    // info("first %i %i", width, height);
     if (width * height == 1) {
-        info("leaf %i", *(raster+start_height*h+start_width));
+        // info("leaf %i, %i, %i", start_width, start_height, *(raster+start_height*h+start_width));
         return *(raster+start_height*h+start_width); // leaf
     } else if (width > height) {
         // split width
+        // info("before %i %i", width, height);
         width = width/2;
-        level = bdd_min_level(width, height);
         int left = split_raster_data(start_width, start_width+width, start_height, end_height, w, h, raster);
         int right = split_raster_data(start_width+width, end_width, start_height, end_height, w, h, raster);
-        info("level %i, left %i, right %i, lookup %i", level, left, right, bdd_lookup(level, left, right));
+        info("%i %i level %i", width, height, level);
+        // info("level %i, left %i, right %i, lookup %i", level, left, right, bdd_lookup(level, left, right));
         return bdd_lookup(level, left, right);
     } else {
         // split height
+        // info("before %i %i", width, height);
         height = height/2;
-        level = bdd_min_level(width, height);
         int top = split_raster_data(start_width, end_width, start_height, start_height+height, w, h, raster);
         int bottom = split_raster_data(start_width, end_width, start_height+height, end_height, w, h, raster);
-        info("level %i, top %i, bottom %i lookup %i", level, top, bottom, bdd_lookup(level, top, bottom));
+        info("%i %i level %i", width, height, level);
+        // info("level %i, top %i, bottom %i lookup %i", level, top, bottom, bdd_lookup(level, top, bottom));
         return bdd_lookup(level, top, bottom);
     }
 }
