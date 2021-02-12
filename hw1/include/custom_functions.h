@@ -71,14 +71,6 @@ int equal_node_children(BDD_NODE *node1, BDD_NODE *node2);
 int equal_node(BDD_NODE *node1, BDD_NODE *node2);
 
 /**
- * Checks if a BDD NODE with left, and right values exists in bdd_hash_map using linear probing. If the node is not found, insert it into the hash map.
- * 
- * @param node  The BDD node.
- * @return 1 if found, otherwise 0.
- */
-int search_node_map(BDD_NODE *node);
-
-/**
  * Checks if a node with level, left, and right values of 0.
  * 
  * @param node The BDD node.

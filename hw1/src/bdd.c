@@ -26,25 +26,21 @@
  */
 int bdd_lookup(int level, int left, int right) {
     // TO BE IMPLEMENTED
-    // Check if arguments are in range
-    // level [0, BDD_LEVELS_MAX] 32
-    // left/right [0, BDD_NODES_MAX) 1<<20
     if (level < 0 || level > BDD_LEVELS_MAX)
         return -1;
     if (left < 0 || left >= BDD_NODES_MAX)
         return -1;
     if (right < 0 || right >= BDD_NODES_MAX)
         return -1;
-    if (left == right) // node with same children
-        return left; // return the index of child
+    if (left == right) 
+        return left;
     BDD_NODE node = {level, left, right};
-    // Check if BDD node with specified level and children exists bdd_hash_map (2097169)
+    // Check if BDD node with specified level and children exists bdd_hash_map
     int start = hash(node.left, node.right);
     int hash_index = start;
     do {
         BDD_NODE *hash_current = *(bdd_hash_map+hash_index);
         if (hash_current == NULL) {
-            // insert and break
             for (int index = BDD_NUM_LEAVES; index < BDD_NODES_MAX; index++) {
                 BDD_NODE *current = bdd_nodes+index;
                 if (null_node(current)) {
@@ -60,25 +56,6 @@ int bdd_lookup(int level, int left, int right) {
         }
         hash_index = (hash_index+1) % BDD_HASH_SIZE;
     } while (hash_index != start);
-
-    // if (search_node_map(&node)) {
-    //     // If exists search for it in bdd_nodes and return index
-    //     for (int index = BDD_NUM_LEAVES; index < BDD_NODES_MAX; index++) {
-    //         BDD_NODE *current = bdd_nodes+index;
-    //         if (equal_node(&node, current))
-    //             return index;
-    //     }
-    // } else {
-    //     // else (doesn't exist) find the next open spot in bdd nodes
-    //     for (int index = BDD_NUM_LEAVES; index < BDD_NODES_MAX; index++) {
-    //         BDD_NODE *current = bdd_nodes+index;
-    //         if (null_node(current)) {
-    //             *current = node;
-    //             return index;
-    //         }
-    //     }
-    // }
-
     return -1;
 }
 

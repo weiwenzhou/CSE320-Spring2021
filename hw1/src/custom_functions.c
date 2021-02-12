@@ -53,12 +53,9 @@ int string_to_int(char *str, int min, int max) {
 }
 
 int hash(int left, int right) {
-    // 1<<21 = 2097152 
-    // hash (20 bits approximately) 
+    // hash (20 bits approximately) 1<<21 = 2097152 
         // bits(15-0) (left and right are indices so they will trend towards 0-255)
             // attempt 1 : 8 bits left 8 bits right (doing this first)
-            // attempt 2 : sum and take 16 bits
-            // attempt 3 : ???
         // bits(19-16)
             // use bits(3-0) of the product of left%256 and right%256
     int result = 0;
@@ -75,23 +72,6 @@ int equal_node_children(BDD_NODE *node1, BDD_NODE *node2) {
 
 int equal_node(BDD_NODE *node1, BDD_NODE *node2) {
     return node1->level == node2->level && node1->left == node2->left && node1->right == node2->right;
-}
-
-int search_node_map(BDD_NODE *node) {
-    int start = hash(node->left, node->right);
-    int index = start;
-    do {
-        BDD_NODE *current = *(bdd_hash_map+index);
-        if (current == NULL) {
-            // insert and break
-            current = node;
-            return 0;
-        } else if (equal_node_children(node, current)) {
-            return 1;
-        }
-        index = (index+1) % BDD_HASH_SIZE;
-    } while (index != start);
-    return 0;
 }
 
 int null_node(BDD_NODE *node) {
