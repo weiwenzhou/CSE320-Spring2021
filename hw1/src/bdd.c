@@ -35,7 +35,8 @@ int bdd_lookup(int level, int left, int right) {
         return -1;
     if (right < 0 || right >= BDD_NODES_MAX)
         return -1;
-
+    if (left == right) // node with same children
+        return left; // return the index of child
     BDD_NODE node = {level, left, right};
     // Check if BDD node with specified level and children exists bdd_hash_map (2097169)
     int start = hash(node.left, node.right);
