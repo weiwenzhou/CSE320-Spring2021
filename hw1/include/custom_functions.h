@@ -91,3 +91,5 @@ int null_node(BDD_NODE *node);
  * @return index of BDD_NODE for the subset of raster data.
  */
 int split_raster_data(int start_width, int end_width, int start_height, int end_height, int w, int h, unsigned char *raster);
+
+int bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter);

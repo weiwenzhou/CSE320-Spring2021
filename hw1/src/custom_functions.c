@@ -106,3 +106,63 @@ int split_raster_data(int start_width, int end_width, int start_height, int end_
         return bdd_lookup(level, top, bottom);
     }
 }
+
+int bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter) {
+    if (node->level == 0) {
+        return -1;
+    } else {
+        int left = node->left;
+        int right = node->right;
+        // printf("level %i, %li, %i, %i\n", node->level, node-bdd_nodes, left, right);
+        if (left < BDD_NUM_LEAVES) {
+            if (*(bdd_index_map+left) == 0) {
+                int character = '@';
+                fputc(character, out);
+                fputc(left, out);
+                // printf("@%i\n",left);
+                *(bdd_index_map+left) = *counter;
+                (*counter)++;
+            }
+        } else {
+            bdd_serialize_helper(bdd_nodes+left,out, counter);
+        }
+        if (right < BDD_NUM_LEAVES) {
+            if (*(bdd_index_map+right) == 0) {
+                int character = '@';
+                fputc(character, out);
+                fputc(right, out);
+                // printf("@%i\n",right);
+                *(bdd_index_map+right) = *counter;
+                (*counter)++;
+            }
+        } else {
+            bdd_serialize_helper(bdd_nodes+right, out, counter);
+        }
+        char level = '@' + node->level;
+        int index = node-bdd_nodes;
+        left = *(bdd_index_map+left);
+        right = *(bdd_index_map+right);
+        fputc(level, out);
+        fputc(left & 0xff, out);
+        left = left >> 8;
+        fputc(left & 0xff, out);
+        left = left >> 8;
+        fputc(left & 0xff, out);
+        left = left >> 8;
+        fputc(left & 0xff, out);
+
+        fputc(right & 0xff, out);
+        right = right >> 8;
+        fputc(right & 0xff, out);
+        right = right >> 8;
+        fputc(right & 0xff, out);
+        right = right >> 8;
+        fputc(right & 0xff, out);
+        // printf("%c %i %i\n", level, left, right);
+        *(bdd_index_map+index) = *counter;
+        (*counter)++;
+        // printf("%li level %i\n", node-bdd_nodes, node->level);
+    }
+
+    return 0;
+}
