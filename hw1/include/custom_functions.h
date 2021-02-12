@@ -78,4 +78,16 @@ int equal_node(BDD_NODE *node1, BDD_NODE *node2);
  */
 int null_node(BDD_NODE *node);
 
+/**
+ * Divides the raster data evenly until we get a single character. A helper method for bdd_from_raster.
+ * 
+ * @param start_width The starting width position.
+ * @param end_width The ending width position.
+ * @param start_height The starting height position.
+ * @param end_height The ending height position.
+ * @param w The width of the raster data.
+ * @param h The height of the raster data.
+ * @param raster The 2D array containing the raster data.
+ * @return index of BDD_NODE for the subset of raster data.
+ */
 int split_raster_data(int start_width, int end_width, int start_height, int end_height, int w, int h, unsigned char *raster);
