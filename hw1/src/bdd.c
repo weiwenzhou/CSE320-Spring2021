@@ -20,9 +20,9 @@
 int bdd_min_level(int w, int h) {
     int width_level = 0;
     int height_level = 0;
-    while (w <= 1<<width_level) 
+    while (w > 1<<width_level) 
         width_level++;
-    while (h <= 1<<height_level)
+    while (h > 1<<height_level)
         height_level++;
     return width_level+height_level;
 }
