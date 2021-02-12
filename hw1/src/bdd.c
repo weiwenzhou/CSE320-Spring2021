@@ -17,6 +17,16 @@
 #define LEFT(np, l) ((l) > (np)->level ? (np) : bdd_nodes + (np)->left)
 #define RIGHT(np, l) ((l) > (np)->level ? (np) : bdd_nodes + (np)->right)
 
+int bdd_min_level(int w, int h) {
+    int width_level = 0;
+    int height_level = 0;
+    while (w <= 1<<width_level) 
+        width_level++;
+    while (h <= 1<<height_level)
+        height_level++;
+    return width_level+height_level;
+}
+
 /**
  * Look up, in the node table, a BDD node having the specified level and children,
  * inserting a new node if a matching node does not already exist.
