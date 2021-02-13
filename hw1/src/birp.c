@@ -43,22 +43,22 @@ int pgm_to_ascii(FILE *in, FILE *out) {
             char c = 0;
             switch (*currentChar) {
                 case 0 ... 63:
-                    printf("%c", ' ');
+                    c = ' ';
                     break;
                 case 64 ... 127:
-                    printf("%c", '.');
+                    c = '.';
                     break;
                 case 128 ... 191:
-                    printf("%c", '*');
+                    c = '*';
                     break;
                 case 192 ... 255:
-                    printf("%c", '@');
+                    c = '@';
             }
+            fputc(c, out);
             currentChar++;
         }
         printf("\n");
     }
-    printf("\n");
     return 0;
 }
 
