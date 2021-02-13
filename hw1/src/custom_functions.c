@@ -52,7 +52,7 @@ int string_to_int(char *str, int min, int max) {
         return -1;
 }
 
-int hash(int left, int right) {
+int hash(int level, int left, int right) {
     // hash (20 bits approximately) 1<<21 = 2097152 
         // bits(15-0) (left and right are indices so they will trend towards 0-255)
             // attempt 1 : 8 bits left 8 bits right (doing this first)
@@ -61,7 +61,8 @@ int hash(int left, int right) {
     int result = 0;
     result += (left % (1<<8)) << 8;
     result += (right % (1<<8));
-    result += (((left % (1<<8)) * right % (1<<8)) & 0xf) << 16;
+    // result += (((left % (1<<8)) * right % (1<<8)) & 0xf) << 16;
+    result += (level & 0xf) << 16;
 
     return result;
 }

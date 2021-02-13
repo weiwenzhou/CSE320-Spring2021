@@ -46,7 +46,7 @@ int bdd_lookup(int level, int left, int right) {
         return left;
     BDD_NODE node = {level, left, right};
     // Check if BDD node with specified level and children exists bdd_hash_map
-    int start = hash(node.left, node.right);
+    int start = hash(level, left, right);
     int hash_index = start;
     do {
         BDD_NODE *hash_current = *(bdd_hash_map+hash_index);

@@ -50,7 +50,7 @@ int string_to_int(char *str, int min, int max);
  * of the BDD node to be looked up.
  * @return 
  */
-int hash(int left, int right);
+int hash(int level, int left, int right);
 
 /**
  * Checks if two BDD node have the same left and right values.
