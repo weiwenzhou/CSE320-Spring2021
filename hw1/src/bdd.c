@@ -96,7 +96,31 @@ int bdd_serialize(BDD_NODE *node, FILE *out) {
 
 BDD_NODE *bdd_deserialize(FILE *in) {
     // TO BE IMPLEMENTED
-    return NULL;
+    int character;
+    int serial = 0;
+    while ((character = fgetc(in)) != EOF) {
+        if (character == 64) {
+            serial++;
+            *(bdd_index_map+serial) = fgetc(in);
+        } else if (character >= 'A' && character <= '`') {
+            // get left
+            int left = fgetc(in);
+            left += fgetc(in) << 8;
+            left += fgetc(in) << 16;
+            left += fgetc(in) << 24;
+            // get right
+            int right = fgetc(in);
+            right += fgetc(in) << 8;
+            right += fgetc(in) << 16;
+            right += fgetc(in) << 24;
+            serial++;
+            // info("%i %i %i", character-64, left, right);
+            character = character - '@';
+            *(bdd_index_map+serial) = bdd_lookup(character, *(bdd_index_map+left), *(bdd_index_map+right));
+        }
+        // debug("%c %o: %i", character, serial, character);
+    }
+    return bdd_nodes+*(bdd_index_map+serial);
 }
 
 unsigned char bdd_apply(BDD_NODE *node, int r, int c) {
