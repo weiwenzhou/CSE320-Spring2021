@@ -86,7 +86,9 @@ int split_raster_data(int start_width, int end_width, int start_height, int end_
     // info("first %i %i", width, height);
     if (width * height == 1) {
         // info("leaf %i, %i, %i", start_width, start_height, *(raster+start_height*h+start_width));
-        return *(raster+start_height*h+start_width); // leaf
+        if (start_height < h && start_width < w)
+            return *(raster+start_height*h+start_width); // leaf
+        return 0;
     } else if (width > height) {
         // split width
         // info("before %i %i", width, height);
