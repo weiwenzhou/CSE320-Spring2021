@@ -92,4 +92,12 @@ int null_node(BDD_NODE *node);
  */
 int split_raster_data(int start_width, int end_width, int start_height, int end_height, int w, int h, unsigned char *raster);
 
+/**
+ * A helper function for bdd_serialize (look at bdd.h for specification) that takes an int to keep track of the current serial number.
+ * 
+ * @param node  The node at the root of the BDD to be serialized.
+ * @param out  Stream on which to output the serialized BDD.
+ * @param counter A pointer to an integer tracking the current serial number
+ * @return  0 if successful, -1 if any error occurs.
+ */
 int bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter);
