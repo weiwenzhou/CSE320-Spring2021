@@ -78,7 +78,6 @@ BDD_NODE *bdd_from_raster(int w, int h, unsigned char *raster) {
     }
     square = 1<<square;
     int nodeIndex = split_raster_data(0, square, 0, square, w, h, raster);
-    info("%i", nodeIndex);
     if (nodeIndex != 0) 
         return bdd_nodes+nodeIndex;
     return NULL;

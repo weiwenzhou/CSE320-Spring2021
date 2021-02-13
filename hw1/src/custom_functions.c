@@ -57,11 +57,10 @@ int hash(int level, int left, int right) {
         // bits(15-0) (left and right are indices so they will trend towards 0-255)
             // attempt 1 : 8 bits left 8 bits right (doing this first)
         // bits(19-16)
-            // use bits(3-0) of the product of left%256 and right%256
+            // use bits(3-0) of 4 bits of level
     int result = 0;
     result += (left % (1<<8)) << 8;
     result += (right % (1<<8));
-    // result += (((left % (1<<8)) * right % (1<<8)) & 0xf) << 16;
     result += (level & 0xf) << 16;
 
     return result;
@@ -83,29 +82,19 @@ int split_raster_data(int start_width, int end_width, int start_height, int end_
     int width = end_width-start_width;
     int height = end_height-start_height;
     int level = bdd_min_level(width, height);
-    // info("first %i %i", width, height);
     if (width * height == 1) {
-        // info("leaf %i, %i, %i", start_width, start_height, *(raster+start_height*w+start_width));
         if (start_height < h && start_width < w)
-            return *(raster+start_height*w+start_width); // leaf
+            return *(raster+start_height*w+start_width);
         return 0;
     } else if (width > height) {
-        // split width
-        // info("before %i %i", width, height);
         width = width/2;
         int left = split_raster_data(start_width, start_width+width, start_height, end_height, w, h, raster);
         int right = split_raster_data(start_width+width, end_width, start_height, end_height, w, h, raster);
-        info("%i %i level %i", width, height, level);
-        // info("level %i, left %i, right %i, lookup %i", level, left, right, bdd_lookup(level, left, right));
         return bdd_lookup(level, left, right);
     } else {
-        // split height
-        // info("before %i %i", width, height);
         height = height/2;
         int top = split_raster_data(start_width, end_width, start_height, start_height+height, w, h, raster);
         int bottom = split_raster_data(start_width, end_width, start_height+height, end_height, w, h, raster);
-        info("%i %i level %i", width, height, level);
-        // info("level %i, top %i, bottom %i lookup %i", level, top, bottom, bdd_lookup(level, top, bottom));
         return bdd_lookup(level, top, bottom);
     }
 }
@@ -116,13 +105,11 @@ int bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter) {
     } else {
         int left = node->left;
         int right = node->right;
-        // printf("level %i, %li, %i, %i\n", node->level, node-bdd_nodes, left, right);
         if (left < BDD_NUM_LEAVES) {
             if (*(bdd_index_map+left) == 0) {
                 int character = '@';
                 fputc(character, out);
                 fputc(left, out);
-                debug("counter %o @%o", *counter, left);
                 *(bdd_index_map+left) = *counter;
                 (*counter)++;
             }
@@ -134,19 +121,17 @@ int bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter) {
                 int character = '@';
                 fputc(character, out);
                 fputc(right, out);
-                debug("counter %o @%o", *counter, right);
                 *(bdd_index_map+right) = *counter;
                 (*counter)++;
             }
         } else {
             bdd_serialize_helper(bdd_nodes+right, out, counter);
         }
-            char level = '@' + node->level;
-            int index = node-bdd_nodes;
+        char level = '@' + node->level;
+        int index = node-bdd_nodes;
         if (*(bdd_index_map+index) == 0) {
             left = *(bdd_index_map+left);
             right = *(bdd_index_map+right);
-            debug("counter %o, %c %o %o", *counter, level, left, right);
             fputc(level, out);
             fputc(left & 0xff, out);
             left = left >> 8;
