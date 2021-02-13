@@ -119,7 +119,7 @@ int bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter) {
                 int character = '@';
                 fputc(character, out);
                 fputc(left, out);
-                // printf("@%i\n",left);
+                debug("counter %o @%o", *counter, left);
                 *(bdd_index_map+left) = *counter;
                 (*counter)++;
             }
@@ -131,37 +131,38 @@ int bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter) {
                 int character = '@';
                 fputc(character, out);
                 fputc(right, out);
-                // printf("@%i\n",right);
+                debug("counter %o @%o", *counter, right);
                 *(bdd_index_map+right) = *counter;
                 (*counter)++;
             }
         } else {
             bdd_serialize_helper(bdd_nodes+right, out, counter);
         }
-        char level = '@' + node->level;
-        int index = node-bdd_nodes;
-        left = *(bdd_index_map+left);
-        right = *(bdd_index_map+right);
-        fputc(level, out);
-        fputc(left & 0xff, out);
-        left = left >> 8;
-        fputc(left & 0xff, out);
-        left = left >> 8;
-        fputc(left & 0xff, out);
-        left = left >> 8;
-        fputc(left & 0xff, out);
+            char level = '@' + node->level;
+            int index = node-bdd_nodes;
+        if (*(bdd_index_map+index) == 0) {
+            left = *(bdd_index_map+left);
+            right = *(bdd_index_map+right);
+            debug("counter %o, %c %o %o", *counter, level, left, right);
+            fputc(level, out);
+            fputc(left & 0xff, out);
+            left = left >> 8;
+            fputc(left & 0xff, out);
+            left = left >> 8;
+            fputc(left & 0xff, out);
+            left = left >> 8;
+            fputc(left & 0xff, out);
 
-        fputc(right & 0xff, out);
-        right = right >> 8;
-        fputc(right & 0xff, out);
-        right = right >> 8;
-        fputc(right & 0xff, out);
-        right = right >> 8;
-        fputc(right & 0xff, out);
-        // printf("%c %i %i\n", level, left, right);
-        *(bdd_index_map+index) = *counter;
-        (*counter)++;
-        // printf("%li level %i\n", node-bdd_nodes, node->level);
+            fputc(right & 0xff, out);
+            right = right >> 8;
+            fputc(right & 0xff, out);
+            right = right >> 8;
+            fputc(right & 0xff, out);
+            right = right >> 8;
+            fputc(right & 0xff, out);
+            *(bdd_index_map+index) = *counter;
+            (*counter)++;
+        }
     }
 
     return 0;
