@@ -85,12 +85,19 @@ BDD_NODE *bdd_from_raster(int w, int h, unsigned char *raster) {
 
 void bdd_to_raster(BDD_NODE *node, int w, int h, unsigned char *raster) {
     // TO BE IMPLEMENTED
-    int square = 1;
-    while (!(w <= 1<<square && h <= 1<<square)) {
-        square++;
+    // int square = 1;
+    // while (!(w <= 1<<square && h <= 1<<square)) {
+    //     square++;
+    // }
+    // square = 1<<square;
+    // fill_raster_data(node, 0, square, 0, square, w, h, raster);
+    unsigned char *current = raster;
+    for (int row = 0; row < h; row++) {
+        for (int col = 0; col < w; col++) {
+            // info("%i %i %i", row, col, bdd_apply(node, row, col));
+            *current++ = bdd_apply(node, row, col);
+        }
     }
-    square = 1<<square;
-    fill_raster_data(node, 0, square, 0, square, w, h, raster);
 }
 
 int bdd_serialize(BDD_NODE *node, FILE *out) {
@@ -134,20 +141,21 @@ unsigned char bdd_apply(BDD_NODE *node, int r, int c) {
     int mid;
     BDD_NODE *next;
     BDD_NODE *current = node;
+    int level = node->level;
+    int left = 0;
+    int top = 0;
+    int right = 1 << (level/2);
+    int bottom = 1 << (level/2);
     do {
-        int level = node->level;
-        int left = 0;
-        int top = 0;
-        int right = 2 << (level/2);
-        int bottom = 2 << (level/2);
-
         int current_level = current->level;
         int left_node = current->left;
         int right_node = current->right;
-
+        // warn("l:%i %i", current_level, level);
+        // info("%i %i %i: %i-%i, %i-%i", current_level, left_node, right_node, left, right, top, bottom);
         if (level & 1) {
             // if odd split width | 
-            mid = (right-left)/2;
+            mid = (right+left)/2;
+            // debug("width split %i vs %i", mid, c);
             if (c < mid) {
                 right = mid;
                 if (left_node < BDD_NUM_LEAVES)
@@ -161,7 +169,8 @@ unsigned char bdd_apply(BDD_NODE *node, int r, int c) {
             }
         } else {
             // else even split height -
-            mid = (bottom-top)/2;
+            mid = (bottom+top)/2;
+            // debug("height split %i vs %i", mid, r);
             if (r < mid) {
                 bottom = mid;
                 if (left_node < BDD_NUM_LEAVES)
@@ -174,14 +183,11 @@ unsigned char bdd_apply(BDD_NODE *node, int r, int c) {
                 next = bdd_nodes+right_node;
             }
         }
-        if (current_level == level) {
-            level--;
+        if (current_level == level) 
             current = next;
-        }
+        level--;
     } while (1);
-
-
-
+    
     return 0;
 }
 
