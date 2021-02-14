@@ -131,3 +131,14 @@ void fill_raster_data(BDD_NODE *node, int start_width, int end_width, int start_
  * @param raster The 2D array being filled.
  */
 void fill_region(unsigned char value, int start_width, int end_width, int start_height, int end_height, int w, int h, unsigned char *raster);
+
+/**
+ * Writes the raster data to out file.
+ * 
+ * @param out Stream to which to write the ASCII art output.
+ * @param width The width of the raster data.
+ * @param height The height of the raster data.
+ * @param raster Pointer to an array that holds the image data,
+ * stored in row-major order.
+ */
+void raster_to_ascii(FILE *out, int width, int height, unsigned char *raster);

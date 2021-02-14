@@ -37,28 +37,7 @@ int pgm_to_ascii(FILE *in, FILE *out) {
     int code = img_read_pgm(in, &width, &height, raster_data, RASTER_SIZE_MAX);
     if (code)
         return -1;
-    unsigned char *currentChar = raster_data;
-    for (int row = 0; row < height; row++) {
-        for (int col = 0; col < width; col++) {
-            char c = 0;
-            switch (*currentChar) {
-                case 0 ... 63:
-                    c = ' ';
-                    break;
-                case 64 ... 127:
-                    c = '.';
-                    break;
-                case 128 ... 191:
-                    c = '*';
-                    break;
-                case 192 ... 255:
-                    c = '@';
-            }
-            fputc(c, out);
-            currentChar++;
-        }
-        printf("\n");
-    }
+    raster_to_ascii(out, width, height, raster_data);
     return 0;
 }
 

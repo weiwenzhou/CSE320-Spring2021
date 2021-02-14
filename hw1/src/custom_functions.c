@@ -212,3 +212,28 @@ void fill_region(unsigned char value, int start_width, int end_width, int start_
         }
     }
 }
+
+void raster_to_ascii(FILE *out, int width, int height, unsigned char *raster) {
+    unsigned char *currentChar = raster;
+    for (int row = 0; row < height; row++) {
+        for (int col = 0; col < width; col++) {
+            char c = 0;
+            switch (*currentChar) {
+                case 0 ... 63:
+                    c = ' ';
+                    break;
+                case 64 ... 127:
+                    c = '.';
+                    break;
+                case 128 ... 191:
+                    c = '*';
+                    break;
+                case 192 ... 255:
+                    c = '@';
+            }
+            fputc(c, out);
+            currentChar++;
+        }
+        printf("\n");
+    }
+}
