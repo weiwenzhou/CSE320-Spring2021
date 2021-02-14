@@ -43,7 +43,13 @@ int pgm_to_ascii(FILE *in, FILE *out) {
 
 int birp_to_ascii(FILE *in, FILE *out) {
     // TO BE IMPLEMENTED
-    return -1;
+    int width, height;
+    BDD_NODE *node = img_read_birp(in, &width, &height);
+    if (node == NULL)
+        return -1;
+    bdd_to_raster(node, width, height, raster_data);
+    raster_to_ascii(out, width, height, raster_data);
+    return 0;
 }
 
 /**
