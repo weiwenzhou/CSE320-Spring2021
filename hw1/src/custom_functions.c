@@ -160,14 +160,36 @@ int fill_raster_data(BDD_NODE *node, int start_width, int end_width, int start_h
     // split node into left and right
 
     // check level 
-    // if odd split width | 
-    // else even split height -
-
-    // if left is leaf fill entire region with value of left
-
-    // else call bdd_to_raster on left
-
-    // if right is leaf fill entire region with value of right
-
-    // else call bdd_to_raster on right
+    int width = end_width-start_width;
+    int height = end_height-start_height;
+    int level = node->level;
+    int left = node->left;
+    int right = node->right;
+    if (level & 1) {
+        // if odd split width | 
+        width = width/2;
+        if (left < BDD_NUM_LEAVES) {
+            // fill entire region
+        } else {
+            fill_raster_data(bdd_nodes+left, start_width, start_width+width, start_height, end_height, h, w, raster);
+        }
+        if (right < BDD_NUM_LEAVES) {
+            // fill entire region
+        } else {
+            fill_raster_data(bdd_nodes+right, start_width+width, end_width, start_height, end_height, w, h, raster);
+        }
+    } else {
+        // else even split height -
+        height = height/2;
+        if (left < BDD_NUM_LEAVES) {
+            // fill entire region
+        } else {
+            fill_raster_data(bdd_nodes+left, start_width, end_width, start_height, start_height+height, h, w, raster);
+        }
+        if (right < BDD_NUM_LEAVES) {
+            // fill entire region
+        } else {
+            fill_raster_data(bdd_nodes+right, start_width, end_width, start_height+height, end_height, w, h, raster);
+        }
+    }
 }
