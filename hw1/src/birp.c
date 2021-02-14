@@ -23,7 +23,13 @@ int pgm_to_birp(FILE *in, FILE *out) {
 
 int birp_to_pgm(FILE *in, FILE *out) {
     // TO BE IMPLEMENTED
-    return -1;
+    int width, height;
+    BDD_NODE *node = img_read_birp(in, &width, &height);
+    if (node == NULL)
+        return -1;
+    bdd_to_raster(node, width, height, raster_data);
+    img_write_pgm(raster_data, width, height, out);
+    return 0;
 }
 
 int birp_to_birp(FILE *in, FILE *out) {
