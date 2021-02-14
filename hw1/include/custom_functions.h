@@ -103,36 +103,6 @@ int split_raster_data(int start_width, int end_width, int start_height, int end_
 int bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter);
 
 /**
- * Fills the raster data using the provided bdd node. A helper method for bdd_to_raster.
- * 
- * @param node The node at the root of the BDD to be converted to raster data.
- * @param start_width The starting width position.
- * @param end_width The ending width position.
- * @param start_height The starting height position.
- * @param end_height The ending height position.
- * @param w The width of the raster data.
- * @param h The height of the raster data.
- * @param raster The 2D array being filled.
- */
-void fill_raster_data(BDD_NODE *node, int start_width, int end_width, int start_height, int end_height, int w, int h, unsigned char *raster);
-
-/**
- * Fills the area in raster data define by the parameters with the value given.
- * The width is define by start_width and end_width/w (whichever is smaller).
- * The height is define by start_height and end_height/h (whichever is smaller).
- * 
- * @param value The value of the region.
- * @param start_width The starting width position.
- * @param end_width The ending width position.
- * @param start_height The starting height position.
- * @param end_height The ending height position.
- * @param w The width of the raster data.
- * @param h The height of the raster data.
- * @param raster The 2D array being filled.
- */
-void fill_region(unsigned char value, int start_width, int end_width, int start_height, int end_height, int w, int h, unsigned char *raster);
-
-/**
  * Writes the raster data to out file.
  * 
  * @param out Stream to which to write the ASCII art output.

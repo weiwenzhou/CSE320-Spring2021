@@ -85,12 +85,6 @@ BDD_NODE *bdd_from_raster(int w, int h, unsigned char *raster) {
 
 void bdd_to_raster(BDD_NODE *node, int w, int h, unsigned char *raster) {
     // TO BE IMPLEMENTED
-    // int square = 1;
-    // while (!(w <= 1<<square && h <= 1<<square)) {
-    //     square++;
-    // }
-    // square = 1<<square;
-    // fill_raster_data(node, 0, square, 0, square, w, h, raster);
     unsigned char *current = raster;
     for (int row = 0; row < h; row++) {
         for (int col = 0; col < w; col++) {
