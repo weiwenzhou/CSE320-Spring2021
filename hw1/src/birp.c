@@ -28,7 +28,16 @@ int birp_to_pgm(FILE *in, FILE *out) {
 
 int birp_to_birp(FILE *in, FILE *out) {
     // TO BE IMPLEMENTED
-    return -1;
+    int width, height;
+    BDD_NODE *node = img_read_birp(in, &width, &height);
+    if (node == NULL)
+        return -1;
+    // reset bdd_index_map
+    for (int i = 0; i < BDD_NODES_MAX; i++) {
+        *(bdd_index_map+i) = 0;
+    }
+    img_write_birp(node, width, height, out);
+    return 0;
 }
 
 int pgm_to_ascii(FILE *in, FILE *out) {
