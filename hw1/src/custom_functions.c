@@ -156,7 +156,7 @@ int bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter) {
     return 0;
 }
 
-int fill_raster_data(BDD_NODE *node, int start_width, int end_width, int start_height, int end_height, int w, int h, unsigned char *raster) {
+void fill_raster_data(BDD_NODE *node, int start_width, int end_width, int start_height, int end_height, int w, int h, unsigned char *raster) {
     // split node into left and right
 
     // check level 
