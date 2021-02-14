@@ -131,6 +131,17 @@ BDD_NODE *bdd_deserialize(FILE *in) {
 
 unsigned char bdd_apply(BDD_NODE *node, int r, int c) {
     // TO BE IMPLEMENTED
+    // get the initial level of the node
+    // get the starting width/height from the level
+
+    // level is odd 
+    // if split width | 
+    // find which half has c in it
+
+    // else even split height -
+    // find which half has r in it
+
+
     return 0;
 }
 
