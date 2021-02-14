@@ -162,34 +162,45 @@ void fill_raster_data(BDD_NODE *node, int start_width, int end_width, int start_
     // check level 
     int width = end_width-start_width;
     int height = end_height-start_height;
+    int actual_level = bdd_min_level(width, height);
     int level = node->level;
     int left = node->left;
     int right = node->right;
-    if (level & 1) {
+    if (actual_level & 1) {
         // if odd split width | 
         width = width/2;
-        if (left < BDD_NUM_LEAVES) {
-            fill_region(left, start_width, start_width+width, start_height, end_height, h, w, raster);
+        if (level != actual_level) {
+            fill_raster_data(node, start_width, start_width+width, start_height, end_height, h, w, raster);
+            fill_raster_data(node, start_width+width, end_width, start_height, end_height, w, h, raster);
         } else {
-            fill_raster_data(bdd_nodes+left, start_width, start_width+width, start_height, end_height, h, w, raster);
-        }
-        if (right < BDD_NUM_LEAVES) {
-            fill_region(right, start_width+width, end_width, start_height, end_height, w, h, raster);
-        } else {
-            fill_raster_data(bdd_nodes+right, start_width+width, end_width, start_height, end_height, w, h, raster);
+            if (left < BDD_NUM_LEAVES) {
+                fill_region(left, start_width, start_width+width, start_height, end_height, h, w, raster);
+            } else {
+                fill_raster_data(bdd_nodes+left, start_width, start_width+width, start_height, end_height, h, w, raster);
+            }
+            if (right < BDD_NUM_LEAVES) {
+                fill_region(right, start_width+width, end_width, start_height, end_height, w, h, raster);
+            } else {
+                fill_raster_data(bdd_nodes+right, start_width+width, end_width, start_height, end_height, w, h, raster);
+            }
         }
     } else {
         // else even split height -
         height = height/2;
-        if (left < BDD_NUM_LEAVES) {
-            fill_region(left, start_width, end_width, start_height, start_height+height, h, w, raster);
+        if (level != actual_level) {
+            fill_raster_data(node, start_width, end_width, start_height, start_height+height, h, w, raster);
+            fill_raster_data(node, start_width, end_width, start_height+height, end_height, w, h, raster);
         } else {
-            fill_raster_data(bdd_nodes+left, start_width, end_width, start_height, start_height+height, h, w, raster);
-        }
-        if (right < BDD_NUM_LEAVES) {
-            fill_region(right, start_width, end_width, start_height+height, end_height, w, h, raster);
-        } else {
-            fill_raster_data(bdd_nodes+right, start_width, end_width, start_height+height, end_height, w, h, raster);
+            if (left < BDD_NUM_LEAVES) {
+                fill_region(left, start_width, end_width, start_height, start_height+height, h, w, raster);
+            } else {
+                fill_raster_data(bdd_nodes+left, start_width, end_width, start_height, start_height+height, h, w, raster);
+            }
+            if (right < BDD_NUM_LEAVES) {
+                fill_region(right, start_width, end_width, start_height+height, end_height, w, h, raster);
+            } else {
+                fill_raster_data(bdd_nodes+right, start_width, end_width, start_height+height, end_height, w, h, raster);
+            }
         }
     }
 }
