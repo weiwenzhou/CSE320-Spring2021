@@ -130,4 +130,4 @@ void fill_raster_data(BDD_NODE *node, int start_width, int end_width, int start_
  * @param h The height of the raster data.
  * @param raster The 2D array being filled.
  */
-void fill_region(unsigned char value, int start_width, int end_width, int start_height, int end_height, int w, int h, unsigned char *raster) {
+void fill_region(unsigned char value, int start_width, int end_width, int start_height, int end_height, int w, int h, unsigned char *raster);
