@@ -158,12 +158,12 @@ unsigned char bdd_apply(BDD_NODE *node, int r, int c) {
             // debug("width split %i vs %i", mid, c);
             if (c < mid) {
                 right = mid;
-                if (left_node < BDD_NUM_LEAVES)
+                if (left_node < BDD_NUM_LEAVES && level == current_level)
                     return left_node;
                 next = bdd_nodes+left_node;
             } else {
                 left = mid;
-                if (right_node < BDD_NUM_LEAVES)
+                if (right_node < BDD_NUM_LEAVES && level == current_level)
                     return right_node;
                 next = bdd_nodes+right_node;
             }
@@ -173,12 +173,12 @@ unsigned char bdd_apply(BDD_NODE *node, int r, int c) {
             // debug("height split %i vs %i", mid, r);
             if (r < mid) {
                 bottom = mid;
-                if (left_node < BDD_NUM_LEAVES)
+                if (left_node < BDD_NUM_LEAVES && level == current_level)
                     return left_node;
                 next = bdd_nodes+left_node;
             } else {
                 top = mid;
-                if (right_node < BDD_NUM_LEAVES)
+                if (right_node < BDD_NUM_LEAVES && level == current_level)
                     return right_node;
                 next = bdd_nodes+right_node;
             }
