@@ -131,15 +131,55 @@ BDD_NODE *bdd_deserialize(FILE *in) {
 
 unsigned char bdd_apply(BDD_NODE *node, int r, int c) {
     // TO BE IMPLEMENTED
-    // get the initial level of the node
-    // get the starting width/height from the level
+    int mid;
+    BDD_NODE *next;
+    BDD_NODE *current = node;
+    do {
+        int level = node->level;
+        int left = 0;
+        int top = 0;
+        int right = 2 << (level/2);
+        int bottom = 2 << (level/2);
 
-    // level is odd 
-    // if split width | 
-    // find which half has c in it
+        int current_level = current->level;
+        int left_node = current->left;
+        int right_node = current->right;
 
-    // else even split height -
-    // find which half has r in it
+        if (level & 1) {
+            // if odd split width | 
+            mid = (right-left)/2;
+            if (c < mid) {
+                right = mid;
+                if (left_node < BDD_NUM_LEAVES)
+                    return left_node;
+                next = bdd_nodes+left_node;
+            } else {
+                left = mid;
+                if (right_node < BDD_NUM_LEAVES)
+                    return right_node;
+                next = bdd_nodes+right_node;
+            }
+        } else {
+            // else even split height -
+            mid = (bottom-top)/2;
+            if (r < mid) {
+                bottom = mid;
+                if (left_node < BDD_NUM_LEAVES)
+                    return left_node;
+                next = bdd_nodes+left_node;
+            } else {
+                top = mid;
+                if (right_node < BDD_NUM_LEAVES)
+                    return right_node;
+                next = bdd_nodes+right_node;
+            }
+        }
+        if (current_level == level) {
+            level--;
+            current = next;
+        }
+    } while (1);
+
 
 
     return 0;
