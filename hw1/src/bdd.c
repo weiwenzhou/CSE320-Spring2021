@@ -85,19 +85,12 @@ BDD_NODE *bdd_from_raster(int w, int h, unsigned char *raster) {
 
 void bdd_to_raster(BDD_NODE *node, int w, int h, unsigned char *raster) {
     // TO BE IMPLEMENTED
-    // split node into left and right
-
-    // check level 
-    // if odd split width | 
-    // else even split height -
-
-    // if left is leaf fill entire region with value of left
-
-    // else call bdd_to_raster on left
-
-    // if right is leaf fill entire region with value of right
-
-    // else call bdd_to_raster on right
+    int square = 1;
+    while (!(w <= 1<<square && h <= 1<<square)) {
+        square++;
+    }
+    square = 1<<square;
+    fill_raster_data(node, 0, square, 0, square, w, h, raster);
 }
 
 int bdd_serialize(BDD_NODE *node, FILE *out) {

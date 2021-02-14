@@ -101,3 +101,17 @@ int split_raster_data(int start_width, int end_width, int start_height, int end_
  * @return  0 if successful, -1 if any error occurs.
  */
 int bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter);
+
+/**
+ * Fills the raster data using the provided bdd node. A helper method for bdd_to_raster.
+ * 
+ * @param node The node at the root of the BDD to be converted to raster data.
+ * @param start_width The starting width position.
+ * @param end_width The ending width position.
+ * @param start_height The starting height position.
+ * @param end_height The ending height position.
+ * @param w The width of the raster data.
+ * @param h The height of the raster data.
+ * @param raster The 2D array being filled.
+ */
+void fill_raster_data(BDD_NODE *node, int start_width, int end_width, int start_height, int end_height, int w, int h, unsigned char *raster);
