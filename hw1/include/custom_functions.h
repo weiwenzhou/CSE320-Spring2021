@@ -89,7 +89,7 @@ int null_node(BDD_NODE *node);
  * @param w The width of the raster data.
  * @param h The height of the raster data.
  * @param raster The 2D array containing the raster data.
- * @return index of BDD_NODE for the subset of raster data.
+ * @return index of BDD_NODE for the subset of raster data or -1 if num of nodes exceeds BDD_NODES_MAX.
  */
 int split_raster_data(int start_width, int end_width, int start_height, int end_height, int w, int h, unsigned char *raster);
 
