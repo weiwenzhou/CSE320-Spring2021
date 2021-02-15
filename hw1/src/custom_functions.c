@@ -99,7 +99,7 @@ int split_raster_data(int start_width, int end_width, int start_height, int end_
     }
 }
 
-int bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter) {
+void bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter) {
     if (node->level == 0) {
         int index = node-bdd_nodes;
         if (*(bdd_index_map+index) == 0) {
@@ -109,7 +109,6 @@ int bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter) {
                 *(bdd_index_map+index) = *counter;
                 (*counter)++;
             }
-        return -1;
     } else {
         int left = node->left;
         int right = node->right;
@@ -140,8 +139,6 @@ int bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter) {
             (*counter)++;
         }
     }
-
-    return 0;
 }
 
 void raster_to_ascii(FILE *out, int width, int height, unsigned char *raster) {

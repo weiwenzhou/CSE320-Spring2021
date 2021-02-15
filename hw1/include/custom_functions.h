@@ -99,9 +99,8 @@ int split_raster_data(int start_width, int end_width, int start_height, int end_
  * @param node  The node at the root of the BDD to be serialized.
  * @param out  Stream on which to output the serialized BDD.
  * @param counter A pointer to an integer tracking the current serial number
- * @return  0 if successful, -1 if any error occurs.
  */
-int bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter);
+void bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter);
 
 /**
  * Writes the raster data to out file.
