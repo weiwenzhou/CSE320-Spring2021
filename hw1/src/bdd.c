@@ -99,9 +99,11 @@ void bdd_to_raster(BDD_NODE *node, int w, int h, unsigned char *raster) {
 
 int bdd_serialize(BDD_NODE *node, FILE *out) {
     // TO BE IMPLEMENTED
+    if (node == NULL)
+        return -1;
     int counter = 1;
     bdd_serialize_helper(node, out, &counter);
-    return -1;
+    return 0;
 }
 
 BDD_NODE *bdd_deserialize(FILE *in) {
