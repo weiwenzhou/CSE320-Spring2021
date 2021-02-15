@@ -140,6 +140,8 @@ unsigned char bdd_apply(BDD_NODE *node, int r, int c) {
     int top = 0;
     int right = 1 << (level/2);
     int bottom = 1 << (level/2);
+    if (level == 0)
+        return node-bdd_nodes;
     do {
         int current_level = current->level;
         int left_node = current->left;
