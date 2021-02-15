@@ -113,28 +113,8 @@ int bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter) {
     } else {
         int left = node->left;
         int right = node->right;
-        if (left < BDD_NUM_LEAVES) {
-            if (*(bdd_index_map+left) == 0) {
-                int character = '@';
-                fputc(character, out);
-                fputc(left, out);
-                *(bdd_index_map+left) = *counter;
-                (*counter)++;
-            }
-        } else {
-            bdd_serialize_helper(bdd_nodes+left,out, counter);
-        }
-        if (right < BDD_NUM_LEAVES) {
-            if (*(bdd_index_map+right) == 0) {
-                int character = '@';
-                fputc(character, out);
-                fputc(right, out);
-                *(bdd_index_map+right) = *counter;
-                (*counter)++;
-            }
-        } else {
-            bdd_serialize_helper(bdd_nodes+right, out, counter);
-        }
+        bdd_serialize_helper(bdd_nodes+left,out, counter);
+        bdd_serialize_helper(bdd_nodes+right, out, counter);
         char level = '@' + node->level;
         int index = node-bdd_nodes;
         if (*(bdd_index_map+index) == 0) {
