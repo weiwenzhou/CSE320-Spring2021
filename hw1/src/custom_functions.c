@@ -101,6 +101,14 @@ int split_raster_data(int start_width, int end_width, int start_height, int end_
 
 int bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter) {
     if (node->level == 0) {
+        int index = node-bdd_nodes;
+        if (*(bdd_index_map+index) == 0) {
+                int character = '@';
+                fputc(character, out);
+                fputc(index, out);
+                *(bdd_index_map+index) = *counter;
+                (*counter)++;
+            }
         return -1;
     } else {
         int left = node->left;
