@@ -61,6 +61,7 @@ int bdd_lookup(int level, int left, int right) {
                     return index;
                 }
             }
+            return -1;
         } else if (equal_node(&node, hash_current)) {
             return hash_current - bdd_nodes;
         }
