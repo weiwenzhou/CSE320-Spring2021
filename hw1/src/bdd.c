@@ -74,7 +74,7 @@ BDD_NODE *bdd_from_raster(int w, int h, unsigned char *raster) {
     // find the min d for w<=2^d and h<=2^d
     if (w <= 0 || w <= 0)
         return NULL;
-    int square = 1;
+    int square = 0;
     while (!(w <= 1<<square && h <= 1<<square)) {
         square++;
     }
