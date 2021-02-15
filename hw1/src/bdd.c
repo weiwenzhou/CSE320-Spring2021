@@ -187,6 +187,17 @@ unsigned char bdd_apply(BDD_NODE *node, int r, int c) {
 
 BDD_NODE *bdd_map(BDD_NODE *node, unsigned char (*func)(unsigned char)) {
     // TO BE IMPLEMENTED
+    // take node and check children
+    // left
+    // if left is leaf then apply the function else keep breaking down
+
+    // right
+    // if right is leaf then apply the function else keep breaking down
+
+    // bdd_lookup with level and new leaf and right (returns index)
+
+    // return node
+
     return NULL;
 }
 
