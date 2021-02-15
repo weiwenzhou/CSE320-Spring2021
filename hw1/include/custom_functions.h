@@ -44,6 +44,7 @@ int string_to_int(char *str, int min, int max);
 /**
  * Returns a hash using level and indices of left and right bdd_nodes
  * 
+ * @param level The level of the bdd_nodes.
  * @param left  The index, in the bdd_nodes array, of the left (i.e. "0") child
  * of the BDD node to be looked up.
  * @param right  The index, in the bdd_nodes array, of the right (i.e. "1") child
