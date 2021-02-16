@@ -172,5 +172,5 @@ unsigned char complement(unsigned char c) {
 
 unsigned char cap_pixel(unsigned char c) {
     int t = (global_options & 0xff0000) >> 16;
-    return t>=c ? 255:0;
+    return c>=t ? 255:0;
 }

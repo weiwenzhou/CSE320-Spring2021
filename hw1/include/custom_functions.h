@@ -126,6 +126,6 @@ unsigned char complement(unsigned char c);
  * The threshold is contain in bits 16-23 in global options
  * 
  * @param c The 8 bit char
- * @returns 255 if c <= threshold, otherwise 0
+ * @returns 255 if c >= threshold, otherwise 0
  */ 
 unsigned char cap_pixel(unsigned char c);
