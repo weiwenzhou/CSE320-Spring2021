@@ -120,3 +120,12 @@ void raster_to_ascii(FILE *out, int width, int height, unsigned char *raster);
  * @return the complement. 
  */
 unsigned char complement(unsigned char c);
+
+/**
+ * Returns 255 (white) if the char is greater than or equal to the threshold or 0 (black). 
+ * The threshold is contain in bits 16-23 in global options
+ * 
+ * @param c The 8 bit char
+ * @returns 255 if c <= threshold, otherwise 0
+ */ 
+unsigned char cap_pixel(unsigned char c);

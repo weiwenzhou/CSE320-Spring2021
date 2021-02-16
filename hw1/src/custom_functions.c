@@ -169,3 +169,8 @@ void raster_to_ascii(FILE *out, int width, int height, unsigned char *raster) {
 unsigned char complement(unsigned char c) {
     return ~c;
 }
+
+unsigned char cap_pixel(unsigned char c) {
+    int t = (global_options & 0xff0000) >> 16;
+    return t>=c ? 255:0;
+}

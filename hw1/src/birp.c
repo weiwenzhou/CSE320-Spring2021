@@ -47,6 +47,9 @@ int birp_to_birp(FILE *in, FILE *out) {
         case 1:
             node = bdd_map(node, complement);
             break;
+        case 2:
+            node = bdd_map(node, cap_pixel);
+            break;
     }
     img_write_birp(node, width, height, out);
     return 0;
