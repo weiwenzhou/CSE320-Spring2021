@@ -264,5 +264,12 @@ BDD_NODE *bdd_rotate(BDD_NODE *node, int level) {
 
 BDD_NODE *bdd_zoom(BDD_NODE *node, int level, int factor) {
     // TO BE IMPLEMENTED
+    // if node is leaf
+        // return itself
+
+    // zoom left and right
+    // left = zoom(left, level-1, factor)
+    // right = zoom(right, level-1, factor)
+    // return bdd_lookup(node->level+factor, left, right)
     return NULL;
 }
