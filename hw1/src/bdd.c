@@ -207,6 +207,25 @@ BDD_NODE *bdd_map(BDD_NODE *node, unsigned char (*func)(unsigned char)) {
 
 BDD_NODE *bdd_rotate(BDD_NODE *node, int level) {
     // TO BE IMPLEMENTED
+    // if node level = 0
+        // return the node
+
+    // compare node level with level
+    // 3 possibilities
+    // 1. node_level = level
+        // get the 4 quadrants and rotate counter clockwise
+        // top_left -> bottom_left
+        // bottom_left -> bottom_right
+        // bottom_right -> top_right
+        // top_right -> top_left
+        // new_top = (level-1, top_right + bottom_right)
+        // new_bottom = (level-1, top_left + bottom_left)
+        // return (level, new_top, new_bottom)
+    // 2. node_level = level-1
+        // get the left and right create a top and bottom with that
+        // return (level, right, left);
+    // 3. node_level <= level-2
+        // return bdd_rotate(node, level-2);
     return NULL;
 }
 
