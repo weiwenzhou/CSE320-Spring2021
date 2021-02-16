@@ -58,6 +58,8 @@ int birp_to_birp(FILE *in, FILE *out) {
             break;
         case 4:
             node = bdd_rotate(node, bdd_min_level(square, square));
+            width = square;
+            height = square;
             break;
     }
     img_write_birp(node, width, height, out);
