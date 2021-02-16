@@ -112,3 +112,11 @@ void bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter);
  * stored in row-major order.
  */
 void raster_to_ascii(FILE *out, int width, int height, unsigned char *raster);
+
+/**
+ * Returns the complement of the bits of the char.
+ * 
+ * @param c The 8 bit char.
+ * @return the complement. 
+ */
+unsigned char complement(unsigned char c);

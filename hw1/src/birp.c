@@ -42,6 +42,12 @@ int birp_to_birp(FILE *in, FILE *out) {
     for (int i = 0; i < BDD_NODES_MAX; i++) {
         *(bdd_index_map+i) = 0;
     }
+    int transformation = (global_options & 0xf00) >> 8;
+    switch (transformation) {
+        case 1:
+            node = bdd_map(node, complement);
+            break;
+    }
     img_write_birp(node, width, height, out);
     return 0;
 }

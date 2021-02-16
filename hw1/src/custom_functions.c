@@ -165,3 +165,7 @@ void raster_to_ascii(FILE *out, int width, int height, unsigned char *raster) {
         printf("\n");
     }
 }
+
+unsigned char complement(unsigned char c) {
+    return ~c;
+}
