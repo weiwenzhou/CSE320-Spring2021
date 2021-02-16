@@ -214,11 +214,12 @@ BDD_NODE *bdd_rotate(BDD_NODE *node, int level) {
     }
     if (node_level == level) {
         int top_left, top_right;
+        BDD_NODE *top = bdd_nodes+node->left;
+        BDD_NODE *bottom = bdd_nodes+node->right;
         if (node->left < BDD_NUM_LEAVES) {
             top_left = node->left;
             top_right = node->left;
         } else {
-            BDD_NODE *top = bdd_nodes+node->left;
             top_left = top->left;
             top_right = top->right;
         }
@@ -227,20 +228,30 @@ BDD_NODE *bdd_rotate(BDD_NODE *node, int level) {
             bottom_left = node->right;
             bottom_right = node->right;
         } else {
-            BDD_NODE *bottom = bdd_nodes+node->right;
             bottom_left = bottom->left;
             bottom_right = bottom->right;
 
         }
         // debug("index %li", node-bdd_nodes);
-        // info("split 4| %i - %i %i %i %i", level,top_left, top_right, bottom_left, bottom_right);
-        int new_top_left = bdd_rotate(bdd_nodes+top_right, level-2)-bdd_nodes;
-        int new_top_right = bdd_rotate(bdd_nodes+bottom_right, level-2)-bdd_nodes;
-        int new_top = bdd_lookup(level-1, new_top_left, new_top_right);
-        
-        int new_bottom_left = bdd_rotate(bdd_nodes+top_left, level-2)-bdd_nodes;
-        int new_bottom_right = bdd_rotate(bdd_nodes+bottom_left, level-2)-bdd_nodes;
-        int new_bottom = bdd_lookup(level-1, new_bottom_left, new_bottom_right);
+        int new_top_left, new_top_right, new_top, new_bottom_left, new_bottom_right, new_bottom;
+        if (top->level == level-1) 
+            new_top_left = bdd_rotate(bdd_nodes+top_right, level-2)-bdd_nodes;
+        else 
+            new_top_left = bdd_rotate(top, level-2)-bdd_nodes;
+        if (bottom->level == level-1)
+            new_top_right = bdd_rotate(bdd_nodes+bottom_right, level-2)-bdd_nodes;
+        else
+            new_top_right = bdd_rotate(bottom, level-2)-bdd_nodes;
+        new_top = bdd_lookup(level-1, new_top_left, new_top_right);
+        if (top->level == level-1)
+            new_bottom_left = bdd_rotate(bdd_nodes+top_left, level-2)-bdd_nodes;
+        else
+            new_bottom_left = bdd_rotate(top, level-2)-bdd_nodes;
+        if (bottom->level == level-1)
+            new_bottom_right = bdd_rotate(bdd_nodes+bottom_left, level-2)-bdd_nodes;
+        else
+            new_bottom_right = bdd_rotate(bottom, level-2)-bdd_nodes;
+        new_bottom = bdd_lookup(level-1, new_bottom_left, new_bottom_right);
         return bdd_nodes+bdd_lookup(level, new_top, new_bottom);
     } else if (node_level == level-1) {
         int new_top = bdd_rotate(bdd_nodes+(node->right), level-2)-bdd_nodes;
