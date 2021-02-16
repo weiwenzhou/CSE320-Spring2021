@@ -42,6 +42,12 @@ int birp_to_birp(FILE *in, FILE *out) {
     for (int i = 0; i < BDD_NODES_MAX; i++) {
         *(bdd_index_map+i) = 0;
     }
+    int square = 0;
+    while (!(width <= 1<<square && height <= 1<<square)) {
+        square++;
+    }
+    square = 1<<square;
+
     int transformation = (global_options & 0xf00) >> 8;
     switch (transformation) {
         case 1:
@@ -49,6 +55,9 @@ int birp_to_birp(FILE *in, FILE *out) {
             break;
         case 2:
             node = bdd_map(node, cap_pixel);
+            break;
+        case 4:
+            node = bdd_rotate(node, bdd_min_level(square, square));
             break;
     }
     img_write_birp(node, width, height, out);
