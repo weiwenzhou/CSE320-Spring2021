@@ -194,18 +194,15 @@ unsigned char bdd_apply(BDD_NODE *node, int r, int c) {
 
 BDD_NODE *bdd_map(BDD_NODE *node, unsigned char (*func)(unsigned char)) {
     // TO BE IMPLEMENTED
-    // take node and check children
-    // left
-    // if left is leaf then apply the function else keep breaking down
-
-    // right
-    // if right is leaf then apply the function else keep breaking down
-
-    // bdd_lookup with level and new leaf and right (returns index)
-
-    // return node
-
-    return NULL;
+    int level = node->level;
+    if (level == 0)
+        return bdd_nodes+func(node-bdd_nodes);
+    int left = node->left;
+    int right = node->right;
+    left = bdd_map(bdd_nodes+left, func)-bdd_nodes;
+    right = bdd_map(bdd_nodes+right, func)-bdd_nodes;
+    int index = bdd_lookup(level, left, right);
+    return bdd_nodes+index;
 }
 
 BDD_NODE *bdd_rotate(BDD_NODE *node, int level) {
