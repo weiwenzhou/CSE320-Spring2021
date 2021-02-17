@@ -47,6 +47,7 @@ int birp_to_birp(FILE *in, FILE *out) {
         square++;
     }
     square = 1<<square;
+    char factor;
 
     int transformation = (global_options & 0xf00) >> 8;
     switch (transformation) {
@@ -55,6 +56,21 @@ int birp_to_birp(FILE *in, FILE *out) {
             break;
         case 2:
             node = bdd_map(node, cap_pixel);
+            break;
+        case 3:
+            factor = (global_options & 0xff0000) >> 16;
+            // info("%i", factor);
+            // info("%li %i %i %i", node-bdd_nodes, node->level, width, height);
+            node = bdd_zoom(node, bdd_min_level(square, square), factor);
+            if (factor > 0) {
+                width = width << factor;
+                height = height << factor;
+            } else {
+                width = width >> -factor;
+                height = height >> -factor;
+            }
+            // debug("%i", square<<factor);
+            // info("%li %i %i %i", node-bdd_nodes, node->level, width, height);
             break;
         case 4:
             node = bdd_rotate(node, bdd_min_level(square, square));
