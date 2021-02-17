@@ -273,16 +273,17 @@ BDD_NODE *bdd_zoom(BDD_NODE *node, int level, int factor) {
     int current_level = node->level;
     int left = node->left;
     int right = node->right;
-    if (f < 0 && current_level+f == 0) {
+    if (f < 0 && current_level+f <= 0) {
+        // warn("HERE? %i", current_level);
         if (node-bdd_nodes == 0) 
             return node;
         else
             return bdd_nodes+255;
     } else {
-        // info("%li %i %i", node-bdd_nodes,left, right);
+        // info("%li %i %i %i", node-bdd_nodes, current_level, left, right);
         left = bdd_zoom(bdd_nodes+left, level, factor)-bdd_nodes;
         right = bdd_zoom(bdd_nodes+right, level, factor)-bdd_nodes;
-        // debug("%i %i %i %i", current_level+factor, left, right, bdd_lookup(current_level+factor, left, right));
+        // debug("%i %i %i %i", current_level+f, left, right, bdd_lookup(current_level+f, left, right));
         return bdd_nodes+bdd_lookup(current_level+f, left, right);
     }
    return NULL;
