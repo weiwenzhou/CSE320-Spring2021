@@ -46,7 +46,7 @@ int main(int argc, char **argv)
         else
             return EXIT_SUCCESS;
     }
-    if (global_options == 0x22) {
+    if ((global_options & 0xff) == 0x22) {
         if (birp_to_birp(stdin, stdout))
             return EXIT_FAILURE;
         else
