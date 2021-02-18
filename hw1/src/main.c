@@ -3,9 +3,6 @@
 
 #include "const.h"
 #include "debug.h"
-#include "bdd.h"
-#include "custom_functions.h"
-#include "image.h"
 
 #ifdef _STRING_H
 #error "Do not #include <string.h>. You will get a ZERO."
