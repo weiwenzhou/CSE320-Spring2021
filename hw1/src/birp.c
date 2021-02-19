@@ -25,7 +25,7 @@ int birp_to_pgm(FILE *in, FILE *out) {
     // TO BE IMPLEMENTED
     int width, height;
     BDD_NODE *node = img_read_birp(in, &width, &height);
-    if (node == NULL)
+    if (node == NULL || width*height*sizeof(unsigned char) > RASTER_SIZE_MAX)
         return -1;
     bdd_to_raster(node, width, height, raster_data);
     img_write_pgm(raster_data, width, height, out);
@@ -96,7 +96,7 @@ int birp_to_ascii(FILE *in, FILE *out) {
     // TO BE IMPLEMENTED
     int width, height;
     BDD_NODE *node = img_read_birp(in, &width, &height);
-    if (node == NULL)
+    if (node == NULL || width*height*sizeof(unsigned char) > RASTER_SIZE_MAX)
         return -1;
     bdd_to_raster(node, width, height, raster_data);
     raster_to_ascii(out, width, height, raster_data);
