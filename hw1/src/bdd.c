@@ -278,10 +278,7 @@ BDD_NODE *bdd_zoom(BDD_NODE *node, int level, int factor) {
     int right = node->right;
     if (f < 0 && current_level+f <= 0) {
         // warn("HERE? %i", current_level);
-        if (node-bdd_nodes == 0) 
-            return node;
-        else
-            return bdd_nodes+255;
+        return (node == bdd_nodes) ? node:(bdd_nodes+255);
     } else {
         // info("%li %i %i %i", node-bdd_nodes, current_level, left, right);
         left = bdd_zoom(bdd_nodes+left, level, factor)-bdd_nodes;
