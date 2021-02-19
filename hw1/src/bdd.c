@@ -89,10 +89,13 @@ BDD_NODE *bdd_from_raster(int w, int h, unsigned char *raster) {
 void bdd_to_raster(BDD_NODE *node, int w, int h, unsigned char *raster) {
     // TO BE IMPLEMENTED
     unsigned char *current = raster;
+    int level = node->level;
+    int width_bound = 1 << (level-(level/2));
+    int height_bound = 1 << (level/2);
     for (int row = 0; row < h; row++) {
         for (int col = 0; col < w; col++) {
             // info("%i %i %i", row, col, bdd_apply(node, row, col));
-            *current++ = bdd_apply(node, row, col);
+            *current++ = bdd_apply(node, row % height_bound, col % width_bound);
         }
     }
 }
@@ -143,7 +146,7 @@ unsigned char bdd_apply(BDD_NODE *node, int r, int c) {
     int level = node->level;
     int left = 0;
     int top = 0;
-    int right = 1 << (level/2);
+    int right = 1 << (level-(level/2));
     int bottom = 1 << (level/2);
     if (level == 0)
         return node-bdd_nodes;
