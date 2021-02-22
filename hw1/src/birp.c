@@ -121,9 +121,13 @@ int birp_to_ascii(FILE *in, FILE *out) {
  */
 int validargs(int argc, char **argv) {
     // TO BE IMPLEMENTED DONE
-    // check if there are flags (argc > 1)
-    if (argc <= 1)
+    global_options = 0x00000022; // default global_option 0x00000022 (birp birp)
+    // check if there are flags (argc > 1) 
+    if (argc < 1)
         return invalidargs_return();
+    // bin/birp with no flag shoud apply indentity transformation with birp to birp
+    if (argc == 1)
+        return 0;
     // check if the first flag is -h 
     if (equal(*(argv+1), "-h")) {
         global_options = HELP_OPTION;
@@ -136,7 +140,6 @@ int validargs(int argc, char **argv) {
     int io_search_done = 0;
     int input = 0;
     int output = 0;
-    global_options = 0x00000022; // default global_option 0x00000022 (birp birp)
     for (int index = 1; index < argc; index++) {
         char *flag = *(argv+index);
         if (equal(flag, "-i")) {
