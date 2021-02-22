@@ -18,18 +18,12 @@
 
 int main(int argc, char **argv)
 {
-    if(validargs(argc, argv)) {
-        debug("exit failure");
-        debug("0x%X",global_options);
+    if(validargs(argc, argv)) 
         USAGE(*argv, EXIT_FAILURE);
-    }
     // Placeholder for the checking value
     debug("0x%X",global_options);
-    
-    if(global_options & HELP_OPTION) {
-        debug("exit success");
+    if(global_options & HELP_OPTION)
         USAGE(*argv, EXIT_SUCCESS);
-    }
     // TO BE IMPLEMENTED
     if (global_options == 0x21) {
         if (pgm_to_birp(stdin, stdout))
@@ -61,7 +55,6 @@ int main(int argc, char **argv)
         else
             return EXIT_SUCCESS;
     }
-    debug("TBA");
     return EXIT_FAILURE;
 }
 
