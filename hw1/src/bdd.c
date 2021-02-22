@@ -116,22 +116,29 @@ BDD_NODE *bdd_deserialize(FILE *in) {
     while ((character = fgetc(in)) != EOF) {
         if (character == 64) {
             serial++;
-            *(bdd_index_map+serial) = fgetc(in);
+            if ((character = fgetc(in)) == EOF)
+                return NULL;
+            *(bdd_index_map+serial) = character;
         } else if (character >= 'A' && character <= '`') {
-            // get left
-            int left = fgetc(in);
-            left += fgetc(in) << 8;
-            left += fgetc(in) << 16;
-            left += fgetc(in) << 24;
-            // get right
-            int right = fgetc(in);
-            right += fgetc(in) << 8;
-            right += fgetc(in) << 16;
-            right += fgetc(in) << 24;
+            int left = 0;
+            int right = 0;
+            int temp;
+            for (int i = 0; i < 32; i+=8) {
+                if ((temp = fgetc(in)) == EOF)
+                    return NULL;
+                left += temp << i;
+            }
+            for (int i = 0; i < 32; i+=8) {
+                if ((temp = fgetc(in)) == EOF)
+                    return NULL;
+                right += temp << i;
+            }
             serial++;
             // info("%i %i %i", character-64, left, right);
             character = character - '@';
             *(bdd_index_map+serial) = bdd_lookup(character, *(bdd_index_map+left), *(bdd_index_map+right));
+        } else {
+            return NULL;
         }
         // debug("%c %o: %i", character, serial, character);
     }
