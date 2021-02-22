@@ -116,21 +116,14 @@ void bdd_serialize_helper(BDD_NODE *node, FILE *out, int *counter) {
             left = *(bdd_index_map+left);
             right = *(bdd_index_map+right);
             fputc(level, out);
-            fputc(left & 0xff, out);
-            left = left >> 8;
-            fputc(left & 0xff, out);
-            left = left >> 8;
-            fputc(left & 0xff, out);
-            left = left >> 8;
-            fputc(left & 0xff, out);
-
-            fputc(right & 0xff, out);
-            right = right >> 8;
-            fputc(right & 0xff, out);
-            right = right >> 8;
-            fputc(right & 0xff, out);
-            right = right >> 8;
-            fputc(right & 0xff, out);
+            for (int i = 0; i < 4; i++) {
+                fputc(left & 0xff, out);
+                left = left >> 8;    
+            }
+            for (int i = 0; i < 4; i++) {
+                fputc(right & 0xff, out);
+                right = right >> 8;
+            }
             *(bdd_index_map+index) = *counter;
             (*counter)++;
         }
