@@ -11,13 +11,13 @@
 int pgm_to_birp(FILE *in, FILE *out) {
     // TO BE IMPLEMENTED
     int width, height;
-    int code = img_read_pgm(in, &width, &height, raster_data, RASTER_SIZE_MAX);
-    if (code)
+    if (img_read_pgm(in, &width, &height, raster_data, RASTER_SIZE_MAX))
         return -1;
     BDD_NODE* node = bdd_from_raster(width, height, raster_data);
     if (node == NULL)
         return -1;
-    img_write_birp(node, width, height, out);
+    if (img_write_birp(node, width, height, out))
+        return -1;
     return 0;
 }
 
@@ -28,7 +28,8 @@ int birp_to_pgm(FILE *in, FILE *out) {
     if (node == NULL || width*height*sizeof(unsigned char) > RASTER_SIZE_MAX)
         return -1;
     bdd_to_raster(node, width, height, raster_data);
-    img_write_pgm(raster_data, width, height, out);
+    if (img_write_pgm(raster_data, width, height, out))
+        return -1;
     return 0;
 }
 
@@ -79,15 +80,15 @@ int birp_to_birp(FILE *in, FILE *out) {
             height = square;
             break;
     }
-    img_write_birp(node, width, height, out);
+    if (img_write_birp(node, width, height, out))
+        return -1;
     return 0;
 }
 
 int pgm_to_ascii(FILE *in, FILE *out) {
     // TO BE IMPLEMENTED
     int width, height;
-    int code = img_read_pgm(in, &width, &height, raster_data, RASTER_SIZE_MAX);
-    if (code)
+    if (img_read_pgm(in, &width, &height, raster_data, RASTER_SIZE_MAX))
         return -1;
     raster_to_ascii(out, width, height, raster_data);
     return 0;
