@@ -68,8 +68,8 @@ int birp_to_birp(FILE *in, FILE *out) {
                 width = width << factor;
                 height = height << factor;
             } else {
-                width = width >> -factor;
-                height = height >> -factor;
+                width = (width >> -factor) + ((width % (1 << -factor))?1:0);
+                height = (height >> -factor) + ((height % (1 << -factor))?1:0);
             }
             // debug("%i", square<<factor);
             // info("%li %i %i %i", node-bdd_nodes, node->level, width, height);
