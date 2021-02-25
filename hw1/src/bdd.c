@@ -73,7 +73,6 @@ int bdd_lookup(int level, int left, int right) {
 
 BDD_NODE *bdd_from_raster(int w, int h, unsigned char *raster) {
     // TO BE IMPLEMENTED
-    // find the min d for w<=2^d and h<=2^d
     if (w <= 0 || w <= 0)
         return NULL;
     int square = 0;
@@ -95,7 +94,6 @@ void bdd_to_raster(BDD_NODE *node, int w, int h, unsigned char *raster) {
     int height_bound = 1 << (level/2);
     for (int row = 0; row < h; row++) {
         for (int col = 0; col < w; col++) {
-            // info("%i %i %i", row, col, bdd_apply(node, row, col));
             *current++ = bdd_apply(node, row % height_bound, col % width_bound);
         }
     }
@@ -135,13 +133,11 @@ BDD_NODE *bdd_deserialize(FILE *in) {
                 right += temp << i;
             }
             serial++;
-            // info("%i %i %i", character-64, left, right);
             character = character - '@';
             *(bdd_index_map+serial) = bdd_lookup(character, *(bdd_index_map+left), *(bdd_index_map+right));
         } else {
             return NULL;
         }
-        // debug("%c %o: %i", character, serial, character);
     }
     return bdd_nodes+*(bdd_index_map+serial);
 }
@@ -162,12 +158,8 @@ unsigned char bdd_apply(BDD_NODE *node, int r, int c) {
         int current_level = current->level;
         int left_node = current->left;
         int right_node = current->right;
-        // warn("l:%i %i", current_level, level);
-        // info("%i %i %i: %i-%i, %i-%i", current_level, left_node, right_node, left, right, top, bottom);
         if (level & 1) {
-            // if odd split width | 
             mid = (right+left)/2;
-            // debug("width split %i vs %i", mid, c);
             if (c < mid) {
                 right = mid;
                 if (left_node < BDD_NUM_LEAVES && level == current_level)
@@ -180,9 +172,7 @@ unsigned char bdd_apply(BDD_NODE *node, int r, int c) {
                 next = bdd_nodes+right_node;
             }
         } else {
-            // else even split height -
             mid = (bottom+top)/2;
-            // debug("height split %i vs %i", mid, r);
             if (r < mid) {
                 bottom = mid;
                 if (left_node < BDD_NUM_LEAVES && level == current_level)
@@ -220,7 +210,6 @@ BDD_NODE *bdd_rotate(BDD_NODE *node, int level) {
     // TO BE IMPLEMENTED
     int node_level = node->level;
     if (node_level == 0) {
-        // info("%li", node-bdd_nodes);
         return node;
     }
     if (node_level == level) {
@@ -243,7 +232,6 @@ BDD_NODE *bdd_rotate(BDD_NODE *node, int level) {
             bottom_right = bottom->right;
 
         }
-        // debug("index %li", node-bdd_nodes);
         int new_top_left, new_top_right, new_top, new_bottom_left, new_bottom_right, new_bottom;
         if (top->level == level-1) 
             new_top_left = bdd_rotate(bdd_nodes+top_right, level-2)-bdd_nodes;

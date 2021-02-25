@@ -62,7 +62,6 @@ int birp_to_birp(FILE *in, FILE *out) {
         case 3:
             if (level + 2*factor < 0 || level+2*factor > BDD_LEVELS_MAX)
                 return -1;
-            // info("%li %i %i %i", node-bdd_nodes, node->level, width, height);
             node = bdd_zoom(node, bdd_min_level(square, square), factor);
             if (factor > 0) {
                 width = width << factor;
@@ -71,8 +70,6 @@ int birp_to_birp(FILE *in, FILE *out) {
                 width = (width >> -factor) + ((width % (1 << -factor))?1:0);
                 height = (height >> -factor) + ((height % (1 << -factor))?1:0);
             }
-            // debug("%i", square<<factor);
-            // info("%li %i %i %i", node-bdd_nodes, node->level, width, height);
             break;
         case 4:
             node = bdd_rotate(node, bdd_min_level(square, square));
