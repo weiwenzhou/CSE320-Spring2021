@@ -8,7 +8,7 @@
 
 
 #define D_ASCII  0
-#define D_POST   1
+#define D_POST   1 // postscript
 #define D_TEX    2
 #define D_ROFF   3
 #define D_XCHESS 4
@@ -41,7 +41,9 @@ typedef struct {
   int print_piece   ;  /* print piece name */
   int print_pawn    ; /* print the PAWN name */
   int roque_alg     ; /*  roque in algebraic form Ke1g1 or O-O */
+  // true = Ke1g1 (king from e1 to g1) else O-O
   int print_liaison ; /* print the - or x in move output */
+  // what is this??? it's everywhere. formatting?
   int only_board ;
   int variation     ; /* variation level */
   int print_headers ; /* include the header/footer file */

@@ -71,7 +71,7 @@
 /* ---- structure to represent the game ---- */
 typedef struct {
 
-  /* board definition */
+  /* board definition */ // board is 1-padded on all sides
   int board[SIZE][SIZE];
   int color[SIZE][SIZE];
 
@@ -82,11 +82,11 @@ typedef struct {
 
 /* french(roque) == english(castling) */
 
-#define MOVE		1  	/* un mouvement        */
-#define PRISE		2      	/* une prise           */
-#define GRANDROQUE	3 	/* grand roque         */
-#define PETITROQUE	4 	/* petit roque         */
-#define EN_PASSANT	5	/* prise en passant    */
+#define MOVE		1  	/* un mouvement        */ // a move
+#define PRISE		2      	/* une prise           */ // to take
+#define GRANDROQUE	3 	/* grand roque         */ // grand castling? Rook on queen sides?
+#define PETITROQUE	4 	/* petit roque         */  // small castling? Rook closer to king?
+#define EN_PASSANT	5	/* prise en passant    */ // pawn moving 2 steps?
 #define PROMOTION  	6	/* promotion           */
 #define PROM_ET_PRISE	7	/* promotion + capture */
 
@@ -109,7 +109,7 @@ struct deplace {
   int type;		/* type of move: MOVE, PRISE, etc..   */
   int piece;		/* type of the piece */
 
-  int fromcol, fromlig;	/* from position */
+  int fromcol, fromlig;	/* from position */ // lig is row
   int tocol, tolig ;	/* destination   */
 
   int prise;		/* captured piece */
@@ -122,7 +122,7 @@ struct deplace {
 
 
 } ;
-typedef struct deplace depl ;
+typedef struct deplace depl ; // deplace/depl = move
 
 #define MULL (depl *) 0
 
@@ -134,7 +134,7 @@ typedef struct deplace depl ;
    this structure is
    - an initial board 
    - a chain of moves
-   moves are applied to the board, and coan also be undone
+   moves are applied to the board, and can also be undone
    */
 typedef struct {
   game * initial;

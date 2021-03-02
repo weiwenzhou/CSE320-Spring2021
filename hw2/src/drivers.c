@@ -213,14 +213,14 @@ static void output_move_generic(dr,d)
 #endif
 {
   char ligne[128] ;
-  char themove[128] ;
+  char themove[128] ; // combination of piece,column,orig.loc.,lie(formatting),newloc.,prom.
   char thepiece[16]  ;
-  char debcol[16];
-  char frommove[16]  ;
-  char tomove[16] ;
-  char captsymb[16] ;
-  char lie[16] ;
-  char prom[16];
+  char debcol[16]; // column letter [a,h] (for pawn captures only?)
+  char frommove[16]  ; // where the piece is original at
+  char tomove[16] ; // new position of the piece
+  char captsymb[16] ; // use to put in lie? 
+  char lie[16] ; // is check?
+  char prom[16]; // promotion
 
   int ambigue = FALSE ;
   int ambigueline, ambiguecols;
@@ -243,11 +243,11 @@ static void output_move_generic(dr,d)
   if ((d->type == GRANDROQUE) && !dr->roque_alg)
     (void) sprintf (themove,"%s",G_ROQUE);
   if (dr->roque_alg && 
-      ((d->type == GRANDROQUE) || (d->type == PETITROQUE)))
+      ((d->type == GRANDROQUE) || (d->type == PETITROQUE))) // castling move in K format 
     (void) roque_to_move(d);
 
   if (dr-> roque_alg || 
-      ((d->type != GRANDROQUE) && (d->type != PETITROQUE))) {
+      ((d->type != GRANDROQUE) && (d->type != PETITROQUE))) { // K format but not castling move
 
     /* we check here for ambiguous move */
     if ((d->type != GRANDROQUE) && (d->type != PETITROQUE)) {
@@ -261,10 +261,10 @@ static void output_move_generic(dr,d)
     themove[0] = '\0' ;
     if ((dr->output_move_format == SHORTENED) 
 	&& (d->type == PRISE) && (d->piece == PAWN))
-      (void) sprintf (debcol, "%c",coltoletter(d->fromcol));
+      (void) sprintf (debcol, "%c",coltoletter(d->fromcol)); // pawn defined by column?
 
-    if (dr->print_piece)
-      if (d->piece != PAWN || dr->print_pawn) {
+    if (dr->print_piece) // if it is a chess piece
+      if (d->piece != PAWN || dr->print_pawn) { // not pawn
         if (dr->type == D_TEX )
           (void) sprintf(thepiece,"%s",latex_table[d->piece]);
         else
@@ -273,8 +273,8 @@ static void output_move_generic(dr,d)
 
     if ((dr->output_move_format == ALGEBRAIC))
       (void)sprintf(frommove,"%c%c",
-		    coltoletter(d->fromcol),ligtoletter(d->fromlig));
-    if ( ambigue && dr->print_liaison ) {
+		    coltoletter(d->fromcol),ligtoletter(d->fromlig)); // ex. e1
+    if ( ambigue && dr->print_liaison ) { // no clue what this section is about 
       /* is the ambiguity on lines ? -> print col */
       if (ambigueline && !ambiguecols)
 	(void)sprintf(frommove,"%c", coltoletter(d->fromcol));
@@ -301,20 +301,20 @@ static void output_move_generic(dr,d)
           
     if (dr->print_liaison) {
       if ((d->type == PRISE) || (d->type == PROM_ET_PRISE) 
-	  || (d->type == EN_PASSANT) )
+	  || (d->type == EN_PASSANT) ) // capture or pawn move 2
 	(void) sprintf(lie,"%s",captsymb);
       else
-	if ((dr->output_move_format == ALGEBRAIC))
+	if ((dr->output_move_format == ALGEBRAIC)) // algebraic add dash
 	  (void) sprintf(lie,"%c",'-');
     }
     
-    (void) sprintf(tomove,"%c%c",coltoletter(d->tocol),ligtoletter(d->tolig));
+    (void) sprintf(tomove,"%c%c",coltoletter(d->tocol),ligtoletter(d->tolig)); // new position
 
     (void) sprintf (themove,"%s%s%s%s%s%s",
 		    thepiece,debcol,frommove,lie, tomove,prom);
   }
 
-  if (d->whiteturn)
+  if (d->whiteturn) // push move to the correct buffer
     (void) sprintf (dr->white_buffer, "%s",themove);
   else
     (void) sprintf (dr->black_buffer, "%s",themove);
@@ -327,7 +327,7 @@ static void output_move_generic(dr,d)
 
 /* variation handler */
 #ifdef __STDC__
-static void output_variation_generic (format *dr, int inout)
+static void output_variation_generic (format *dr, int inout) // only 1 variation idk what it means but yeah 
 #else
 static void output_variation_generic (dr,inout)
      format * dr;
@@ -371,7 +371,7 @@ static void output_text_generic(dr, type, string, code)
 {
   switch (type) {
   case T_COMMENT:
-    if (com_short[code] != '\0' )
+    if (com_short[code] != '\0' ) // comment table, no clue atm*
       (void) fprintf(dr->outfile," %s ",com_short[code]);
     else
       (void) fprintf(dr->outfile," %s ",com_long[code]);
@@ -403,7 +403,7 @@ format *dr;
 {}
     
 #ifdef __STDC__
-static void output_board_ascii(format *dr,game *g)
+static void output_board_ascii(format *dr,game *g) // writes the gameboard
 #else
 static void output_board_ascii(dr,g)
      format * dr;
@@ -660,7 +660,7 @@ void output_move(dr,d)
 #endif
 {
   if (! (((dr->type == D_GNU) || (dr->type == D_XCHESS))
-	&& (dr->variation > 0)))
+	&& (dr->variation > 0))) // not GNU nor XCHESS and variation greater 1
     dr->out_move(dr,d);
 }
 
