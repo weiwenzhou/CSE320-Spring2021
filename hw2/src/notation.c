@@ -7,6 +7,7 @@
    Nom: notation
    Auteur: Henry Thomas
    Date: 27/11/90
+ */
 /*
 This file is part of NOTATION program.
 
@@ -1298,7 +1299,7 @@ int execute(num,c)
     m->tocol = curcol;
     m->tolig = curlig ;
 
-    /*m->topiece = curpiece ; /* ? */
+    /*m->topiece = curpiece ;*/ /* ? */
 
     if (configuring)
       (void) configure();
