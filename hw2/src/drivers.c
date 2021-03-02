@@ -560,11 +560,11 @@ static void output_text_tex(dr, type, string, code)
 
   switch (type) {
   case T_COMMENT:
-    if (com_tex[code] != '\0' )
+    if (*com_tex[code] != '\0' )
       (void) fprintf(dr->outfile,"%s\\ ",com_tex[code]);
     else
       (void) fprintf(dr->outfile,"%s\\ ",com_short[code]);
-      break;
+    break;
   case T_TEXT:
     (void) fprintf(dr->outfile," %s ",string);
     break;
