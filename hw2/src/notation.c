@@ -387,7 +387,7 @@ static int find_keyword(tab, nbentry,defaut,key,warning)
   int i ;
 
   for(i=0; (i< nbentry) ;i++)
-    if (strcmp(tab[i],key))
+    if (strcmp(tab[i],key) == 0)
       return(i);
 
   /* we failed to find the keyword */
