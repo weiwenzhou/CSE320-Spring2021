@@ -406,6 +406,8 @@ for the various options (as well as the original short forms):
   - `--output-file` as equivalent to `-o`
   - `--show-after` as equivalent to `-c`
   - `--end-after` as equivalent to `-e`
+  - `--board-only` as equivalent to `-b`
+  - `--driver` as equivalent to `-d`
   - `--no-headers` as equivalent to `-i`
   - `--help` as equivalent to `-h`
   - `--version` as equivalent to `-v`
