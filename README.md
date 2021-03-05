@@ -401,8 +401,8 @@ for the various options (as well as the original short forms):
 
   - `--long-algebraic` as equivalent to `-a`
   - `--short-algebraic` as equivalent to `-s`
-  - `--output-language` as equivalent to `-f`
-  - `--input-language` as equivalent to `-t`
+  - `--input-language` as equivalent to `-f`
+  - `--output-language` as equivalent to `-t`
   - `--output-file` as equivalent to `-o`
   - `--show-after` as equivalent to `-c`
   - `--end-after` as equivalent to `-e`
