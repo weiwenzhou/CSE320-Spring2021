@@ -581,7 +581,6 @@ static void free_move_list(d)
      depl * d;
 #endif
 {  
-
   if (d->next != (depl *) NULL) {
     free_move_list(d->next);
     free(d->next);
@@ -1868,8 +1867,8 @@ int notation_main(argc,argv)
   /* free descriptors */
   free(dr);
   free(tos);
-  free_move_list(m);
-  free(m);
+  free_move_list(theplay->chain);
+  free(theplay->chain);
   free(theplay);
 
   /* exit properly */
