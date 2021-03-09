@@ -1862,6 +1862,9 @@ int notation_main(argc,argv)
   /* close files */
   close_files();
 
+  /* destroy memory allocated by flex */
+  yylex_destroy();
+
   /* exit properly */
   return 0;
 }

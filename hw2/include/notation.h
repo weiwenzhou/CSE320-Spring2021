@@ -221,3 +221,9 @@ extern int associe_traduction(/*char **table, int langage*/);
 
 
 #endif
+
+#ifdef __STDC__
+extern int yylex_destroy(/*void*/);
+#else
+extern int yylex_destroy(/*void*/);
+#endif
