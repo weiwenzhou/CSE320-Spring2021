@@ -999,8 +999,9 @@ int check_move(m)
   l2 = m->tolig;
   c2 = m->tocol;
 
-  if ((m->piece == KING) && (abs(m->fromcol - m->tocol) == 2)) {
-    if (m->fromcol < m->tocol)
+  if ((m->piece == KING) && (abs(c1 - c2) == 2) &&   
+    ((l1 == 1 && l2 == 1) || (l1 == 8 && l2 == 8))) {
+    if (c1 < c2)
         m->type = PETITROQUE;
     else
         m->type = GRANDROQUE;
