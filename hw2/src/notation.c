@@ -1844,7 +1844,7 @@ int notation_main(argc,argv)
   yyin = infile ;
   yyout = stderr ;
 
-  /*init_parse(m); */
+  init_parse(m);
   yylex();
 
   if ((count == 0) && !error_flag)
