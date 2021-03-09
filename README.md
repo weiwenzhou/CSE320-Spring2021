@@ -323,7 +323,7 @@ the board and exit.
 be used in generating the output.
 - If `-i` is specified, then header and footer "boilerplate" that would normally be inserted
 at the beginning and end of output files is omitted.
-- If `-h` or an unknown option is specified, then a help message is printed;
+- If `-h` is specified, then a help message is printed;
 - If `-v` is specified, then the program exits after printing the version number;
 
 You are to complete the following steps:
