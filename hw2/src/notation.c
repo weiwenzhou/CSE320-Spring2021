@@ -502,8 +502,8 @@ void init_move(m)
      depl *m;
 #endif
 {
-  m->move= 1 ;
-  m->whiteturn = TRUE ;
+  m->move= 0 ;
+  m->whiteturn = FALSE ;
 }
 
 #ifdef __STDC__
@@ -1832,7 +1832,7 @@ int notation_main(argc,argv)
   m = new_move();
   /* allocation of move descriptor */
   m->type = VOID ;
-  /*init_move(m);*/
+  init_move(m);
   
   /* allocation of the play descriptor */
   theplay = (play *) malloc (sizeof(play)) ;
