@@ -1865,6 +1865,13 @@ int notation_main(argc,argv)
   /* destroy memory allocated by flex */
   yylex_destroy();
 
+  /* free descriptors */
+  free(dr);
+  free(tos);
+  free_move_list(m);
+  free(m);
+  free(theplay);
+
   /* exit properly */
   return 0;
 }
