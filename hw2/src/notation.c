@@ -1221,6 +1221,7 @@ int execute_move()
     (void) fprintf(dr->outfile, "\nLast position encountered:\n");
     output_board(dr,tos);
     close_files();
+    free_resources();
     exit(0);
   }
 
@@ -1231,7 +1232,8 @@ int execute_move()
 	output_board(dr,tos);
 	if (stop_at_display) {
 	  output_end(dr);
-	  close_files();
+      close_files();
+      free_resources();
 	  exit(0);
 	}
       }
@@ -1726,6 +1728,8 @@ int parse_options(argc,argv)
                 break;
                 case 'v': /* print version */
                     /* this already done, so exit() */
+                    close_files();
+                    free_resources();
                     exit(0);
                     break;
                 case 'h': /* help file */
@@ -1736,6 +1740,8 @@ int parse_options(argc,argv)
                         while ((c = getc(fhelp)) != EOF)
                             (void) fputc(c,stderr);
                         (void) fclose(fhelp);
+                        close_files();
+                        free_resources();
                         exit(0);
                     }
                     break;
@@ -1870,16 +1876,41 @@ int notation_main(argc,argv)
   /* close files */
   close_files();
 
+//   /* destroy memory allocated by flex */
+//   yylex_destroy();
+
+//   /* free descriptors */
+//   free(dr);
+//   free(tos);
+//   free_move_list(theplay->chain);
+//   free(theplay->chain);
+//   free(theplay);
+  free_resources();
+
+  /* exit properly */
+  return 0;
+}
+
+#ifdef __STDC__
+void free_resources(void)
+#else
+void free_resources()
+#endif
+{
   /* destroy memory allocated by flex */
   yylex_destroy();
 
   /* free descriptors */
-  free(dr);
-  free(tos);
-  free_move_list(theplay->chain);
-  free(theplay->chain);
-  free(theplay);
+  if (dr != (format *) NULL)
+    free(dr);
+  if (tos != (game *) NULL)
+    free(tos);
 
-  /* exit properly */
-  return 0;
+  if (theplay != (play *) NULL) {
+    if (theplay->chain != (depl *) NULL) {
+      free_move_list(theplay->chain);
+      free(theplay->chain);
+    }
+    free(theplay);
+  }
 }
