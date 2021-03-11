@@ -1758,10 +1758,10 @@ int parse_options(argc,argv)
   }
 
   if (optind < argc) { /* inputfile */
-    while (optind < argc) {
-        if ((infile = fopen (argv[optind++],"r")) == NULL)
-            fatal((stderr,"can't open %s input file\n",cp));
-    }
+    if ((infile = fopen (argv[optind++],"r")) == NULL)
+        fatal((stderr,"can't open %s input file\n",argv[optind-1]));
+    if (optind < argc)
+        fatal((stderr,"Too many input files\n"));
   }
   return(argc);
 }
