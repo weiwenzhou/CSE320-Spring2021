@@ -1758,13 +1758,10 @@ int parse_options(argc,argv)
   }
 
   if (optind < argc) { /* inputfile */
-    printf ("non-option ARGV-elements: ");
     while (optind < argc) {
-        printf ("%s ", argv[optind]);
         if ((infile = fopen (argv[optind++],"r")) == NULL)
             fatal((stderr,"can't open %s input file\n",cp));
     }
-    putchar ('\n');
   }
   return(argc);
 }
