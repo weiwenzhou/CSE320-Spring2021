@@ -1911,8 +1911,11 @@ void free_resources()
   yylex_destroy();
 
   /* free descriptors */
-  if (dr != (format *) NULL)
+  if (dr != (format *) NULL) {
+    for (int index = 0; index < dr->variation; index++)
+        free(stack[index].b);
     free(dr);
+  }
   if (tos != (game *) NULL)
     free(tos);
 
