@@ -1749,10 +1749,11 @@ int parse_options(argc,argv)
             exit(0);
             break;
         default:
-            if (optopt)
-                fatal((stderr,"missing argument to %s option",argv[optind-1]));
-            else
-                error((stderr,"\nUnknown command line options %s\n", argv[optind-1]));
+            // if (optopt)
+            //     fatal((stderr,"missing argument to %s option",argv[optind-1]));
+            // else
+            //     error((stderr,"\nUnknown command line options %s\n", argv[optind-1]));
+            fatal();
             break;
     }
   }
