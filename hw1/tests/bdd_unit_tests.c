@@ -213,7 +213,7 @@ Test(unit_test_suite, bdd_map_contrast_test, .timeout=5) {
 Test(unit_test_suite, zoom_in_out_test, .timeout=5) {
     int w, h;
     unsigned char test_raster[1000]; // RASTER_SIZE_MAX caused crashing
-    FILE *in = fopen("rsrc/M.pgm", "r");
+    FILE *in = fopen("tests/rsrc/M.pgm", "r");
 
     img_read_pgm(in, &w, &h, test_raster, sizeof(test_raster));
     
@@ -335,7 +335,7 @@ Test(unit_test_suite, bdd_lookup_hash_stress, .timeout=10) {
  */
 Test(unit_test_suite, bdd_serialize, .timeout=5) {  // suite_name, test_name
     int w, h, max;
-    FILE *in = fopen("rsrc/M.birp", "r") ;
+    FILE *in = fopen("tests/rsrc/M.birp", "r") ;
     BDD_NODE *node;
     node = img_read_birp(in, &w, &h) ;
 

@@ -6,8 +6,8 @@
 Test(basecode_tests_suite, birp_basic_test, .timeout=10) {
 
 	system("mkdir -p test_output");
-	char *cmd = "ulimit -t 10; bin/birp -i pgm < rsrc/M.pgm > test_output/M.birp";
-	char *cmp = "diff -B test_output/M.birp rsrc/M.birp";
+	char *cmd = "ulimit -t 10; bin/birp -i pgm < tests/rsrc/M.pgm > test_output/M.birp";
+	char *cmp = "diff -B test_output/M.birp tests/rsrc/M.birp";
 
 	int return_code = WEXITSTATUS(system(cmd));
 	cr_assert_eq(return_code, EXIT_SUCCESS,
@@ -22,8 +22,8 @@ Test(blackbox_tests, pgm_2_birp1, .timeout=10){
 	system("mkdir -p test_output");
 
 
-	char *cmd = "ulimit -t 10; bin/birp -i pgm < rsrc/M.pgm > test_output/M.birp";
-	char *cmp = "cmp test_output/M.birp rsrc/M.birp";
+	char *cmd = "ulimit -t 10; bin/birp -i pgm < tests/rsrc/M.pgm > test_output/M.birp";
+	char *cmp = "cmp test_output/M.birp tests/rsrc/M.birp";
 
 	int return_code = WEXITSTATUS(system(cmd));
 	cr_assert_eq(return_code, EXIT_SUCCESS,
@@ -35,8 +35,8 @@ Test(blackbox_tests, pgm_2_birp1, .timeout=10){
 }
 
 Test(blackbox_tests, birp_2_pgm1, .timeout=10){
-	char* cmd = "ulimit -t 10; bin/birp -o pgm < rsrc/M.birp > test_output/M.pgm";
-	char* cmp = "cmp test_output/M.pgm rsrc/newImages/test_M.pgm";
+	char* cmd = "ulimit -t 10; bin/birp -o pgm < tests/rsrc/M.birp > test_output/M.pgm";
+	char* cmp = "cmp test_output/M.pgm tests/rsrc/test_M.pgm";
 
 
 	int ret_code = WEXITSTATUS(system(cmd));
@@ -51,8 +51,8 @@ Test(blackbox_tests, birp_2_pgm_2, .timeout=10){
 	system("mkdir -p test_output");
 
 
-	char *cmd = "ulimit -t 10; bin/birp -o pgm < rsrc/checker.birp > test_output/checker.pgm";
-	char *cmp = "cmp test_output/checker.pgm rsrc/newImages/test_checker.pgm";
+	char *cmd = "ulimit -t 10; bin/birp -o pgm < tests/rsrc/checker.birp > test_output/checker.pgm";
+	char *cmp = "cmp test_output/checker.pgm tests/rsrc/test_checker.pgm";
 
 
 	int ret_code = WEXITSTATUS(system(cmd));
@@ -66,8 +66,8 @@ Test(blackbox_tests, birp_2_pgm_3, .timeout=10){
 
 	system("mkdir -p test_output");
 
-	char *cmd = "ulimit -t 10; bin/birp -o pgm < rsrc/cour25.birp > test_output/cour25.pgm";
-	char *cmp = "cmp test_output/cour25.pgm rsrc/newImages/test_cour25.pgm";
+	char *cmd = "ulimit -t 10; bin/birp -o pgm < tests/rsrc/cour25.birp > test_output/cour25.pgm";
+	char *cmp = "cmp test_output/cour25.pgm tests/rsrc/test_cour25.pgm";
 
 
 	int ret_code = WEXITSTATUS(system(cmd));
@@ -81,8 +81,8 @@ Test(blackbox_tests, pgm_2_birp_cat, .timeout=10){
 
 	system("mkdir -p test_output");
 
-	char *cmd = "ulimit -t 10; bin/birp -i pgm < rsrc/newImages/cat.pgm > test_output/cat.birp";
-	char *cmp = "cmp test_output/cat.birp rsrc/newImages/cat.birp";
+	char *cmd = "ulimit -t 10; bin/birp -i pgm < tests/rsrc/cat.pgm > test_output/cat.birp";
+	char *cmp = "cmp test_output/cat.birp tests/rsrc/cat.birp";
 
 
 	int ret_code = WEXITSTATUS(system(cmd));
@@ -96,8 +96,8 @@ Test(black_box_tests, birp_to_pgm_cat, .timeout=10){
 
 	system("mkdir -p test_output");
 
-	char *cmd = "ulimit -t 10; bin/birp -o pgm < rsrc/newImages/cat.birp > test_output/cat.pgm";
-	char *cmp = "cmp test_output/cat.pgm rsrc/newImages/test_cat.pgm";
+	char *cmd = "ulimit -t 10; bin/birp -o pgm < tests/rsrc/cat.birp > test_output/cat.pgm";
+	char *cmp = "cmp test_output/cat.pgm tests/rsrc/test_cat.pgm";
 
 
 	int ret_code = WEXITSTATUS(system(cmd));
@@ -111,8 +111,8 @@ Test(black_box_tests, birp_to_pgm_cat, .timeout=10){
 Test(blackbox_tests, both_to_ascii, .timeout=10){
 
 	system("mkdir -p test_output");
-	char *cmd1 = "ulimit -t 10; bin/birp -o ascii < rsrc/cour25.birp > test_output/cour25.asc";
-	char *cmd2 = "ulimit -t 10; bin/birp -i pgm -o ascii < rsrc/cour25.pgm > test_output/cour25-2.asc";
+	char *cmd1 = "ulimit -t 10; bin/birp -o ascii < tests/rsrc/cour25.birp > test_output/cour25.asc";
+	char *cmd2 = "ulimit -t 10; bin/birp -i pgm -o ascii < tests/rsrc/cour25.pgm > test_output/cour25-2.asc";
 	char *cmp = "diff -B test_output/cour25.asc test_output/cour25-2.asc";
 
 
@@ -130,8 +130,8 @@ Test(blackbox_tests, allWhite_to_pgm, .timeout=10){
 
 	system("mkdir -p test_output");
 
-	char *cmd1 = "ulimit -t 10; bin/birp -o pgm < rsrc/newImages/AllWhite.birp > test_output/AllWhite.pgm";
-	char *cmp = "cmp rsrc/newImages/test_AllWhite.pgm test_output/AllWhite.pgm";
+	char *cmd1 = "ulimit -t 10; bin/birp -o pgm < tests/rsrc/AllWhite.birp > test_output/AllWhite.pgm";
+	char *cmp = "cmp tests/rsrc/test_AllWhite.pgm test_output/AllWhite.pgm";
 
 
 
@@ -149,8 +149,8 @@ Test(blackbox_tests, allWhite_to_ASCII, .timeout=10){
 
 	system("mkdir -p test_output");
 
-	char *cmd1 = "ulimit -t 10; bin/birp -o ascii < rsrc/newImages/AllWhite.birp > test_output/AllWhite.asc";
-	char *cmp = "diff -B rsrc/newImages/AllWhite.asc test_output/AllWhite.asc";
+	char *cmd1 = "ulimit -t 10; bin/birp -o ascii < tests/rsrc/AllWhite.birp > test_output/AllWhite.asc";
+	char *cmp = "diff -B tests/rsrc/AllWhite.asc test_output/AllWhite.asc";
 
 
 
@@ -169,8 +169,8 @@ Test(blackbox_tests, allWhite_to_birp, .timeout=10){
 
 	system("mkdir -p test_output");
 
-	char *cmd1 = "ulimit -t 10; bin/birp -i pgm < rsrc/newImages/AllWhite.pgm > test_output/AllWhite.birp";
-	char *cmp = "cmp rsrc/newImages/AllWhite.birp test_output/AllWhite.birp";
+	char *cmd1 = "ulimit -t 10; bin/birp -i pgm < tests/rsrc/AllWhite.pgm > test_output/AllWhite.birp";
+	char *cmp = "cmp tests/rsrc/AllWhite.birp test_output/AllWhite.birp";
 
 
 
@@ -189,8 +189,8 @@ Test(blackbox_tests, allBlack_to_ASCII, .timeout=10){
 
 	system("mkdir -p test_output");
 
-	char *cmd1 = "ulimit -t 10; bin/birp -o ascii < rsrc/newImages/allBlack.birp > test_output/allBlack.asc";
-	char *cmp = "diff -B rsrc/newImages/allBlack.asc test_output/allBlack.asc";
+	char *cmd1 = "ulimit -t 10; bin/birp -o ascii < tests/rsrc/allBlack.birp > test_output/allBlack.asc";
+	char *cmp = "diff -B tests/rsrc/allBlack.asc test_output/allBlack.asc";
 
 
 
@@ -209,8 +209,8 @@ Test(blackbox_tests, allBlack_to_birp, .timeout=10){
 
 	system("mkdir -p test_output");
 
-	char *cmd1 = "ulimit -t 10; bin/birp -i pgm < rsrc/newImages/allBlack.pgm > test_output/allBlack.birp";
-	char *cmp = "cmp rsrc/newImages/allBlack.birp test_output/allBlack.birp";
+	char *cmd1 = "ulimit -t 10; bin/birp -i pgm < tests/rsrc/allBlack.pgm > test_output/allBlack.birp";
+	char *cmp = "cmp tests/rsrc/allBlack.birp test_output/allBlack.birp";
 
 
 
@@ -229,8 +229,8 @@ Test(blackbox_tests, allBlack_to_pgm, .timeout=10){
 
 	system("mkdir -p test_output");
 
-	char *cmd1 = "ulimit -t 10; bin/birp -o pgm < rsrc/newImages/allBlack.birp > test_output/allBlack.pgm";
-	char *cmp = "cmp rsrc/newImages/test_allBlack.pgm test_output/allBlack.pgm";
+	char *cmd1 = "ulimit -t 10; bin/birp -o pgm < tests/rsrc/allBlack.birp > test_output/allBlack.pgm";
+	char *cmp = "cmp tests/rsrc/test_allBlack.pgm test_output/allBlack.pgm";
 
 
 
@@ -254,8 +254,8 @@ Test(blackbox_tests, BWVert_to_PGM, .timeout=10){
 
 	system("mkdir -p test_output");
 
-	char *cmd1 = "ulimit -t 10; bin/birp -o pgm < rsrc/newImages/BWVert.birp > test_output/BWVert.pgm";
-	char *cmp = "cmp rsrc/newImages/test_BWVert.pgm test_output/BWVert.pgm";
+	char *cmd1 = "ulimit -t 10; bin/birp -o pgm < tests/rsrc/BWVert.birp > test_output/BWVert.pgm";
+	char *cmp = "cmp tests/rsrc/test_BWVert.pgm test_output/BWVert.pgm";
 
 
 	int retCode1 = WEXITSTATUS(system(cmd1));
@@ -274,8 +274,8 @@ Test(blackbox_tests, BWVert_to_Birp, .timeout=10){
 	system("mkdir -p test_output");
 
 
-	char *cmd1 = "ulimit -t 10; bin/birp -i pgm < rsrc/newImages/BWVert.pgm > test_output/BWVert.birp";
-	char *cmp = "cmp rsrc/newImages/BWVert.birp test_output/BWVert.birp";
+	char *cmd1 = "ulimit -t 10; bin/birp -i pgm < tests/rsrc/BWVert.pgm > test_output/BWVert.birp";
+	char *cmp = "cmp tests/rsrc/BWVert.birp test_output/BWVert.birp";
 
 
 
@@ -295,10 +295,10 @@ Test(blackbox_tests, BWVert_to_Birp, .timeout=10){
 Test(blackbox_tests, BWVert_to_ASCII, .timeout=10){
 	system("mkdir -p test_output");
 
-	char *cmd1 = "ulimit -t 10; bin/birp -o ascii < rsrc/newImages/BWVert.birp > test_output/BWVert.asc";
-	char *cmp = "diff -B rsrc/newImages/BWVert.asc test_output/BWVert.asc";
-	char *cmd2 = "ulimit -t 10; bin/birp -i pgm -o ascii < rsrc/newImages/test_BWVert.pgm > test_output/BWVert-2.asc";
-	char *cmp2 = "diff -B rsrc/newImages/BWVert.asc test_output/BWVert-2.asc";
+	char *cmd1 = "ulimit -t 10; bin/birp -o ascii < tests/rsrc/BWVert.birp > test_output/BWVert.asc";
+	char *cmp = "diff -B tests/rsrc/BWVert.asc test_output/BWVert.asc";
+	char *cmd2 = "ulimit -t 10; bin/birp -i pgm -o ascii < tests/rsrc/test_BWVert.pgm > test_output/BWVert-2.asc";
+	char *cmp2 = "diff -B tests/rsrc/BWVert.asc test_output/BWVert-2.asc";
 	char *cmp3 = "diff -B test_output/BWVert.asc test_output/BWVert-2.asc";
 
 
@@ -324,11 +324,11 @@ Test(blackbox_tests, BWHoriz_to_ASCII, .timeout=10){
 
 	system("mkdir -p test_output");
 
-	char *cmd1 = "ulimit -t 10; bin/birp -o ascii < rsrc/newImages/BWHoriz.birp > test_output/BWHoriz.asc";
-	char *cmp = "diff -B rsrc/newImages/BWHoriz.asc test_output/BWHoriz.asc";
+	char *cmd1 = "ulimit -t 10; bin/birp -o ascii < tests/rsrc/BWHoriz.birp > test_output/BWHoriz.asc";
+	char *cmp = "diff -B tests/rsrc/BWHoriz.asc test_output/BWHoriz.asc";
 	
-	char *cmd2 = "ulimit -t 10; bin/birp -i pgm -o ascii < rsrc/newImages/test_BWHoriz.pgm > test_output/BWHoriz-2.asc";
-	char *cmp2 = "diff -B rsrc/newImages/BWHoriz.asc test_output/BWHoriz-2.asc";
+	char *cmd2 = "ulimit -t 10; bin/birp -i pgm -o ascii < tests/rsrc/test_BWHoriz.pgm > test_output/BWHoriz-2.asc";
+	char *cmp2 = "diff -B tests/rsrc/BWHoriz.asc test_output/BWHoriz-2.asc";
 	char *cmp3 = "diff -B test_output/BWHoriz.asc test_output/BWHoriz-2.asc";
 
 
@@ -353,8 +353,8 @@ Test(blackbox_tests, BWHoriz_to_PGM, .timeout=10){
 
 	system("mkdir -p test_output");
 
-	char *cmd1 = "ulimit -t 10; bin/birp -o pgm < rsrc/newImages/BWHoriz.birp > test_output/BWHoriz.pgm";
-	char *cmp = "cmp rsrc/newImages/test_BWHoriz.pgm test_output/BWHoriz.pgm";
+	char *cmd1 = "ulimit -t 10; bin/birp -o pgm < tests/rsrc/BWHoriz.birp > test_output/BWHoriz.pgm";
+	char *cmp = "cmp tests/rsrc/test_BWHoriz.pgm test_output/BWHoriz.pgm";
 
 
 
@@ -373,8 +373,8 @@ Test(blackbox_tests, BWHoriz_to_Birp, .timeout=10){
 
 	system("mkdir -p test_output");
 
-	char *cmd1 = "ulimit -t 10; bin/birp -i pgm < rsrc/newImages/BWHoriz.pgm > test_output/BWHoriz.birp";
-	char *cmp = "cmp rsrc/newImages/BWHoriz.birp test_output/BWHoriz.birp";
+	char *cmd1 = "ulimit -t 10; bin/birp -i pgm < tests/rsrc/BWHoriz.pgm > test_output/BWHoriz.birp";
+	char *cmp = "cmp tests/rsrc/BWHoriz.birp test_output/BWHoriz.birp";
 
 
 
@@ -392,8 +392,8 @@ Test(blackbox_tests, birp_to_birp_1, .timeout=10){
 
 	system("mkdir -p test_output");
 
-	char *cmd1 = "ulimit -t 10; bin/birp -i birp -o birp < rsrc/M.birp > test_output/M_birp.birp";
-	char *cmp = "cmp test_output/M_birp.birp rsrc/M.birp";
+	char *cmd1 = "ulimit -t 10; bin/birp -i birp -o birp < tests/rsrc/M.birp > test_output/M_birp.birp";
+	char *cmp = "cmp test_output/M_birp.birp tests/rsrc/M.birp";
 
 
 	int retCode1 = WEXITSTATUS(system(cmd1));
@@ -407,8 +407,8 @@ Test(blackbox_tests, birp_to_birp_2, .timeout=10){
 
 	system("mkdir -p test_output");
 
-	char *cmd1 = "ulimit -t 10; bin/birp -i birp -o birp < rsrc/checker.birp > test_output/checker_birp.birp";
-	char *cmp = "cmp test_output/checker_birp.birp rsrc/checker.birp";
+	char *cmd1 = "ulimit -t 10; bin/birp -i birp -o birp < tests/rsrc/checker.birp > test_output/checker_birp.birp";
+	char *cmp = "cmp test_output/checker_birp.birp tests/rsrc/checker.birp";
 
 
 	int retCode1 = WEXITSTATUS(system(cmd1));
