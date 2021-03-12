@@ -1883,15 +1883,6 @@ int notation_main(argc,argv)
   /* close files */
   close_files();
 
-//   /* destroy memory allocated by flex */
-//   yylex_destroy();
-
-//   /* free descriptors */
-//   free(dr);
-//   free(tos);
-//   free_move_list(theplay->chain);
-//   free(theplay->chain);
-//   free(theplay);
   free_resources();
 
   /* exit properly */
