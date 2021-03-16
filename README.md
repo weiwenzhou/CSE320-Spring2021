@@ -705,7 +705,6 @@ the following cases to be invalid pointers:
 - The size of the block is not a multiple of 16.
 - The size of the block is less than the minimum block size.
 - The `allocated` bit in the header is 0.
-- The contents of the block header are different than those of the block footer.
 - Some or all of the block lies outside of the current heap bounds.
 - The header of the next block lies outside of the current heap bounds.
 - The `prev_alloc` bit of the block header does not match the `alloc` bit of the
