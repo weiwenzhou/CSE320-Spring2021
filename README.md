@@ -744,8 +744,8 @@ When reallocating to a larger size, always follow these three steps:
 2. Call `memcpy` to copy the data in the block given by the client to the block
 returned by `sf_malloc`.  Be sure to copy the entire payload area, but no more.
 
-3. Call `sf_free` on the block given by the client (inserting into a quick list
-or main freelist and coalescing if required).
+3. Call `sf_free` on the block given by the client (inserting into the freelist
+and coalescing if required).
 
 4. Return the block given to you by `sf_malloc` to the client.
 
@@ -781,8 +781,7 @@ Therefore, the block is not split.
 
 - The block can be split without creating a splinter. In this case, split the
 block and update the block size fields in both headers.  Free the remainder block
-by inserting it into the appropriate free list (after coalescing, if possible --
-do not insert the remainder block into a quick list).
+by inserting it into the appropriate free list (after coalescing, if possible).
 Return a pointer to the payload of the now-smaller block to the caller.
 
 Note that in both of these sub-cases, you return a pointer to the same block
@@ -865,8 +864,6 @@ which should be self explanatory.  They all output to `stderr`.
 void sf_show_block(sf_block *bp);
 void sf_show_free_list(int index);
 void sf_show_free_lists();
-void sf_show_quick_list(int index);
-void sf_show_quick_lists();
 void sf_show_heap();
 ```
 
