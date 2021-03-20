@@ -15,6 +15,11 @@ void *sf_malloc(size_t size) {
     if (start == end) {
         sf_initialize_heap();
     }
+    // calculate the number of bytes: min(header (8) + size + padding to be 16 byte align, 32)
+    // check if 8+size is a multiple of 16
+    // if true then use actual
+    // else take the (quotient+1)*16 which should be enough bytes to hold actual
+    // then check if actual is at least 32 bytes (minimum block)
     return NULL;
 }
 
