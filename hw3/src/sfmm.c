@@ -19,6 +19,13 @@ void *sf_malloc(size_t size) {
     size_t actual = 8 + size;
     actual = (actual % 16 == 0) ? actual:((actual/16 + 1) * 16);
     actual = (actual < 32) ? 32:actual;
+    // calculate the class size
+    int class = 0;
+    while (class < NUM_FREE_LISTS-1) {
+        if (actual <= (32 << class))
+            break;
+        class++;
+    }
     return NULL;
 }
 
