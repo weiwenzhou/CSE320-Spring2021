@@ -1,5 +1,6 @@
-#include "sfmm.h"
 #include "custom_functions.h"
+#include "debug.h"
+#include "sfmm.h"
 
 void sf_initialize_heap() {
     // initialize free list
@@ -69,4 +70,23 @@ void sf_add_to_free_list(sf_block *block) {
     block->body.links.next = &sf_free_list_heads[class];
     sf_free_list_heads[class].body.links.prev->body.links.next = block;
     sf_free_list_heads[class].body.links.prev = block;
+}
+
+int sf_increase_wilderness() {
+    sf_block *old_epilogue = (sf_block *) (sf_mem_end()-8);
+    sf_block *page = (sf_block *) sf_mem_grow();
+    if (page == NULL) {
+        return -1;
+    }
+    sf_block *new_epilogue = (sf_block *) (sf_mem_end()-8);
+    new_epilogue->header = old_epilogue->header;
+    // if prev of old epilogue is free than combine
+    if ((old_epilogue->header & PREV_BLOCK_ALLOCATED) == 0) {
+        // get header 
+        sf_header *prev_size = (sf_header *) (((char *) old_epilogue) - 8);
+        sf_block *prev_block = (sf_block *) (((char *) old_epilogue) - (*prev_size & ~0x3));
+        prev_block->header = prev_block->header + PAGE_SZ;
+        *((sf_header *) (((char *) prev_block) + (prev_block->header & ~(0x3)) - 8)) = prev_block->header;
+    }
+    return 0;
 }

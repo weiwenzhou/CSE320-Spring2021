@@ -25,3 +25,10 @@ void *sf_check_free_list(size_t size, int index);
  * @param block Address of memory 
  */
 void sf_add_to_free_list(sf_block *block);
+
+/**
+ * Increases the size of the wilderness by one page of memory (8192 bytes).
+ * 
+ * @return Returns -1 if error, otherwise 0. 
+ */
+int sf_increase_wilderness();
