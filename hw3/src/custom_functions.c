@@ -101,6 +101,8 @@ int sf_check_pointer(void *pp) {
     if (pp == NULL)
         return -1;
     if (((size_t) pp) % 16 != 0)
+        return -1; 
+    if (pp < sf_mem_start()) // not inside the heap
         return -1;
     sf_block *block = (sf_block *) ((char *) pp - 8);
     sf_header size = block->header & ~0x3;
