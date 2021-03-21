@@ -71,10 +71,10 @@ void sf_add_to_free_list(sf_block *block) {
             break;
         class++;
     }
-    block->body.links.prev = sf_free_list_heads[class].body.links.prev;
-    block->body.links.next = &sf_free_list_heads[class];
-    sf_free_list_heads[class].body.links.prev->body.links.next = block;
-    sf_free_list_heads[class].body.links.prev = block;
+    block->body.links.next = sf_free_list_heads[class].body.links.next;
+    block->body.links.prev = &sf_free_list_heads[class];
+    sf_free_list_heads[class].body.links.next->body.links.prev = block;
+    sf_free_list_heads[class].body.links.next = block;
 }
 
 int sf_increase_wilderness() {
