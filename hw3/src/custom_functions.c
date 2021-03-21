@@ -116,6 +116,10 @@ int sf_check_pointer(void *pp) {
         return -1;
     if ((char *) block + size > (char *) (sf_mem_end()-8)) 
         return -1;
-    // if ((char *) block != ) // not the first block
+    if ((block->header & PREV_BLOCK_ALLOCATED) == 0) { // check if prev block is not allocated
+        sf_header *prev_header = (sf_header *) (((char *) block) - 8);
+        if ((*prev_header & THIS_BLOCK_ALLOCATED) != 0)
+            return -1;
+    }
     return 0;
 }
