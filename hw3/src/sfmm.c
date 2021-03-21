@@ -68,7 +68,8 @@ void sf_free(void *pp) {
         next->body.links.prev->body.links.next = next->body.links.next;
         next->body.links.next->body.links.prev = next->body.links.prev;
         size += next->header & ~0x3;
-    }
+    } else
+        next->header ^= PREV_BLOCK_ALLOCATED;
     if ((block->header & PREV_BLOCK_ALLOCATED) == 0) { // prev_block not allocated
         sf_header *prev_size = (sf_header *) (((char *) block) - 8);
         block = (sf_block *) (((char *) block) - (*prev_size & ~0x3));
