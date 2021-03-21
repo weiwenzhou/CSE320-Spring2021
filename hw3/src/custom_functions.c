@@ -60,7 +60,8 @@ void *sf_check_free_list(size_t size, int index) {
 void sf_add_to_free_list(sf_block *block) {
     // get block size
     sf_header size = block->header & ~0x3;
-    int class = 0;
+    // last block is always place in the wilderness at index 7 
+    int class = (((char *) block + size) == sf_mem_end() -8)? 7:0; 
     while (class < NUM_FREE_LISTS-1) {
         if (size <= (32 << class))
             break;
