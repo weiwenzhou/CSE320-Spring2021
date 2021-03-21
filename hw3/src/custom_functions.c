@@ -38,6 +38,7 @@ void *sf_check_free_list(size_t size, int index) {
                 current->body.links.prev->body.links.next = current->body.links.next;
                 current->body.links.next->body.links.prev = current->body.links.prev;
                 current->header = current->header | THIS_BLOCK_ALLOCATED;
+                ((sf_block *)((char *) current + size))->header |= PREV_BLOCK_ALLOCATED;
             } else { // split
                 sf_block *new_block = (sf_block *) (((char *) current) + size);
                 current->body.links.prev->body.links.next = current->body.links.next;
@@ -47,10 +48,6 @@ void *sf_check_free_list(size_t size, int index) {
                 new_block->header = (length - size) | PREV_BLOCK_ALLOCATED;
                 *((sf_header *) (((char *) new_block) + (new_block->header & ~(0x3)) - 8)) = new_block->header;
                 sf_add_to_free_list(new_block);
-            }
-            // if current block is the last block and modifies epilogue
-            if ((char *) current + size == sf_mem_end() - 8) {
-                ((sf_block *)(sf_mem_end() - 8))->header |= PREV_BLOCK_ALLOCATED;
             }
             return current;
         }
