@@ -1,4 +1,5 @@
 #include "sfmm.h"
+#include "custom_functions.h"
 
 void sf_initialize_heap() {
     // initialize free list
@@ -23,4 +24,41 @@ void sf_initialize_heap() {
     sf_free_list_heads[NUM_FREE_LISTS-1].body.links.prev = free_block;
     free_block->body.links.next = &sf_free_list_heads[NUM_FREE_LISTS-1];
     free_block->body.links.prev = &sf_free_list_heads[NUM_FREE_LISTS-1];
+}
+
+void *sf_check_free_list(size_t size, int index) {
+    // check if there is space in free_list
+    sf_block *list = &sf_free_list_heads[index];
+    if (list->body.links.next == list) // empty
+        return NULL;
+    // search through the linked list
+    sf_block *current = list->body.links.next;
+    do {
+        if (size <= (current->header & ~0x3)) {
+            sf_header length = current->header & ~0x3;
+            // decide whether to split or not
+            if (length - size < 32) { // don't split
+                current->body.links.prev->body.links.next = current->body.links.next;
+                current->body.links.next->body.links.prev = current->body.links.prev;
+                current->header = current->header | THIS_BLOCK_ALLOCATED;
+            } else { // split
+                sf_block *new_block = (sf_block *) (((char *) current) + size);
+                current->body.links.prev->body.links.next = current->body.links.next;
+                current->body.links.next->body.links.prev = current->body.links.prev;
+                current->header = size | THIS_BLOCK_ALLOCATED | (current->header & PREV_BLOCK_ALLOCATED);
+
+                new_block->header = (length - size) | PREV_BLOCK_ALLOCATED;
+                sf_free_list_heads[NUM_FREE_LISTS-1].body.links.next = new_block;
+                sf_free_list_heads[NUM_FREE_LISTS-1].body.links.prev = new_block;
+                new_block->body.links.next = &sf_free_list_heads[NUM_FREE_LISTS-1];
+                new_block->body.links.prev = &sf_free_list_heads[NUM_FREE_LISTS-1];
+                 *((sf_header *) (((char *) new_block) + (new_block->header & ~(0x3)) - 8)) = new_block->header;
+            }
+            return current;
+        }
+
+        current = current->body.links.next;
+    } while (current != list);
+    
+    return NULL;
 }
