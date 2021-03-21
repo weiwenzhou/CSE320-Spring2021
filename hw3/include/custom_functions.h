@@ -32,3 +32,10 @@ void sf_add_to_free_list(sf_block *block);
  * @return Returns -1 if error, otherwise 0. 
  */
 int sf_increase_wilderness();
+
+/**
+ * Checks if the pointer is valid
+ * 
+ * @return Return -1 if invalid, otherwise 0.
+ */
+int sf_check_pointer(void *pp);

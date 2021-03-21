@@ -96,3 +96,24 @@ int sf_increase_wilderness() {
     }
     return 0;
 }
+
+int sf_check_pointer(void *pp) {
+    if (pp == NULL)
+        return -1;
+    if (((size_t) pp) % 16 != 0)
+        return -1;
+    sf_block *block = (sf_block *) ((char *) pp - 8);
+    sf_header size = block->header & ~0x3;
+    if (size % 16 != 0)
+        return -1;
+    if (size < 32)
+        return -1;
+    if ((block->header & THIS_BLOCK_ALLOCATED) == 0)
+        return -1;
+    if (*((sf_header *) (((char *) block) + (block->header & ~(0x3)) - 8)) == block->header) 
+        return -1;
+    if ((char *) block + size > (char *) (sf_mem_end()-8)) 
+        return -1;
+    // if ((char *) block != ) // not the first block
+    return 0;
+}

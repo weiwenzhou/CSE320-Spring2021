@@ -46,23 +46,10 @@ void *sf_malloc(size_t size) {
 }
 
 void sf_free(void *pp) {
-    if (pp == NULL)
-        abort();
-    if (((size_t) pp) % 16 != 0)
+    if (sf_check_pointer(pp)) 
         abort();
     sf_block *block = (sf_block *) ((char *) pp - 8);
     sf_header size = block->header & ~0x3;
-    if (size % 16 != 0)
-        abort();
-    if (size < 32)
-        abort();
-    if ((block->header & THIS_BLOCK_ALLOCATED) == 0)
-        abort();
-    if (*((sf_header *) (((char *) block) + (block->header & ~(0x3)) - 8)) == block->header) 
-        abort();
-    if ((char *) block + size > (char *) (sf_mem_end()-8)) 
-        abort();
-    // if ((char *) block != ) // not the first block
     sf_block *next = (sf_block *) ((char *) block + size);
     if ((next->header & THIS_BLOCK_ALLOCATED) == 0) {
         next->body.links.prev->body.links.next = next->body.links.next;
