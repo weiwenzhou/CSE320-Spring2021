@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include "debug.h"
 #include "sfmm.h"
 #include "custom_functions.h"
@@ -26,7 +27,20 @@ void *sf_malloc(size_t size) {
             break;
         class++;
     }
-    return NULL;
+    sf_block *block;
+    for (int place = class; place < NUM_FREE_LISTS; place++) {
+        block = (sf_block *) sf_check_free_list(actual, place);
+        if (block != NULL)
+            break;
+    }
+    while (block == NULL) {
+        if (sf_increase_wilderness()) {
+            sf_errno = ENOMEM;
+            return NULL;
+        }
+        block = (sf_block *) sf_check_free_list(actual, NUM_FREE_LISTS-1);
+    }
+    return &block->body;
 }
 
 void sf_free(void *pp) {
