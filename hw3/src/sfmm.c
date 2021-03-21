@@ -76,8 +76,8 @@ void sf_free(void *pp) {
         block->header += size;
         block->body.links.prev->body.links.next = block->body.links.next;
         block->body.links.next->body.links.prev = block->body.links.prev;
-    }
-    block->header = size | (block->header & PREV_BLOCK_ALLOCATED);
+    } else 
+        block->header = size | (block->header & PREV_BLOCK_ALLOCATED);
     *((sf_header *) (((char *) block) + (block->header & ~(0x3)) - 8)) = block->header;
     sf_add_to_free_list(block);
     return;
