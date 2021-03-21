@@ -18,3 +18,10 @@ void sf_initialize_heap();
  * @return Returns NULL if block is not found, otherwise a pointer to the allocated block
  */
 void *sf_check_free_list(size_t size, int index);
+
+/**
+ * Adds the given block pointer to appropriate free list class size.
+ * 
+ * @param block Address of memory 
+ */
+void sf_add_to_free_list(sf_block *block);

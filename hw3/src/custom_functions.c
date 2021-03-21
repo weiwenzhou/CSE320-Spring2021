@@ -19,11 +19,7 @@ void sf_initialize_heap() {
     free_block->header = PAGE_SZ - 48 + PREV_BLOCK_ALLOCATED;
     *((sf_header *) (((char *) free_block) + (free_block->header & ~(0x3)) - 8)) = free_block->header;
 
-
-    sf_free_list_heads[NUM_FREE_LISTS-1].body.links.next = free_block;
-    sf_free_list_heads[NUM_FREE_LISTS-1].body.links.prev = free_block;
-    free_block->body.links.next = &sf_free_list_heads[NUM_FREE_LISTS-1];
-    free_block->body.links.prev = &sf_free_list_heads[NUM_FREE_LISTS-1];
+    sf_add_to_free_list(free_block);
 }
 
 void *sf_check_free_list(size_t size, int index) {
@@ -48,11 +44,8 @@ void *sf_check_free_list(size_t size, int index) {
                 current->header = size | THIS_BLOCK_ALLOCATED | (current->header & PREV_BLOCK_ALLOCATED);
 
                 new_block->header = (length - size) | PREV_BLOCK_ALLOCATED;
-                sf_free_list_heads[NUM_FREE_LISTS-1].body.links.next = new_block;
-                sf_free_list_heads[NUM_FREE_LISTS-1].body.links.prev = new_block;
-                new_block->body.links.next = &sf_free_list_heads[NUM_FREE_LISTS-1];
-                new_block->body.links.prev = &sf_free_list_heads[NUM_FREE_LISTS-1];
-                 *((sf_header *) (((char *) new_block) + (new_block->header & ~(0x3)) - 8)) = new_block->header;
+                *((sf_header *) (((char *) new_block) + (new_block->header & ~(0x3)) - 8)) = new_block->header;
+                sf_add_to_free_list(new_block);
             }
             return current;
         }
@@ -61,4 +54,19 @@ void *sf_check_free_list(size_t size, int index) {
     } while (current != list);
     
     return NULL;
+}
+
+void sf_add_to_free_list(sf_block *block) {
+    // get block size
+    sf_header size = block->header & ~0x3;
+    int class = 0;
+    while (class < NUM_FREE_LISTS-1) {
+        if (size <= (32 << class))
+            break;
+        class++;
+    }
+    block->body.links.prev = sf_free_list_heads[class].body.links.prev->body.links.next;
+    block->body.links.next = &sf_free_list_heads[class];
+    sf_free_list_heads[class].body.links.prev->body.links.next = block;
+    sf_free_list_heads[class].body.links.prev = block;
 }
