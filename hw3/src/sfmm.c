@@ -63,7 +63,20 @@ void sf_free(void *pp) {
     if ((char *) block + size > (char *) (sf_mem_end()-8)) 
         abort();
     // if ((char *) block != ) // not the first block
-    block->header ^= THIS_BLOCK_ALLOCATED; // flip allocated bit
+    sf_block *next = (sf_block *) ((char *) block + size);
+    if ((next->header & THIS_BLOCK_ALLOCATED) == 0) {
+        next->body.links.prev->body.links.next = next->body.links.next;
+        next->body.links.next->body.links.prev = next->body.links.prev;
+        size += next->header & ~0x3;
+    }
+    if ((block->header & PREV_BLOCK_ALLOCATED) == 0) { // prev_block not allocated
+        sf_header *prev_size = (sf_header *) (((char *) block) - 8);
+        block = (sf_block *) (((char *) block) - (*prev_size & ~0x3));
+        block->header += size;
+        block->body.links.prev->body.links.next = block->body.links.next;
+        block->body.links.next->body.links.prev = block->body.links.prev;
+    }
+    block->header = size | (block->header & PREV_BLOCK_ALLOCATED);
     *((sf_header *) (((char *) block) + (block->header & ~(0x3)) - 8)) = block->header;
     sf_add_to_free_list(block);
     return;
