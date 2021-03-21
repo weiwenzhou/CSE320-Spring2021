@@ -48,6 +48,10 @@ void *sf_check_free_list(size_t size, int index) {
                 *((sf_header *) (((char *) new_block) + (new_block->header & ~(0x3)) - 8)) = new_block->header;
                 sf_add_to_free_list(new_block);
             }
+            // if current block is the last block and modifies epilogue
+            if ((char *) current + size == sf_mem_end() - 8) {
+                ((sf_block *)(sf_mem_end() - 8))->header |= PREV_BLOCK_ALLOCATED;
+            }
             return current;
         }
 
@@ -88,6 +92,10 @@ int sf_increase_wilderness() {
         sf_block *prev_block = (sf_block *) (((char *) old_epilogue) - (*prev_size & ~0x3));
         prev_block->header = prev_block->header + PAGE_SZ;
         *((sf_header *) (((char *) prev_block) + (prev_block->header & ~(0x3)) - 8)) = prev_block->header;
+    } else {
+        old_epilogue->header = PAGE_SZ | PREV_BLOCK_ALLOCATED;
+        *((sf_header *) (((char *) old_epilogue) + (old_epilogue->header & ~(0x3)) - 8)) = old_epilogue->header;
+        sf_add_to_free_list(old_epilogue);
     }
     return 0;
 }
