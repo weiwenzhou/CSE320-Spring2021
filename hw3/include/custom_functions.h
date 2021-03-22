@@ -39,3 +39,14 @@ int sf_increase_wilderness();
  * @return Return -1 if invalid, otherwise 0.
  */
 int sf_check_pointer(void *pp);
+
+/**
+ * Allocates the size of bytes in the memory address block. Assumes that
+ * block is a valid pointer in the heaper and size can fit inside of the block. 
+ * 
+ * @param block Address of memory
+ * @param size The number of bytes to allocate
+ * 
+ * @return The address of the newly allocated block.
+ */
+void *sf_allocate_block(void *block, size_t size);

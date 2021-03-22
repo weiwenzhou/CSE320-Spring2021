@@ -32,24 +32,7 @@ void *sf_check_free_list(size_t size, int index) {
     sf_block *current = list->body.links.next;
     do {
         if (size <= (current->header & ~0x3)) {
-            sf_header length = current->header & ~0x3;
-            // decide whether to split or not
-            if (length - size < 32) { // don't split
-                current->body.links.prev->body.links.next = current->body.links.next;
-                current->body.links.next->body.links.prev = current->body.links.prev;
-                current->header = current->header | THIS_BLOCK_ALLOCATED;
-                ((sf_block *)((char *) current + size))->header |= PREV_BLOCK_ALLOCATED;
-            } else { // split
-                sf_block *new_block = (sf_block *) (((char *) current) + size);
-                current->body.links.prev->body.links.next = current->body.links.next;
-                current->body.links.next->body.links.prev = current->body.links.prev;
-                current->header = size | THIS_BLOCK_ALLOCATED | (current->header & PREV_BLOCK_ALLOCATED);
-
-                new_block->header = (length - size) | PREV_BLOCK_ALLOCATED;
-                *((sf_header *) (((char *) new_block) + (new_block->header & ~(0x3)) - 8)) = new_block->header;
-                sf_add_to_free_list(new_block);
-            }
-            return current;
+            return sf_allocate_block(current, size);
         }
 
         current = current->body.links.next;
@@ -122,4 +105,26 @@ int sf_check_pointer(void *pp) {
             return -1;
     }
     return 0;
+}
+
+void *sf_allocate_block(void *block, size_t size) {
+    sf_block *current = (sf_block *) block;
+    sf_header length = current->header & ~0x3;
+    // decide whether to split or not
+    if (length - size < 32) { // don't split
+        current->body.links.prev->body.links.next = current->body.links.next;
+        current->body.links.next->body.links.prev = current->body.links.prev;
+        current->header = current->header | THIS_BLOCK_ALLOCATED;
+        ((sf_block *)((char *) current + size))->header |= PREV_BLOCK_ALLOCATED;
+    } else { // split
+        sf_block *new_block = (sf_block *) (((char *) current) + size);
+        current->body.links.prev->body.links.next = current->body.links.next;
+        current->body.links.next->body.links.prev = current->body.links.prev;
+        current->header = size | THIS_BLOCK_ALLOCATED | (current->header & PREV_BLOCK_ALLOCATED);
+
+        new_block->header = (length - size) | PREV_BLOCK_ALLOCATED;
+        *((sf_header *) (((char *) new_block) + (new_block->header & ~(0x3)) - 8)) = new_block->header;
+        sf_add_to_free_list(new_block);
+    }
+    return current;
 }
