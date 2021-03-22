@@ -49,30 +49,26 @@ void sf_free(void *pp) {
     if (sf_check_pointer(pp)) 
         abort();
     sf_block *block = (sf_block *) ((char *) pp - 8);
-    sf_header size = block->header & ~0x3;
-    sf_block *next = (sf_block *) ((char *) block + size);
-    if ((next->header & THIS_BLOCK_ALLOCATED) == 0) {
-        next->body.links.prev->body.links.next = next->body.links.next;
-        next->body.links.next->body.links.prev = next->body.links.prev;
-        size += next->header & ~0x3;
-    } else
-        next->header ^= PREV_BLOCK_ALLOCATED;
-    if ((block->header & PREV_BLOCK_ALLOCATED) == 0) { // prev_block not allocated
-        sf_header *prev_size = (sf_header *) (((char *) block) - 8);
-        block = (sf_block *) (((char *) block) - (*prev_size & ~0x3));
-        block->header += size;
-        block->body.links.prev->body.links.next = block->body.links.next;
-        block->body.links.next->body.links.prev = block->body.links.prev;
-    } else 
-        block->header = size | (block->header & PREV_BLOCK_ALLOCATED);
-    *((sf_header *) (((char *) block) + (block->header & ~(0x3)) - 8)) = block->header;
     sf_add_to_free_list(block);
     return;
 }
 
 void *sf_realloc(void *pp, size_t rsize) {
+    if (rsize == 0) {
+        sf_free(pp);
+        return NULL;
+    }
     if (sf_check_pointer(pp))
         abort();
+    sf_header size = (*((sf_header *) (pp-8))) & ~0x3;
+    // calculate the number of bytes: min(header (8) + size + padding to be 16 byte align, 32)
+    size_t actual = 8 + rsize;
+    actual = (actual % 16 == 0) ? actual:((actual/16 + 1) * 16);
+    actual = (actual < 32) ? 32:actual;
+    info("%ld", actual);
+    if (actual <= size) {
+        return sf_allocate_block(pp-8, actual);
+    }
     void *block = sf_malloc(rsize);
     if (block == NULL)
         return NULL;
