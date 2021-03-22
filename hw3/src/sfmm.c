@@ -31,7 +31,7 @@ void *sf_malloc(size_t size) {
     }
     sf_block *block;
     for (int place = class; place < NUM_FREE_LISTS; place++) {
-        block = (sf_block *) sf_check_free_list(actual, place);
+        block = (sf_block *) sf_check_free_list(actual, place, 16);
         if (block != NULL)
             break;
     }
@@ -40,7 +40,7 @@ void *sf_malloc(size_t size) {
             sf_errno = ENOMEM;
             return NULL;
         }
-        block = (sf_block *) sf_check_free_list(actual, NUM_FREE_LISTS-1);
+        block = (sf_block *) sf_check_free_list(actual, NUM_FREE_LISTS-1, 16);
     }
     return &block->body;
 }
@@ -101,7 +101,7 @@ void *sf_memalign(size_t size, size_t align) {
     }
     sf_block *block;
     for (int place = class; place < NUM_FREE_LISTS; place++) {
-        block = (sf_block *) sf_check_free_list(actual, place);
+        block = (sf_block *) sf_check_free_list(actual, place, align);
         if (block != NULL)
             break;
     }
@@ -110,7 +110,7 @@ void *sf_memalign(size_t size, size_t align) {
             sf_errno = ENOMEM;
             return NULL;
         }
-        block = (sf_block *) sf_check_free_list(actual, NUM_FREE_LISTS-1);
+        block = (sf_block *) sf_check_free_list(actual, NUM_FREE_LISTS-1, align);
     }
     return &block->body;
 }

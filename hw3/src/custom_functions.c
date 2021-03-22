@@ -23,7 +23,7 @@ void sf_initialize_heap() {
     sf_add_to_free_list(free_block);
 }
 
-void *sf_check_free_list(size_t size, int index) {
+void *sf_check_free_list(size_t size, int index, size_t align) {
     // check if there is space in free_list
     sf_block *list = &sf_free_list_heads[index];
     if (list->body.links.next == list) // empty
@@ -31,7 +31,8 @@ void *sf_check_free_list(size_t size, int index) {
     // search through the linked list
     sf_block *current = list->body.links.next;
     do {
-        if (size <= (current->header & ~0x3)) {
+        size_t padding = (((size_t) current+8) % align);
+        if (size+padding <= (current->header & ~0x3)) {
             current->body.links.prev->body.links.next = current->body.links.next;
             current->body.links.next->body.links.prev = current->body.links.prev;
             return sf_allocate_block(current, size);
