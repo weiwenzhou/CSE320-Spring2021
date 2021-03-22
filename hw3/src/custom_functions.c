@@ -35,6 +35,17 @@ void *sf_check_free_list(size_t size, int index, size_t align) {
         if (size+padding <= (current->header & ~0x3)) {
             current->body.links.prev->body.links.next = current->body.links.next;
             current->body.links.next->body.links.prev = current->body.links.prev;
+            if (padding) {
+                sf_block *pad_block = current;
+                current = (sf_block *) ((char *)pad_block + padding);
+                current->header = pad_block->header - padding; //decrease size 
+                current->header &= ~PREV_BLOCK_ALLOCATED; // previous block is free
+                pad_block->header = padding | (pad_block->header & PREV_BLOCK_ALLOCATED);
+                *((sf_header *) (((char *) pad_block) + (pad_block->header & ~(0x3)) - 8)) = pad_block->header;
+                void *allocated = sf_allocate_block(current, size);
+                sf_add_to_free_list(pad_block);
+                return allocated;
+            } 
             return sf_allocate_block(current, size);
         }
 
