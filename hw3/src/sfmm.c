@@ -71,7 +71,14 @@ void sf_free(void *pp) {
 }
 
 void *sf_realloc(void *pp, size_t rsize) {
-    return NULL;
+    if (sf_check_pointer(pp))
+        abort();
+    void *block = sf_malloc(rsize);
+    if (block == NULL)
+        return NULL;
+    memcpy(block, pp, rsize+8);
+    sf_free(pp);
+    return block;
 }
 
 void *sf_memalign(size_t size, size_t align) {
