@@ -31,7 +31,9 @@ void *sf_check_free_list(size_t size, int index, size_t align) {
     // search through the linked list
     sf_block *current = list->body.links.next;
     do {
-        size_t padding = (((size_t) current+8) % align);
+        size_t padding = (align - (((size_t) current+8) % align)) % align;
+        if (padding && padding < 32) // padding is nonzero and less than 32
+            padding += 32;
         if (size+padding <= (current->header & ~0x3)) {
             current->body.links.prev->body.links.next = current->body.links.next;
             current->body.links.next->body.links.prev = current->body.links.prev;
