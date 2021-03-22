@@ -67,7 +67,7 @@ void *sf_realloc(void *pp, size_t rsize) {
     actual = (actual < 32) ? 32:actual;
     info("%ld", actual);
     if (actual <= size) {
-        return sf_allocate_block(pp-8, actual);
+        return &((sf_block *) sf_allocate_block(pp-8, actual))->body;
     }
     void *block = sf_malloc(rsize);
     if (block == NULL)
