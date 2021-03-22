@@ -85,7 +85,7 @@ void *sf_memalign(size_t size, size_t align) {
     if (size == 0)
         return NULL;
     // check align is at least 32 and a power of 2
-    if (align < 32 || (align & (align-1) != 0)) {
+    if (align < 32 || ((align & (align-1)) != 0)) {
         sf_errno = EINVAL;
         return NULL;
     }
