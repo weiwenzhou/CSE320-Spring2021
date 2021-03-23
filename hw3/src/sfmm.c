@@ -89,9 +89,10 @@ void *sf_memalign(size_t size, size_t align) {
         sf_errno = EINVAL;
         return NULL;
     }
-    // calculate the number of bytes: header (8) + size + padding to be 'align' byte align
+    // calculate the number of bytes: min(header (8) + size + padding to be 16 byte align, 32)
     size_t actual = 8 + size;
-    actual = (actual % align == 0) ? actual:((actual/align + 1) * align);
+    actual = (actual % 16 == 0) ? actual:((actual/16 + 1) * 16);
+    actual = (actual < 32) ? 32:actual;
     // calculate the class size
     int class = 0;
     while (class < NUM_FREE_LISTS-1) {
