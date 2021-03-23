@@ -186,7 +186,6 @@ void *sf_generalize_allocation(size_t size, size_t align) {
     }
     while (block == NULL) {
         if (sf_increase_wilderness()) {
-            sf_errno = ENOMEM;
             return NULL;
         }
         block = (sf_block *) sf_check_free_list(actual, NUM_FREE_LISTS-1, align);
