@@ -147,7 +147,7 @@ void *sf_allocate_block(void *block, size_t size) {
     // decide whether to split or not
     if (length - size < 32) { // don't split
         current->header = current->header | THIS_BLOCK_ALLOCATED;
-        ((sf_block *)((char *) current + size))->header |= PREV_BLOCK_ALLOCATED;
+        ((sf_block *)((char *) current + (current->header & ~(0x3))))->header |= PREV_BLOCK_ALLOCATED;
     } else { // split
         sf_block *new_block = (sf_block *) (((char *) current) + size);
         current->header = size | THIS_BLOCK_ALLOCATED | (current->header & PREV_BLOCK_ALLOCATED);
