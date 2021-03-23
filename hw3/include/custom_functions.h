@@ -51,3 +51,19 @@ int sf_check_pointer(void *pp);
  * @return The address of the newly allocated block.
  */
 void *sf_allocate_block(void *block, size_t size);
+
+/**
+ * Allocates a block of memory with a specific alignment (similar to 
+ * sf_memalign with the minimum alignment being 16 instead of 32). Alignment
+ * is assume to be a power of 2. A helper function for sf_malloc and sf_memalign. 
+ * 
+ * @param size The number of bytes requested to be allocated.
+ * @param align The alignment required of the returned pointer.
+ * 
+ * @return If size is 0, then NULL is returned without setting sf_errno.
+ * If size is nonzero, then if the allocation is successful a pointer to
+ * a valid region of memory of requested size with the requested alignment
+ * is returned. If the allocation is not successful then the NULL is returned
+ * and sf_errno is set to ENOMEM. 
+ */
+void *sf_generalize_allocation(size_t size, size_t align);

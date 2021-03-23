@@ -158,3 +158,38 @@ void *sf_allocate_block(void *block, size_t size) {
     }
     return current;
 }
+
+void *sf_generalize_allocation(size_t size, size_t align) {
+    sf_block *start = (sf_block *) sf_mem_start();
+    sf_block *end = (sf_block *) sf_mem_end();
+    if (start == end) {
+        sf_initialize_heap();
+    }
+    if (size == 0)
+        return NULL;
+    // calculate the number of bytes: min(header (8) + size + padding to be 16 byte align, 32)
+    size_t actual = 8 + size;
+    actual = (actual % 16 == 0) ? actual:((actual/16 + 1) * 16);
+    actual = (actual < 32) ? 32:actual;
+    // calculate the class size
+    int class = 0;
+    while (class < NUM_FREE_LISTS-1) {
+        if (actual <= (32 << class))
+            break;
+        class++;
+    }
+    sf_block *block;
+    for (int place = class; place < NUM_FREE_LISTS; place++) {
+        block = (sf_block *) sf_check_free_list(actual, place, align);
+        if (block != NULL)
+            break;
+    }
+    while (block == NULL) {
+        if (sf_increase_wilderness()) {
+            sf_errno = ENOMEM;
+            return NULL;
+        }
+        block = (sf_block *) sf_check_free_list(actual, NUM_FREE_LISTS-1, align);
+    }
+    return &block->body;
+}

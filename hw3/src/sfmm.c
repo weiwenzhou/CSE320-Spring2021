@@ -11,38 +11,7 @@
 #include "custom_functions.h"
 
 void *sf_malloc(size_t size) {
-    sf_block *start = (sf_block *) sf_mem_start();
-    sf_block *end = (sf_block *) sf_mem_end();
-    if (start == end) {
-        sf_initialize_heap();
-    }
-    if (size == 0)
-        return NULL;
-    // calculate the number of bytes: min(header (8) + size + padding to be 16 byte align, 32)
-    size_t actual = 8 + size;
-    actual = (actual % 16 == 0) ? actual:((actual/16 + 1) * 16);
-    actual = (actual < 32) ? 32:actual;
-    // calculate the class size
-    int class = 0;
-    while (class < NUM_FREE_LISTS-1) {
-        if (actual <= (32 << class))
-            break;
-        class++;
-    }
-    sf_block *block;
-    for (int place = class; place < NUM_FREE_LISTS; place++) {
-        block = (sf_block *) sf_check_free_list(actual, place, 16);
-        if (block != NULL)
-            break;
-    }
-    while (block == NULL) {
-        if (sf_increase_wilderness()) {
-            sf_errno = ENOMEM;
-            return NULL;
-        }
-        block = (sf_block *) sf_check_free_list(actual, NUM_FREE_LISTS-1, 16);
-    }
-    return &block->body;
+    return sf_generalize_allocation(size, 16);
 }
 
 void sf_free(void *pp) {
@@ -77,41 +46,10 @@ void *sf_realloc(void *pp, size_t rsize) {
 }
 
 void *sf_memalign(size_t size, size_t align) {
-    sf_block *start = (sf_block *) sf_mem_start();
-    sf_block *end = (sf_block *) sf_mem_end();
-    if (start == end) {
-        sf_initialize_heap();
-    }
-    if (size == 0)
-        return NULL;
     // check align is at least 32 and a power of 2
     if (align < 32 || ((align & (align-1)) != 0)) {
         sf_errno = EINVAL;
         return NULL;
     }
-    // calculate the number of bytes: min(header (8) + size + padding to be 16 byte align, 32)
-    size_t actual = 8 + size;
-    actual = (actual % 16 == 0) ? actual:((actual/16 + 1) * 16);
-    actual = (actual < 32) ? 32:actual;
-    // calculate the class size
-    int class = 0;
-    while (class < NUM_FREE_LISTS-1) {
-        if (actual <= (32 << class))
-            break;
-        class++;
-    }
-    sf_block *block;
-    for (int place = class; place < NUM_FREE_LISTS; place++) {
-        block = (sf_block *) sf_check_free_list(actual, place, align);
-        if (block != NULL)
-            break;
-    }
-    while (block == NULL) {
-        if (sf_increase_wilderness()) {
-            sf_errno = ENOMEM;
-            return NULL;
-        }
-        block = (sf_block *) sf_check_free_list(actual, NUM_FREE_LISTS-1, align);
-    }
-    return &block->body;
+    return sf_generalize_allocation(size, align);
 }
