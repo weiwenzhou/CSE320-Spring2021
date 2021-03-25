@@ -123,6 +123,9 @@ int sf_check_pointer(void *pp) {
         return -1;
     sf_block *block = (sf_block *) ((char *) pp - 8);
     sf_header size = block->header & ~0x3;
+    // check that pointer is between the prologue and epilogue
+    if ((char *) block < ((char *) sf_mem_start())+40 || (char *) block >= ((char *) sf_mem_end()-8))
+        return -1;
     if (size % 16 != 0)
         return -1;
     if (size < 32)
