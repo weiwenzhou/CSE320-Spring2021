@@ -27,8 +27,10 @@ void *sf_realloc(void *pp, size_t rsize) {
         sf_free(pp);
         return NULL;
     }
-    if (sf_check_pointer(pp))
-        abort();
+    if (sf_check_pointer(pp)) {
+        sf_errno = EINVAL;
+        return NULL;
+    }
     sf_header size = (*((sf_header *) (pp-8))) & ~0x3;
     // calculate the number of bytes: min(header (8) + size + padding to be 16 byte align, 32)
     size_t actual = 8 + rsize;
