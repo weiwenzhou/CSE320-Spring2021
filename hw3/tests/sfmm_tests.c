@@ -213,3 +213,35 @@ Test(sfmm_basecode_suite, memalign_invalid_alignment, .timeout = TEST_TIMEOUT) {
 	    assert_free_block_count(8144, 1);
     }
 }
+
+Test(sfmm_basecode_suite, memalign_on_boundary, .timeout = TEST_TIMEOUT) {
+    sf_errno = 0;
+    size_t sz = 120, align = 128;
+    sf_memalign(sz, align);
+    void *x = sf_memalign(sz, align);
+
+    cr_assert_not_null(x, "x is NULL!");
+    info("%p", x);
+    cr_assert( (size_t) x % align == 0, "x is not ALIGN!");
+
+    assert_free_block_count(0, 2);
+
+    cr_assert(sf_errno == 0, "sf_errno is not zero!");
+    cr_assert(sf_mem_start() + 8192 == sf_mem_end(), "Allocated more than necessary!");
+
+}
+
+Test(sfmm_basecode_suite, memalign_not_on_boundary, .timeout = TEST_TIMEOUT) {
+    sf_errno = 0;
+    size_t sz = 50, align = 128;
+    void *x = sf_memalign(sz, align);
+
+    cr_assert_not_null(x, "x is NULL!");
+    cr_assert( (size_t) x % align == 0, "x is not ALIGN!");
+
+    assert_free_block_count(0, 2);
+
+    cr_assert(sf_errno == 0, "sf_errno is not zero!");
+    cr_assert(sf_mem_start() + 8192 == sf_mem_end(), "Allocated more than necessary!");
+}
+
