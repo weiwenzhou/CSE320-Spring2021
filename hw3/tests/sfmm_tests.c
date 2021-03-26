@@ -185,3 +185,17 @@ Test(sfmm_basecode_suite, free_prologue, .timeout = TEST_TIMEOUT, .signal = SIGA
     sf_block *prologue = (sf_block *) (sf_mem_start() + 8);
     sf_free(&prologue->body);
 } 
+
+Test(sfmm_basecode_suite, realloc_free_block, .timeout = TEST_TIMEOUT) {
+    sf_errno = 0;
+    size_t sz = 4;
+    sf_malloc(sz);
+    sf_block *free_block = sf_free_list_heads[NUM_FREE_LISTS-1].body.links.next;
+    void *x = sf_realloc(free_block, 50);
+
+    cr_assert_null(x, "x is not NULL!");
+    cr_assert(sf_errno == EINVAL, "sf_errnon is not EINVAL");
+
+    assert_free_block_count(0, 1);
+	assert_free_block_count(8112, 1);
+}
