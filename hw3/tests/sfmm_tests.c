@@ -180,3 +180,8 @@ Test(sfmm_basecode_suite, realloc_smaller_block_free_block, .timeout = TEST_TIME
 //STUDENT UNIT TESTS SHOULD BE WRITTEN BELOW
 //DO NOT DELETE THESE COMMENTS
 //############################################
+Test(sfmm_basecode_suite, free_prologue, .timeout = TEST_TIMEOUT, .signal = SIGABRT) {
+    sf_malloc(24);
+    sf_block *prologue = (sf_block *) (sf_mem_start() + 8);
+    sf_free(&prologue->body);
+} 
