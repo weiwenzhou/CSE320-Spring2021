@@ -199,3 +199,17 @@ Test(sfmm_basecode_suite, realloc_free_block, .timeout = TEST_TIMEOUT) {
     assert_free_block_count(0, 1);
 	assert_free_block_count(8112, 1);
 }
+
+Test(sfmm_basecode_suite, memalign_invalid_alignment, .timeout = TEST_TIMEOUT) {
+    sf_errno = 0;
+    size_t sz = 88, align = 50;
+    void *x = sf_memalign(sz, align);
+
+    cr_assert_null(x, "x is not NULL!");
+    cr_assert(sf_errno == EINVAL, "sf_errnon is not EINVAL");
+
+    if (sf_mem_start() != sf_mem_end()) { // heap is initialize
+        assert_free_block_count(0, 1);
+	    assert_free_block_count(8144, 1);
+    }
+}
