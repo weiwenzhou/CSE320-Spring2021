@@ -694,12 +694,15 @@ program, or you risk unreliability.
 
 There is just one function which you have to implement as specified:
 
-* `run_cli(FILE *in, FILE *out)` - This function is called from `main()` to allow the
+* `int run_cli(FILE *in, FILE *out)` - This function is called from `main()` to allow the
   user to interact with the program.  User commands are to be read from the stream `in`
   and output for the user (including error messages) is to be written to the stream `out`.
   You should not make any assumptions about what these streams are, as during grading we
   will likely call this function from a test driver that replaces the human user.
   Use `sf_readline()` to read input.  If `out != stdout` then suppress the prompt.
+  This function should return -1 if either a `quit` command was executed or else
+  `in == NULL || in == stdin` and an EOF was encountered while reading input.
+  Otherwise (*i.e.* `in != NULL && in != stdin` and `quit` was not executed), 0 is returned.
 
 	> :scream:  **Do not make any changes to `main.c`.**
     > Any initialization your program requires must be performed out of the `run_cli()`
