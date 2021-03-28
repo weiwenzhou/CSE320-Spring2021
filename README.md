@@ -748,7 +748,7 @@ will likely result in your program failing our tests.
   to `sf_printer_defined()` implies that the printer has been set to status
   `PRINTER_DISABLED`.
 
-* `void sf_job_created(int id, char *file_name, char *file_type, PRINTER_SET eligible_printers)` -
+* `void sf_job_created(int id, char *file_name, char *file_type)` -
   This function must be called upon the successful creation of a job consisting
   of a file to be printed.
 
