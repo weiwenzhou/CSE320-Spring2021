@@ -810,12 +810,13 @@ We have provided you with an object file `imprimer.a` (in the `lib` directory),
 which will be automatically linked with your program.  This library contains
 the implementations of various functions discussed above.
 
-  * int imp_connect_to_printer(PRINTER *printer);
+  * int imp_connect_to_printer(char *printer_name, char *printer_type, int flags);
 
 	This is the function you **must** use to connect to a printer.  If successful,
 	it returns a file descriptor to be used to send data to the printer;
 	if unsuccessful, -1 is returned.  If the printer is not currently "up",
 	then it will be started (see about the `printer` program below).
+	See `imprimer.h` for more information about the arguments.
 
 In order to interface with the above functions, the header file `imprimer.h` defines
 structure types `PRINTER` and `JOB`.  You *must* pass in instances of these structures
