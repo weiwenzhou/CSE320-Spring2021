@@ -18,8 +18,11 @@ int run_cli(FILE *in, FILE *out)
 {
     // TO BE IMPLEMENTED
     // int stdin_copy = dup(STDIN_FILENO);
+    // int stdout_copy = dup(STDOUT_FILENO);
     // int fd_in = fileno(in);
+    // int fd_out = fileno(out);
     // dup2(fd_in, STDIN_FILENO);
+    // dup2(fd_out, STDOUT_FILENO);
     char *prompt = (in == stdin) ? "imp> ":"";
     while (1) {
         char *cmd = sf_readline(prompt); 
@@ -109,5 +112,6 @@ int run_cli(FILE *in, FILE *out)
     // abort();
 
     // dup2(stdin_copy, STDIN_FILENO);
+    // dup2(stdout_copy, STDOUT_FILENO);
     return 0;
 }
