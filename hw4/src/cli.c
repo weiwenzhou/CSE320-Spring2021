@@ -41,26 +41,37 @@ int run_cli(FILE *in, FILE *out)
             sf_cmd_ok();
             return -1;
         } else if (strcmp(*array, "type") == 0) {
+            CHECK_ARG(length, 1);
             
         } else if (strcmp(*array, "printer") == 0) {
+            CHECK_ARG(length, 2);
             
         } else if (strcmp(*array, "conversion") == 0) {
+            CHECK_ARG(length, 3);
             
         } else if (strcmp(*array, "printers") == 0) {
+            CHECK_ARG(length, 0);
             
         } else if (strcmp(*array, "jobs") == 0) {
+            CHECK_ARG(length, 0);
             
         } else if (strcmp(*array, "print") == 0) {
+            CHECK_ARG(length, 1);
             
         } else if (strcmp(*array, "cancel") == 0) {
+            CHECK_ARG(length, 1);
             
         } else if (strcmp(*array, "pause") == 0) {
+            CHECK_ARG(length, 1);
             
         } else if (strcmp(*array, "resume") == 0) {
+            CHECK_ARG(length, 1);
             
         } else if (strcmp(*array, "disable") == 0) {
+            CHECK_ARG(length, 1);
             
         } else if (strcmp(*array, "enable") == 0) {
+            CHECK_ARG(length, 1);
             
         } else {
             printf("Unrecognized command: %s\n", *array);
