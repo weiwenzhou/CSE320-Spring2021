@@ -22,14 +22,18 @@ int run_cli(FILE *in, FILE *out)
     // dup2(fd_in, STDIN_FILENO);
     char *prompt = (in == stdin) ? "imp> ":"";
     while (1) {
-        char *cmd = sf_readline(prompt);        
+        char *cmd = sf_readline(prompt); 
+        if (cmd == NULL) {
+            free(cmd);
+            break;
+        }       
         int length = 0;
         char **array = split_string(cmd, &length);
 
         // decrement length to account for command
         length--;
-        if (cmd == NULL)
-            break;
+        if (length < 0)
+            goto bad_arg;
         else if (strcmp(*array, "help") == 0) {
             CHECK_ARG(length, 0);
             printf("Commands are: help quit type printer conversion printers jobs print cancel disable enable pause resume\n");
@@ -42,6 +46,9 @@ int run_cli(FILE *in, FILE *out)
             return -1;
         } else if (strcmp(*array, "type") == 0) {
             CHECK_ARG(length, 1);
+            FILE_TYPE *type = define_type(array[1]);
+            if (type == NULL)
+                sf_cmd_error("type");
             
         } else if (strcmp(*array, "printer") == 0) {
             CHECK_ARG(length, 2);
