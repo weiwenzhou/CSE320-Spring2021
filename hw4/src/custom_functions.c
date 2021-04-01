@@ -1,6 +1,9 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "conversions.h"
+#include "imprimer.h"
 #include "custom_functions.h"
 #include "debug.h"
 

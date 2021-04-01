@@ -1,7 +1,3 @@
-#include <stdio.h>
-
-#include "imprimer.h"
-
 #define WRONG_ARG_COUNT(length, required) printf("Wrong number of args (given: %d, required: %d) for CLI command 'help'\n", length, required); sf_cmd_error("arg count");
 #define CHECK_ARG(length, required) if (length != required) {WRONG_ARG_COUNT(length, required); goto bad_arg;}
 
