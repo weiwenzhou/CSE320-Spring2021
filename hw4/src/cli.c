@@ -49,13 +49,28 @@ int run_cli(FILE *in, FILE *out)
             FILE_TYPE *type = define_type(array[1]);
             if (type == NULL)
                 sf_cmd_error("type");
-            
+            else
+                sf_cmd_ok();
         } else if (strcmp(*array, "printer") == 0) {
             CHECK_ARG(length, 2);
             
         } else if (strcmp(*array, "conversion") == 0) {
             CHECK_ARG(length, 3);
-            
+            if (find_type(array[1]) == NULL) {
+                printf("Undeclared file type: %s\n", array[1]);
+                sf_cmd_error("conversion");
+                goto bad_arg;
+            }
+            if (find_type(array[2]) == NULL) {
+                printf("Undeclared file type: %s\n", array[2]);
+                sf_cmd_error("conversion");
+                goto bad_arg;
+            }
+            CONVERSION *conversion = define_conversion(array[1], array[2], &array[3]);
+            if (conversion == NULL)
+                sf_cmd_error("conversion");
+            else
+                sf_cmd_ok();
         } else if (strcmp(*array, "printers") == 0) {
             CHECK_ARG(length, 0);
             
