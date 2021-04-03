@@ -56,6 +56,7 @@ int run_cli(FILE *in, FILE *out)
         } else if (strcmp(*array, "printer") == 0) {
             CHECK_ARG(length, 2);
             FILE_TYPE *type;
+            PRINTER *printer;
             if (find_printer_name(array[1]) != NULL) {
                 printf("Printer name (%s) already exists\n", array[1]);
                 sf_cmd_error("printer - printer name already exists");
@@ -66,11 +67,14 @@ int run_cli(FILE *in, FILE *out)
                 sf_cmd_error("printer - unknown file type");
                 goto bad_arg;
             }
-            if (define_printer(array[1], type) == NULL) {
+            if ((printer = define_printer(array[1], type)) == NULL) {
                 printf("Too many printers (32 max)\n");
                 sf_cmd_error("printer - too many printers");
                 goto bad_arg;
             }
+            sf_printer_defined(printer->name, printer->type->name);
+            printf("PRINTER: id=%d, name=%s, type=%s, status=%s\n", printer_count-1, printer->name, printer->type->name, printer_status_names[printer->status]);
+
             sf_cmd_ok();
         } else if (strcmp(*array, "conversion") == 0) {
             CHECK_ARG(length, 3);
@@ -91,7 +95,9 @@ int run_cli(FILE *in, FILE *out)
                 sf_cmd_ok();
         } else if (strcmp(*array, "printers") == 0) {
             CHECK_ARG(length, 0);
-            
+            for (int i = 0; i < printer_count; i++)
+                printf("PRINTER: id=%d, name=%s, type=%s, status=%s\n", i, printers[i].name, printers[i].type->name, printer_status_names[printers[i].status]);
+            sf_cmd_ok();
         } else if (strcmp(*array, "jobs") == 0) {
             CHECK_ARG(length, 0);
             
