@@ -23,11 +23,14 @@ int run_cli(FILE *in, FILE *out)
     // int fd_out = fileno(out);
     // dup2(fd_in, STDIN_FILENO);
     // dup2(fd_out, STDOUT_FILENO);
+    int returnValue = 0;
     char *prompt = (in == stdin) ? "imp> ":"";
     while (1) {
         char *cmd = sf_readline(prompt); 
-        if (cmd == NULL) {
+        if (cmd == NULL) { // for EOF
             free(cmd);
+            if (in == NULL || in == stdin)
+                returnValue = -1;
             break;
         }       
         int length = 0;
@@ -35,7 +38,7 @@ int run_cli(FILE *in, FILE *out)
 
         // decrement length to account for command
         length--;
-        if (length < 0)
+        if (length < 0) // for an empty line
             goto bad_arg;
         else if (strcmp(*array, "help") == 0) {
             CHECK_ARG(length, 0);
@@ -46,7 +49,8 @@ int run_cli(FILE *in, FILE *out)
             free(cmd);
             free(array);
             sf_cmd_ok();
-            return -1;
+            returnValue = -1;
+            break;
         } else if (strcmp(*array, "type") == 0) {
             CHECK_ARG(length, 1);
             if (define_type(array[1]) == NULL)
@@ -134,5 +138,5 @@ int run_cli(FILE *in, FILE *out)
 
     // dup2(stdin_copy, STDIN_FILENO);
     // dup2(stdout_copy, STDOUT_FILENO);
-    return 0;
+    return returnValue;
 }
