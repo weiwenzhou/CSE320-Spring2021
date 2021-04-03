@@ -73,7 +73,7 @@ int run_cli(FILE *in, FILE *out)
                 goto bad_arg;
             }
             sf_printer_defined(printer->name, printer->type->name);
-            printf("PRINTER: id=%d, name=%s, type=%s, status=%s\n", printer_count-1, printer->name, printer->type->name, printer_status_names[printer->status]);
+            printf("PRINTER: id=%ld, name=%s, type=%s, status=%s\n", printers-printer, printer->name, printer->type->name, printer_status_names[printer->status]);
 
             sf_cmd_ok();
         } else if (strcmp(*array, "conversion") == 0) {
