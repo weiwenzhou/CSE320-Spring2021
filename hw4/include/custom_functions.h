@@ -17,6 +17,22 @@ PRINTER printers[MAX_PRINTERS];
 // Global counter to keep track of the number of printers
 int printer_count;
 
+/*
+ * Structure that describes a job.
+ * You must define this appropriately (but not here).
+ */
+typedef struct job {
+    char *file;
+    int elgible; // 32 bits. One for each printer (1 if eligible)
+    FILE_TYPE *type;
+    JOB_STATUS status;
+} JOB;
+
+/*
+ * Space to store the JOBs.
+ */
+JOB jobs[MAX_JOBS];
+
 /**
  * Splits a string using whitespaces as the delimiter. The 
  * strings in the array do not have whitespaces.
