@@ -34,7 +34,9 @@ PRINTER *define_printer(char *name, FILE_TYPE *type) {
     if (printer_count == MAX_PRINTERS)
         return NULL;
     PRINTER *new_printer = &printers[printer_count++];
-    new_printer->name = name;
+    char *name_copy = malloc(strlen(name)+1); // minimum length + 1 for \0
+    strcpy(name_copy, name);
+    new_printer->name = name_copy;
     new_printer->type = type;
     new_printer->status = PRINTER_DISABLED;
     return new_printer;
