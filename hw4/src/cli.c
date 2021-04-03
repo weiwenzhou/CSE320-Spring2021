@@ -56,10 +56,19 @@ int run_cli(FILE *in, FILE *out)
                 sf_cmd_ok();
         } else if (strcmp(*array, "printer") == 0) {
             CHECK_ARG(length, 2);
+            FILE_TYPE *type;
             // check if printer name already exists
-            // check if file type is defined
-            // try to define printer
-            // if printer is null out (hit max printers) throw error
+            if ((type = find_type(array[2])) == NULL) {
+                printf("Unknown file type: %s\n", array[1]);
+                sf_cmd_error("printer - unknown file type");
+                goto bad_arg;
+            }
+            if (define_printer(array[1], type) == NULL) {
+                printf("Too many printers (32 max)\n");
+                sf_cmd_error("printer - too many printers");
+                goto bad_arg;
+            }
+            sf_cmd_ok();
         } else if (strcmp(*array, "conversion") == 0) {
             CHECK_ARG(length, 3);
             if (find_type(array[1]) == NULL) {
