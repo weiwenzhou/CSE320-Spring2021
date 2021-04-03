@@ -138,5 +138,7 @@ int run_cli(FILE *in, FILE *out)
 
     // dup2(stdin_copy, STDIN_FILENO);
     // dup2(stdout_copy, STDOUT_FILENO);
+    for (int i = 0; i < printer_count; i++) 
+        free(printers[i].name);
     return returnValue;
 }
