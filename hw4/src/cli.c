@@ -56,7 +56,10 @@ int run_cli(FILE *in, FILE *out)
                 sf_cmd_ok();
         } else if (strcmp(*array, "printer") == 0) {
             CHECK_ARG(length, 2);
-            
+            // check if printer name already exists
+            // check if file type is defined
+            // try to define printer
+            // if printer is null out (hit max printers) throw error
         } else if (strcmp(*array, "conversion") == 0) {
             CHECK_ARG(length, 3);
             if (find_type(array[1]) == NULL) {
