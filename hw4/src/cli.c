@@ -49,8 +49,7 @@ int run_cli(FILE *in, FILE *out)
             return -1;
         } else if (strcmp(*array, "type") == 0) {
             CHECK_ARG(length, 1);
-            FILE_TYPE *type = define_type(array[1]);
-            if (type == NULL)
+            if (define_type(array[1]) == NULL)
                 sf_cmd_error("type");
             else
                 sf_cmd_ok();
