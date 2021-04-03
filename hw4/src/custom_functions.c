@@ -28,3 +28,14 @@ char **split_string(char *string, int *length) {
     free(updated);
     return array;
 }
+
+PRINTER *define_printer(char *name, FILE_TYPE *type) {
+    info("%d", printer_count);
+    if (printer_count == MAX_PRINTERS)
+        return NULL;
+    PRINTER *new_printer = &printers[printer_count++];
+    new_printer->name = name;
+    new_printer->type = type;
+    new_printer->status = PRINTER_DISABLED;
+    return new_printer;
+}

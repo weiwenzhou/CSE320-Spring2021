@@ -28,3 +28,14 @@ int printer_count;
  * split by whitespaces.
  */
 char **split_string(char *string, int *length);
+
+/**
+ * Defines a new printer, with a given name and file type.
+ * 
+ * @param name The name of the printer 
+ * @param type A pointer to a FILE_TYPE of the file type
+ * 
+ * @return a newly created printer object with the sepcific name for 
+ * the given file type or NULL, if MAX_PRINTERS have been defined.
+ */
+PRINTER *define_printer(char *name, FILE_TYPE *type);
