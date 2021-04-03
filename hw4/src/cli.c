@@ -56,7 +56,11 @@ int run_cli(FILE *in, FILE *out)
         } else if (strcmp(*array, "printer") == 0) {
             CHECK_ARG(length, 2);
             FILE_TYPE *type;
-            // check if printer name already exists
+            if (find_printer_name(array[1]) != NULL) {
+                printf("Printer name (%s) already exists\n", array[1]);
+                sf_cmd_error("printer - printer name already exists");
+                goto bad_arg;
+            }
             if ((type = find_type(array[2])) == NULL) {
                 printf("Unknown file type: %s\n", array[2]);
                 sf_cmd_error("printer - unknown file type");

@@ -39,3 +39,11 @@ PRINTER *define_printer(char *name, FILE_TYPE *type) {
     new_printer->status = PRINTER_DISABLED;
     return new_printer;
 }
+
+PRINTER *find_printer_name(char *name) {
+    for (int i = 0; i < printer_count; i++) {
+        if (strcmp(printers[i].name, name) == 0)
+            return &printers[i];
+    }
+    return NULL;
+}

@@ -39,3 +39,13 @@ char **split_string(char *string, int *length);
  * the given file type or NULL, if MAX_PRINTERS have been defined.
  */
 PRINTER *define_printer(char *name, FILE_TYPE *type);
+
+/**
+ * Lookup a new printer by its name.
+ * 
+ * @param name The name of the printer 
+ * 
+ * @return the PRINTER object with the specific name, or NULL, 
+ * if no printer with this name has been defined. 
+ */
+PRINTER *find_printer_name(char *name);
