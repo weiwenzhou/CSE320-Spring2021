@@ -49,3 +49,23 @@ PRINTER *find_printer_name(char *name) {
     }
     return NULL;
 }
+
+JOB *create_job(char *file, FILE_TYPE *type, int printer_set) {
+    if (~job_count == 0) // if every bit is 1 then jobs array is full
+        return NULL;
+    size_t temp = ~job_count; // bits that are 1 are open slots
+    for (int i = 0; i < MAX_JOBS; i++) {
+        if ((temp >> i) & 0x1) {
+            job_count |= 1 << i;
+            JOB *new_job = &jobs[i];
+            char *file_copy = malloc(strlen(file)+1); // length + 1 for \0
+            strcpy(file_copy, file);
+            new_job->file = file_copy;
+            new_job->type = type;
+            new_job->status = JOB_CREATED;
+            new_job->eligible = printer_set;
+            return new_job;
+        }
+    }
+    return NULL; // it should never get here
+}

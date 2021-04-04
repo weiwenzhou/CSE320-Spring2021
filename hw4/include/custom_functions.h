@@ -23,7 +23,7 @@ int printer_count;
  */
 typedef struct job {
     char *file;
-    int elgible; // 32 bits. One for each printer (1 if eligible)
+    int eligible; // 32 bits. One for each printer (1 if eligible)
     FILE_TYPE *type;
     JOB_STATUS status;
 } JOB;
@@ -32,6 +32,8 @@ typedef struct job {
  * Space to store the JOBs.
  */
 JOB jobs[MAX_JOBS];
+// Global counter to keep track of the number of jobs. (64 bits - if bit is 1 then it is taken)
+size_t job_count;
 
 /**
  * Splits a string using whitespaces as the delimiter. The 
@@ -65,3 +67,15 @@ PRINTER *define_printer(char *name, FILE_TYPE *type);
  * if no printer with this name has been defined. 
  */
 PRINTER *find_printer_name(char *name);
+
+/**
+ * Define a new job for the given file, with the given eligible printers.
+ *
+ * @param file The name of the file to print
+ * @param type A pointer to a FILE_TYPE of the file type
+ * @param printer_set An integer tracking the set of eligible printers
+ * 
+ * @return the JOB object for the given file, or NULL, if MAX_JOBS
+ * have been defined.
+ */
+JOB *create_job(char *file, FILE_TYPE *type, int printer_set);
