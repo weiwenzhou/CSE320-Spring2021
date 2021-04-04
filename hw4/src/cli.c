@@ -23,6 +23,7 @@ int run_cli(FILE *in, FILE *out)
     // int fd_out = fileno(out);
     // dup2(fd_in, STDIN_FILENO);
     // dup2(fd_out, STDOUT_FILENO);
+    info("%p", jobs[0].type);
     int returnValue = 0;
     char *prompt = (in == stdin) ? "imp> ":"";
     while (1) {
@@ -106,8 +107,38 @@ int run_cli(FILE *in, FILE *out)
             CHECK_ARG(length, 0);
             
         } else if (strcmp(*array, "print") == 0) {
-            CHECK_ARG(length, 1);
-            
+            if (length <= 1)
+                CHECK_ARG(length, 1);
+            FILE_TYPE *type;
+            PRINTER *printer;
+            JOB *job;
+            int printer_set = 0;
+            if ((type = infer_file_type(array[1])) == NULL) {
+                printf("Unknown file type: %s\n", array[1]);
+                sf_cmd_error("print - unknown file type");
+                goto bad_arg;
+            }
+            for (int i = 2; i <= length; i++) {
+                printer = find_printer_name(array[i]);
+                if (printer == NULL) {
+                    printf("Unknown printer: %s\n", array[i]);
+                    sf_cmd_error("print - unknown printer");
+                    goto bad_arg;
+                }
+                if (printer->type != type) {
+                    printf("Printer %s has type %s, but type %s is required\n", array[i], printer->type->name, type->name);
+                    sf_cmd_error("print - printer has incorrect type");
+                    goto bad_arg;
+                }
+                printer_set |= 1 << (printers-printer);
+            }
+            if ((job = create_job(array[1], type, printer_set)) == NULL) {
+                printf("Too many jobs (64 max)\n");
+                sf_cmd_error("printer - too many jobs");
+                goto bad_arg;
+            }
+            printf("JOB[%ld]: status=%s, eligible=%x, file=%s\n", jobs-job, job_status_names[job->status], job->eligible, job->file);
+            sf_cmd_ok();
         } else if (strcmp(*array, "cancel") == 0) {
             CHECK_ARG(length, 1);
             
