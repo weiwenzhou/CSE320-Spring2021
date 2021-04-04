@@ -78,7 +78,7 @@ int run_cli(FILE *in, FILE *out)
                 goto bad_arg;
             }
             sf_printer_defined(printer->name, printer->type->name);
-            printf("PRINTER: id=%ld, name=%s, type=%s, status=%s\n", printers-printer, printer->name, printer->type->name, printer_status_names[printer->status]);
+            printf("PRINTER: id=%ld, name=%s, type=%s, status=%s\n", printer-printers, printer->name, printer->type->name, printer_status_names[printer->status]);
 
             sf_cmd_ok();
         } else if (strcmp(*array, "conversion") == 0) {
@@ -105,7 +105,12 @@ int run_cli(FILE *in, FILE *out)
             sf_cmd_ok();
         } else if (strcmp(*array, "jobs") == 0) {
             CHECK_ARG(length, 0);
-            
+            for (int i = 0; i < MAX_JOBS; i++) {
+                if ((job_count >> i) & 0x1) {
+                    printf("JOB[%d]: status=%s, eligible=%x, file=%s\n", i, job_status_names[jobs[i].status], jobs[i].eligible, jobs[i].file);
+                }
+            }
+            sf_cmd_ok();
         } else if (strcmp(*array, "print") == 0) {
             if (length <= 1)
                 CHECK_ARG(length, 1);
@@ -118,26 +123,33 @@ int run_cli(FILE *in, FILE *out)
                 sf_cmd_error("print - unknown file type");
                 goto bad_arg;
             }
-            for (int i = 2; i <= length; i++) {
-                printer = find_printer_name(array[i]);
-                if (printer == NULL) {
-                    printf("Unknown printer: %s\n", array[i]);
-                    sf_cmd_error("print - unknown printer");
-                    goto bad_arg;
+            if (length == 1) {
+                for (int i = 0; i < printer_count; i++) {
+                    if (printers[i].type == type) 
+                        printer_set |= 1 << i;
                 }
-                if (printer->type != type) {
-                    printf("Printer %s has type %s, but type %s is required\n", array[i], printer->type->name, type->name);
-                    sf_cmd_error("print - printer has incorrect type");
-                    goto bad_arg;
+            } else {
+                for (int i = 2; i <= length; i++) {
+                    printer = find_printer_name(array[i]);
+                    if (printer == NULL) {
+                        printf("Unknown printer: %s\n", array[i]);
+                        sf_cmd_error("print - unknown printer");
+                        goto bad_arg;
+                    }
+                    if (printer->type != type) {
+                        printf("Printer %s has type %s, but type %s is required\n", array[i], printer->type->name, type->name);
+                        sf_cmd_error("print - printer has incorrect type");
+                        goto bad_arg;
+                    }
+                    printer_set |= 1 << (printer-printers);
                 }
-                printer_set |= 1 << (printers-printer);
             }
             if ((job = create_job(array[1], type, printer_set)) == NULL) {
                 printf("Too many jobs (64 max)\n");
                 sf_cmd_error("printer - too many jobs");
                 goto bad_arg;
             }
-            printf("JOB[%ld]: status=%s, eligible=%x, file=%s\n", jobs-job, job_status_names[job->status], job->eligible, job->file);
+            printf("JOB[%ld]: status=%s, eligible=%08x, file=%s\n", job-jobs, job_status_names[job->status], job->eligible, job->file);
             sf_cmd_ok();
         } else if (strcmp(*array, "cancel") == 0) {
             CHECK_ARG(length, 1);
