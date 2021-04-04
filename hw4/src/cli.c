@@ -183,5 +183,10 @@ int run_cli(FILE *in, FILE *out)
     // dup2(stdout_copy, STDOUT_FILENO);
     for (int i = 0; i < printer_count; i++) 
         free(printers[i].name);
+    for (int i = 0; i < MAX_JOBS; i++) {
+        if ((job_count >> i) & 0x1) {
+            free(jobs[i].file);
+        }
+    }
     return returnValue;
 }
