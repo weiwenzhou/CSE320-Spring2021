@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #include "imprimer.h"
@@ -165,7 +168,79 @@ int run_cli(FILE *in, FILE *out)
             
         } else if (strcmp(*array, "enable") == 0) {
             CHECK_ARG(length, 1);
-            
+            pid_t pid;
+            PRINTER *printer = find_printer_name(array[1]);
+            if (printer == NULL) {
+                printf("No printer: %s\n", array[1]);
+                sf_cmd_error("enable - no printer");
+                goto bad_arg;
+            }
+            printer->status = PRINTER_IDLE;
+            sf_printer_status(printer->name, PRINTER_IDLE);
+            pid = fork();
+            if (pid == 0) { // child
+                if (setpgid(0,0) == -1)
+                    perror("setpgid error:");
+                int iteration = 0;
+                while (iteration < 10) { // check the jobs array
+                    if (printer->status != PRINTER_IDLE)
+                        continue;
+                    int printer_mask = 1 << (printer-printers);
+                    int fd = -1;
+                    iteration++;
+                    warn("Checking jobs array %d", iteration);
+                    for (int i = 0; i < MAX_JOBS; i++) {
+                        if (((job_count >> i) & 0x1) && ((jobs[i].eligible & printer_mask) != 0) && jobs[i].status == JOB_CREATED) {
+                            // valid job to process
+                            debug("Starting job %d", i);
+                            jobs[i].status = JOB_RUNNING;
+                            sf_job_status(i, JOB_RUNNING);
+                            printer->status = PRINTER_BUSY;
+                            sf_printer_status(printer->name, printer->status);
+                            // sf_job_started(i, printer->name, getpid(), NULL);
+                            if (fd == -1) 
+                                fd = imp_connect_to_printer(printer->name, printer->type->name, PRINTER_NORMAL);
+                            FILE *input_file = fopen(jobs[i].file, "r");
+                            if (input_file == NULL) 
+		                        perror("input file");
+                            info("here:%d->%d", fileno(input_file), fd);
+                            pid_t job_pid = fork();
+                            int child_status;
+                            if (job_pid == 0) {
+                                char *cat[] = {
+                                    "/bin/cat",
+                                    NULL,
+                                };
+                                info("%d->%d", fileno(input_file), fd);
+                                dup2(fileno(input_file), STDIN_FILENO);
+                                dup2(fd, STDOUT_FILENO);
+                                if (execvp(cat[0], cat) < 0) {
+                                    perror("WHY");
+                                    exit(1);
+                                }
+                                exit(0);
+                            } else {
+                                waitpid(job_pid, &child_status, 0);
+                                if (WIFEXITED(child_status)) {
+                                    sf_job_status(i, JOB_FINISHED);
+                                    sf_job_finished(i, WEXITSTATUS(child_status));
+                                    printer->status = PRINTER_IDLE;
+                                    sf_printer_status(printer->name, PRINTER_IDLE);
+                                } else {
+                                    sf_job_status(i, JOB_ABORTED);
+                                    sf_job_aborted(i, WEXITSTATUS(child_status));
+                                    printer->status = PRINTER_IDLE;
+                                    sf_printer_status(printer->name, PRINTER_IDLE);
+                                }
+                            }
+                        }
+                    }
+                }
+                exit(0);
+            } else { // parent
+                int scan_status;
+                waitpid(pid, &scan_status, 0);
+            }
         } else {
             printf("Unrecognized command: %s\n", *array);
             sf_cmd_error("unrecognized command");
