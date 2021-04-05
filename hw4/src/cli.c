@@ -120,32 +120,20 @@ int run_cli(FILE *in, FILE *out)
             FILE_TYPE *type;
             PRINTER *printer;
             JOB *job;
-            int printer_set = 0;
+            int printer_set = (length == 1)?~0:0; // if no printers specified every printer is eligible
             if ((type = infer_file_type(array[1])) == NULL) {
                 printf("Unknown file type: %s\n", array[1]);
                 sf_cmd_error("print - unknown file type");
                 goto bad_arg;
             }
-            if (length == 1) {
-                for (int i = 0; i < printer_count; i++) {
-                    if (printers[i].type == type) 
-                        printer_set |= 1 << i;
+            for (int i = 2; i <= length; i++) {
+                printer = find_printer_name(array[i]);
+                if (printer == NULL) {
+                    printf("Unknown printer: %s\n", array[i]);
+                    sf_cmd_error("print - unknown printer");
+                    goto bad_arg;
                 }
-            } else {
-                for (int i = 2; i <= length; i++) {
-                    printer = find_printer_name(array[i]);
-                    if (printer == NULL) {
-                        printf("Unknown printer: %s\n", array[i]);
-                        sf_cmd_error("print - unknown printer");
-                        goto bad_arg;
-                    }
-                    if (printer->type != type) {
-                        printf("Printer %s has type %s, but type %s is required\n", array[i], printer->type->name, type->name);
-                        sf_cmd_error("print - printer has incorrect type");
-                        goto bad_arg;
-                    }
-                    printer_set |= 1 << (printer-printers);
-                }
+                printer_set |= 1 << (printer-printers);
             }
             if ((job = create_job(array[1], type, printer_set)) == NULL) {
                 printf("Too many jobs (64 max)\n");
