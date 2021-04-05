@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include "conversions.h"
 #include "imprimer.h"
@@ -68,4 +71,67 @@ JOB *create_job(char *file, FILE_TYPE *type, int printer_set) {
         }
     }
     return NULL; // it should never get here
+}
+
+pid_t start_job(PRINTER *printer, JOB *job) {
+    pid_t pid = fork();
+    if (pid == 0) { // child (master of the pipeline)
+        if (setpgid(0,0) == -1) // set group pid
+            perror("setpgid error:");
+        // CONVERSION **path = find_conversion_path(job->type->name, printer->type->name);
+        // int length = 0;
+        // while (path[length] != NULL) {
+        //     length++;
+        // }
+        debug("Starting job %ld", job-jobs);
+        job->status = JOB_RUNNING;
+        sf_job_status(job-jobs, JOB_RUNNING);
+        printer->status = PRINTER_BUSY;
+        sf_printer_status(printer->name, printer->status);
+        // sf_job_started(job-jobs, printer->name, getpgrp(), NULL);
+        int fd_printer = -1;
+        if (fd_printer == -1) 
+            fd_printer = imp_connect_to_printer(printer->name, printer->type->name, PRINTER_NORMAL);
+        FILE *input_file = fopen(job->file, "r");
+        if (input_file == NULL) {
+            perror("input file");
+            exit(1);
+        }
+
+        // debug("HERE?");
+
+        pid_t job_pid = fork();
+        int child_status;
+        if (job_pid == 0) {
+            char *cat[] = {
+                "/bin/cat",
+                NULL,
+            };
+            info("%d->%d", fileno(input_file), fd_printer);
+            dup2(fileno(input_file), STDIN_FILENO);
+            dup2(fd_printer, STDOUT_FILENO);
+            if (execvp(cat[0], cat) < 0) {
+                perror("WHY");
+                exit(1);
+            }
+            exit(0);
+        } else {
+            waitpid(job_pid, &child_status, 0);
+            if (WIFEXITED(child_status)) {
+                sf_job_status(job-jobs, JOB_FINISHED);
+                sf_job_finished(job-jobs, WEXITSTATUS(child_status));
+                printer->status = PRINTER_IDLE;
+                sf_printer_status(printer->name, PRINTER_IDLE);
+            } else {
+                sf_job_status(job-jobs, JOB_ABORTED);
+                sf_job_aborted(job-jobs, WEXITSTATUS(child_status));
+                printer->status = PRINTER_IDLE;
+                sf_printer_status(printer->name, PRINTER_IDLE);
+            }
+        }
+        
+
+        exit(0);
+    } 
+    return pid;  
 }
