@@ -79,3 +79,40 @@ PRINTER *find_printer_name(char *name);
  * have been defined.
  */
 JOB *create_job(char *file, FILE_TYPE *type, int printer_set);
+
+/**
+ * Process a job using the provided printer.
+ */
+pid_t start_job(PRINTER *printer, JOB *job);
+
+/**
+ * Pause the job specified by the id number [0, MAX_JOBS).
+ */
+void pause_job(int id);
+
+/**
+ * Resume the job specified by the id number [0, MAX_JOBS).
+ */
+void resume_job(int id);
+
+/**
+ * Cancel the job specified by the id number [0, MAX_JOBS).
+ */
+void cancel_job(int id);
+
+/**
+ * Delete the job specified by the id number [0, MAX_JOBS) 
+ * for the jobs array.
+ */
+void delete_job(int id);
+
+/**
+ * Scans jobs array, with the given printer.
+ */ 
+void scan_jobs(PRINTER *printer);
+
+
+/**
+ * SIGCHLD handler that monitors the jobs.
+ */
+void job_handler(int sig);
