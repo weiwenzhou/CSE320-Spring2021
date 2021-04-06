@@ -195,6 +195,8 @@ int run_cli(FILE *in, FILE *out)
 
     // dup2(stdin_copy, STDIN_FILENO);
     // dup2(stdout_copy, STDOUT_FILENO);
+    while (jobs_done != 0)
+        ;
     for (int i = 0; i < printer_count; i++) 
         free(printers[i].name);
     for (int i = 0; i < MAX_JOBS; i++) {
@@ -202,7 +204,5 @@ int run_cli(FILE *in, FILE *out)
             free(jobs[i].file);
         }
     }
-    while (jobs_done != 0)
-        ;
     return returnValue;
 }
