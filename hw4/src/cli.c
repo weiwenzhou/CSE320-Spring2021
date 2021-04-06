@@ -174,6 +174,7 @@ int run_cli(FILE *in, FILE *out)
                     job_process_count++;
                     jobs_done = 1;
                     pid_t job = start_job(printer, &jobs[i]);
+                    printer_pids[printer-printers] = job;
                     job_pids[i] = job;
                     // int scan_status;
                     // waitpid(job, &scan_status, 0);

@@ -120,17 +120,10 @@ pid_t start_job(PRINTER *printer, JOB *job) {
                 exit(0);
             } else {
                 waitpid(job_pid, &child_status, 0);
-                if (WIFEXITED(child_status)) {
-                    sf_job_status(job-jobs, JOB_FINISHED);
-                    sf_job_finished(job-jobs, WEXITSTATUS(child_status));
-                    printer->status = PRINTER_IDLE;
-                    sf_printer_status(printer->name, PRINTER_IDLE);
-                } else {
-                    sf_job_status(job-jobs, JOB_ABORTED);
-                    sf_job_aborted(job-jobs, WEXITSTATUS(child_status));
-                    printer->status = PRINTER_IDLE;
-                    sf_printer_status(printer->name, PRINTER_IDLE);
-                }
+                if (WIFEXITED(child_status) && WEXITSTATUS(child_status) == 0)
+                    exit(0);
+                else 
+                    exit(1);
             }
         } else {
             int pipe_fd[2];
@@ -164,29 +157,15 @@ pid_t start_job(PRINTER *printer, JOB *job) {
                     waitpid(job_pid, &child_status, 0);
                     in_fd = pipe_fd[0]; // set next read as the read end of pipe
                     if (WIFEXITED(child_status) && WEXITSTATUS(child_status) == 0) {
-                        if (i == length-1) {
-                            sf_job_status(job-jobs, JOB_FINISHED);
-                            sf_job_finished(job-jobs, WEXITSTATUS(child_status));
-                            printer->status = PRINTER_IDLE;
-                            sf_printer_status(printer->name, PRINTER_IDLE);
-                        } else {
-                            debug("Not finished yet");
-                        }
+                        if (i == length-1)
+                            exit(0);
                     } else {
-                        if (WIFSIGNALED(child_status))
-                            debug("SIGNALLS??? %d", WTERMSIG(child_status));
-                        sf_job_status(job-jobs, JOB_ABORTED);
-                        sf_job_aborted(job-jobs, WEXITSTATUS(child_status));
-                        printer->status = PRINTER_IDLE;
-                        sf_printer_status(printer->name, PRINTER_IDLE);
+                        exit(1);
                     }
                 }
             }
         }
-
-        
-
-        exit(0);
+        exit(1); // should never be reached by place here just in case
     } 
     return pid;  
 }
@@ -198,24 +177,43 @@ void job_handler(int sig) {
     if (pid < 0)
         debug("an error has occured");
     else {
+        // might need to block other signals during this process of reading/writing
         // get job id from pid
         debug("REAPING %d", pid);
         job_process_count--;
-        int id;
+        int printer_id, job_id;
         for (int i = 0; i < MAX_JOBS; i++) {
             if (pid == job_pids[i]) {
-                id = i;
+                job_id = i;
                 job_pids[i] = 0;
                 break;
             }
         }
-        info("%d", id);
+        for (int i = 0; i < printer_count; i++) {
+            if (pid == printer_pids[i]) {
+                printer_id = i;
+                printer_pids[i] = 0;
+                break;
+            }
+        }
+        // info("%d", id);
         if (WIFEXITED(child_status)) { // exited
             if (WEXITSTATUS(child_status) == EXIT_SUCCESS) {
                 // change job status to JOB_FINISHED
+                jobs[job_id].status = JOB_FINISHED;
+                sf_job_status(job_id, JOB_FINISHED);
+                sf_job_finished(job_id, WEXITSTATUS(child_status));
+                printers[printer_id].status = PRINTER_IDLE;
+                sf_printer_status(printers[printer_id].name, PRINTER_IDLE);
             } else { // EXIT_FAILURE
                 // change job status to JOB_ABORT
+                jobs[job_id].status = JOB_FINISHED;
+                sf_job_status(job_id, JOB_ABORTED);
+                sf_job_aborted(job_id, WEXITSTATUS(child_status));
+                printers[printer_id].status = PRINTER_IDLE;
+                sf_printer_status(printers[printer_id].name, PRINTER_IDLE);
             }
+            // job d
         } else if (WIFSTOPPED(child_status)) { // process stopped
             // change job status to JOB_PAUSE if job status is JOB_RUNNING 
         } else if (WIFCONTINUED(child_status)) { // process continued

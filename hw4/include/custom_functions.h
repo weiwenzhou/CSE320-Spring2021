@@ -36,8 +36,9 @@ JOB jobs[MAX_JOBS];
 size_t job_count;
 
 /*
- * Space to store the JOB group pids.
+ * Space to store the PRINTER/JOB group pids.
  */
+pid_t printer_pids[MAX_PRINTERS];
 pid_t job_pids[MAX_JOBS];
 // Counter for number jobs being processed
 int job_process_count;
