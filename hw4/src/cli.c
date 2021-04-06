@@ -85,7 +85,8 @@ int run_cli(FILE *in, FILE *out)
 
             sf_cmd_ok();
         } else if (strcmp(*array, "conversion") == 0) {
-            CHECK_ARG(length, 3);
+            if (length <= 3)
+                CHECK_ARG(length, 3);
             if (find_type(array[1]) == NULL) {
                 printf("Undeclared file type: %s\n", array[1]);
                 sf_cmd_error("conversion");
