@@ -75,6 +75,12 @@ JOB *create_job(char *file, FILE_TYPE *type, int printer_set) {
 }
 
 pid_t start_job(PRINTER *printer, JOB *job) {
+    debug("Starting job %ld", job-jobs);
+    job->status = JOB_RUNNING;
+    sf_job_status(job-jobs, JOB_RUNNING);
+    printer->status = PRINTER_BUSY;
+    sf_printer_status(printer->name, printer->status);
+    // sf_job_started(job-jobs, printer->name, getpgrp(), NULL);
     pid_t pid = fork();
     if (pid == 0) { // child (master of the pipeline)
         if (setpgid(0,0) == -1) // set group pid
@@ -82,16 +88,10 @@ pid_t start_job(PRINTER *printer, JOB *job) {
         CONVERSION **path = find_conversion_path(job->type->name, printer->type->name);
         int length = 0;
         while (path[length] != NULL) {
-            debug("%s->%s : %s", path[length]->from->name, path[length]->to->name, path[length]->cmd_and_args[0]);
+            // debug("%s->%s : %s", path[length]->from->name, path[length]->to->name, path[length]->cmd_and_args[0]);
             length++;
         }
-        info("%d", length);
-        debug("Starting job %ld", job-jobs);
-        job->status = JOB_RUNNING;
-        sf_job_status(job-jobs, JOB_RUNNING);
-        printer->status = PRINTER_BUSY;
-        sf_printer_status(printer->name, printer->status);
-        // sf_job_started(job-jobs, printer->name, getpgrp(), NULL);
+        // info("%d", length);
         int fd_printer = -1;
         if (fd_printer == -1) 
             fd_printer = imp_connect_to_printer(printer->name, printer->type->name, PRINTER_NORMAL);
@@ -101,7 +101,6 @@ pid_t start_job(PRINTER *printer, JOB *job) {
             exit(1);
         }
 
-        // debug("HERE?");
         if (length == 0) {
             pid_t job_pid = fork();
             int child_status;
@@ -139,10 +138,10 @@ pid_t start_job(PRINTER *printer, JOB *job) {
                 int child_status;
                 
                 pipe(pipe_fd);
-                info("my pipes %d -> %d", pipe_fd[0], pipe_fd[1]);
+                // info("my pipes %d -> %d", pipe_fd[0], pipe_fd[1]);
                 pid_t job_pid = fork();
                 if (job_pid == 0) { // child
-                    debug("%d: Executing %s->%s : %s", getpid(),path[i]->from->name, path[i]->to->name, path[i]->cmd_and_args[0]);
+                    // debug("%d: Executing %s->%s : %s", getpid(),path[i]->from->name, path[i]->to->name, path[i]->cmd_and_args[0]);
                     close(pipe_fd[0]); // close read side;
                     if (i == 0)
                         dup2(fileno(input_file), STDIN_FILENO);
