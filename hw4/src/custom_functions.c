@@ -78,11 +78,13 @@ pid_t start_job(PRINTER *printer, JOB *job) {
     if (pid == 0) { // child (master of the pipeline)
         if (setpgid(0,0) == -1) // set group pid
             perror("setpgid error:");
-        // CONVERSION **path = find_conversion_path(job->type->name, printer->type->name);
-        // int length = 0;
-        // while (path[length] != NULL) {
-        //     length++;
-        // }
+        CONVERSION **path = find_conversion_path(job->type->name, printer->type->name);
+        int length = 0;
+        while (path[length] != NULL) {
+            debug("%s->%s : %s", path[length]->from->name, path[length]->to->name, path[length]->cmd_and_args[0]);
+            length++;
+        }
+        info("%d", length);
         debug("Starting job %ld", job-jobs);
         job->status = JOB_RUNNING;
         sf_job_status(job-jobs, JOB_RUNNING);
@@ -99,36 +101,88 @@ pid_t start_job(PRINTER *printer, JOB *job) {
         }
 
         // debug("HERE?");
-
-        pid_t job_pid = fork();
-        int child_status;
-        if (job_pid == 0) {
-            char *cat[] = {
-                "/bin/cat",
-                NULL,
-            };
-            info("%d->%d", fileno(input_file), fd_printer);
-            dup2(fileno(input_file), STDIN_FILENO);
-            dup2(fd_printer, STDOUT_FILENO);
-            if (execvp(cat[0], cat) < 0) {
-                perror("WHY");
-                exit(1);
-            }
-            exit(0);
-        } else {
-            waitpid(job_pid, &child_status, 0);
-            if (WIFEXITED(child_status)) {
-                sf_job_status(job-jobs, JOB_FINISHED);
-                sf_job_finished(job-jobs, WEXITSTATUS(child_status));
-                printer->status = PRINTER_IDLE;
-                sf_printer_status(printer->name, PRINTER_IDLE);
+        if (length == 0) {
+            pid_t job_pid = fork();
+            int child_status;
+            if (job_pid == 0) {
+                char *cat[] = {
+                    "/bin/cat",
+                    NULL,
+                };
+                info("%d->%d", fileno(input_file), fd_printer);
+                dup2(fileno(input_file), STDIN_FILENO);
+                dup2(fd_printer, STDOUT_FILENO);
+                if (execvp(cat[0], cat) < 0) {
+                    perror("WHY");
+                    exit(1);
+                }
+                exit(0);
             } else {
-                sf_job_status(job-jobs, JOB_ABORTED);
-                sf_job_aborted(job-jobs, WEXITSTATUS(child_status));
-                printer->status = PRINTER_IDLE;
-                sf_printer_status(printer->name, PRINTER_IDLE);
+                waitpid(job_pid, &child_status, 0);
+                if (WIFEXITED(child_status)) {
+                    sf_job_status(job-jobs, JOB_FINISHED);
+                    sf_job_finished(job-jobs, WEXITSTATUS(child_status));
+                    printer->status = PRINTER_IDLE;
+                    sf_printer_status(printer->name, PRINTER_IDLE);
+                } else {
+                    sf_job_status(job-jobs, JOB_ABORTED);
+                    sf_job_aborted(job-jobs, WEXITSTATUS(child_status));
+                    printer->status = PRINTER_IDLE;
+                    sf_printer_status(printer->name, PRINTER_IDLE);
+                }
+            }
+        } else {
+            int pipe_fd[2];
+            int in_fd;
+            for (int i = 0; i < length; i++) {
+                int child_status;
+                
+                pipe(pipe_fd);
+                info("my pipes %d -> %d", pipe_fd[0], pipe_fd[1]);
+                pid_t job_pid = fork();
+                if (job_pid == 0) { // child
+                    debug("%d: Executing %s->%s : %s", getpid(),path[i]->from->name, path[i]->to->name, path[i]->cmd_and_args[0]);
+                    close(pipe_fd[0]); // close read side;
+                    if (i == 0)
+                        dup2(fileno(input_file), STDIN_FILENO);
+                    else {// read in_fd
+                        dup2(in_fd, STDIN_FILENO);
+                        close(in_fd);
+                    }
+                    if (i == length-1)
+                        dup2(fd_printer, STDOUT_FILENO);
+                    else // write to pipe[1]
+                        dup2(pipe_fd[1], STDOUT_FILENO);
+                    if (execvp(path[i]->cmd_and_args[0], path[i]->cmd_and_args) < 0) {
+                        perror("WHY");
+                        exit(1);
+                    }
+                    exit(0);
+                } else { // parent
+                    close(pipe_fd[1]); // close write side;
+                    waitpid(job_pid, &child_status, 0);
+                    in_fd = pipe_fd[0]; // set next read as the read end of pipe
+                    if (WIFEXITED(child_status)) {
+                        if (i == length-1) {
+                            sf_job_status(job-jobs, JOB_FINISHED);
+                            sf_job_finished(job-jobs, WEXITSTATUS(child_status));
+                            printer->status = PRINTER_IDLE;
+                            sf_printer_status(printer->name, PRINTER_IDLE);
+                        } else {
+                            debug("Not finished yet");
+                        }
+                    } else {
+                        if (WIFSIGNALED(child_status))
+                            debug("SIGNALLS??? %d", WTERMSIG(child_status));
+                        sf_job_status(job-jobs, JOB_ABORTED);
+                        sf_job_aborted(job-jobs, WEXITSTATUS(child_status));
+                        printer->status = PRINTER_IDLE;
+                        sf_printer_status(printer->name, PRINTER_IDLE);
+                    }
+                }
             }
         }
+
         
 
         exit(0);
