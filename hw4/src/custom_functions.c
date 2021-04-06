@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -188,4 +189,27 @@ pid_t start_job(PRINTER *printer, JOB *job) {
         exit(0);
     } 
     return pid;  
+}
+
+void job_handler(int sig) {
+    int olderrno = errno;
+    pid_t pid;
+    int child_status;
+    while ((pid = waitpid(-1, &child_status, WNOHANG)) != 0) {
+        if (pid < 0)
+            debug("an error has occured");
+        if (WIFEXITED(child_status)) { // exited
+            if (WEXITSTATUS(child_status) == EXIT_SUCCESS) {
+                // change job status to JOB_FINISHED
+            } else { // EXIT_FAILURE
+                // change job status to JOB_ABORT
+            }
+        } else if (WIFSTOPPED(child_status)) { // process stopped
+            // change job status to JOB_PAUSE if job status is JOB_RUNNING 
+        } else if (WIFCONTINUED(child_status)) { // process continued
+            // change job status to JOB_RUNNING if job status is JOB_PAUSE
+        }
+    }
+
+    errno = olderrno;
 }
