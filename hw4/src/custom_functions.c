@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -192,11 +193,23 @@ pid_t start_job(PRINTER *printer, JOB *job) {
 
 void job_handler(int sig) {
     int olderrno = errno;
-    pid_t pid;
     int child_status;
-    while ((pid = waitpid(-1, &child_status, WNOHANG)) != 0) {
-        if (pid < 0)
-            debug("an error has occured");
+    pid_t pid = waitpid(-1, &child_status, WNOHANG);
+    if (pid < 0)
+        debug("an error has occured");
+    else {
+        // get job id from pid
+        debug("REAPING %d", pid);
+        job_process_count--;
+        int id;
+        for (int i = 0; i < MAX_JOBS; i++) {
+            if (pid == job_pids[i]) {
+                id = i;
+                job_pids[i] = 0;
+                break;
+            }
+        }
+        info("%d", id);
         if (WIFEXITED(child_status)) { // exited
             if (WEXITSTATUS(child_status) == EXIT_SUCCESS) {
                 // change job status to JOB_FINISHED
@@ -209,6 +222,8 @@ void job_handler(int sig) {
             // change job status to JOB_RUNNING if job status is JOB_PAUSE
         }
     }
+    if (job_process_count == 0) 
+        jobs_done = 0;
 
     errno = olderrno;
 }

@@ -35,6 +35,16 @@ JOB jobs[MAX_JOBS];
 // Global counter to keep track of the number of jobs. (64 bits - if bit is 1 then it is taken)
 size_t job_count;
 
+/*
+ * Space to store the JOB group pids.
+ */
+pid_t job_pids[MAX_JOBS];
+// Counter for number jobs being processed
+int job_process_count;
+// Flag to keep track of when things are done.
+volatile sig_atomic_t jobs_done;
+
+
 /**
  * Splits a string using whitespaces as the delimiter. The 
  * strings in the array do not have whitespaces.

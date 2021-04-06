@@ -19,6 +19,7 @@
 
 int run_cli(FILE *in, FILE *out)
 {
+    signal(SIGCHLD, job_handler);
     // TO BE IMPLEMENTED
     // int stdin_copy = dup(STDIN_FILENO);
     // int stdout_copy = dup(STDOUT_FILENO);
@@ -170,9 +171,12 @@ int run_cli(FILE *in, FILE *out)
             int printer_mask = 1 << (printer-printers);
             for (int i = 0; i < MAX_JOBS; i++) {
                 if (((job_count >> i) & 0x1) && ((jobs[i].eligible & printer_mask) != 0) && jobs[i].status == JOB_CREATED) {
+                    job_process_count++;
+                    jobs_done = 1;
                     pid_t job = start_job(printer, &jobs[i]);
-                    int scan_status;
-                    waitpid(job, &scan_status, 0);
+                    job_pids[i] = job;
+                    // int scan_status;
+                    // waitpid(job, &scan_status, 0);
                 }
             }
         } else {
@@ -197,5 +201,7 @@ int run_cli(FILE *in, FILE *out)
             free(jobs[i].file);
         }
     }
+    while (jobs_done != 0)
+        ;
     return returnValue;
 }
