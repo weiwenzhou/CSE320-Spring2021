@@ -23,13 +23,14 @@ char **split_string(char *string, int *length) {
     while ((token = strtok(NULL, " ")) != NULL) 
         length_temp++;
     // create an array of the proper
-    char **array = calloc(length_temp, sizeof(char *));
+    char **array = calloc(length_temp+1, sizeof(char *));
     *length = length_temp;
     length_temp = 0;
     token = strtok(string, " ");
     array[length_temp++] = token;
     while ((token = strtok(NULL, " ")) != NULL) 
         array[length_temp++] = token;
+    array[length_temp] = NULL;
     free(updated);
     return array;
 }
