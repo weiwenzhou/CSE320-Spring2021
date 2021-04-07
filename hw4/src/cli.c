@@ -210,6 +210,8 @@ int run_cli(FILE *in, FILE *out)
             free(jobs[i].file);
         }
     }
+    printer_count = 0;
+    job_count = 0;
     dup2(stdin_copy, STDIN_FILENO);
     dup2(stdout_copy, STDOUT_FILENO);
     return returnValue;
