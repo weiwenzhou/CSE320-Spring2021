@@ -156,7 +156,14 @@ int run_cli(FILE *in, FILE *out)
             
         } else if (strcmp(*array, "disable") == 0) {
             CHECK_ARG(length, 1);
-            
+            PRINTER *printer = find_printer_name(array[1]);
+            if (printer == NULL) {
+                printf("No printer: %s\n", array[1]);
+                sf_cmd_error("enable - no printer");
+                goto bad_arg;
+            }
+            printer->status = PRINTER_DISABLED;
+            sf_printer_status(printer->name, PRINTER_DISABLED);
         } else if (strcmp(*array, "enable") == 0) {
             CHECK_ARG(length, 1);
             // pid_t pid;
