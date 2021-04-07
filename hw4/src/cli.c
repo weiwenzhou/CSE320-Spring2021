@@ -28,7 +28,7 @@ int run_cli(FILE *in, FILE *out)
     int fd_out = fileno(out);
     dup2(fd_in, STDIN_FILENO);
     dup2(fd_out, STDOUT_FILENO);
-    info("%p", jobs[0].type);
+    // info("%p", jobs[0].type);
     int returnValue = 0;
     char *prompt = (in != stdin || out != stdout) ? "":"imp> ";
     while (1) {

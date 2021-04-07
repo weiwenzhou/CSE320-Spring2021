@@ -36,7 +36,7 @@ char **split_string(char *string, int *length) {
 }
 
 PRINTER *define_printer(char *name, FILE_TYPE *type) {
-    info("%d", printer_count);
+    // info("%d", printer_count);
     if (printer_count == MAX_PRINTERS)
         return NULL;
     PRINTER *new_printer = &printers[printer_count++];
@@ -77,7 +77,7 @@ JOB *create_job(char *file, FILE_TYPE *type, int printer_set) {
 }
 
 pid_t start_job(PRINTER *printer, JOB *job) {
-    debug("Starting job %ld", job-jobs);
+    // debug("Starting job %ld", job-jobs);
     job->status = JOB_RUNNING;
     sf_job_status(job-jobs, JOB_RUNNING);
     printer->status = PRINTER_BUSY;
@@ -111,7 +111,7 @@ pid_t start_job(PRINTER *printer, JOB *job) {
                     "/bin/cat",
                     NULL,
                 };
-                info("%d->%d", fileno(input_file), fd_printer);
+                // info("%d->%d", fileno(input_file), fd_printer);
                 dup2(fileno(input_file), STDIN_FILENO);
                 dup2(fd_printer, STDOUT_FILENO);
                 if (execvp(cat[0], cat) < 0) {
@@ -178,7 +178,7 @@ void job_handler(int sig) {
     if (pid >= 0) {
         // might need to block other signals during this process of reading/writing
         // get job id from pid
-        debug("REAPING %d", pid);
+        // debug("REAPING %d", pid);
         job_process_count--;
         int printer_id, job_id;
         for (int i = 0; i < MAX_JOBS; i++) {
