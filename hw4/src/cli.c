@@ -22,12 +22,12 @@ int run_cli(FILE *in, FILE *out)
     signal(SIGCHLD, job_handler);
     sf_set_readline_signal_hook(scanner);
     // TO BE IMPLEMENTED
-    // int stdin_copy = dup(STDIN_FILENO);
-    // int stdout_copy = dup(STDOUT_FILENO);
-    // int fd_in = fileno(in);
-    // int fd_out = fileno(out);
-    // dup2(fd_in, STDIN_FILENO);
-    // dup2(fd_out, STDOUT_FILENO);
+    int stdin_copy = dup(STDIN_FILENO);
+    int stdout_copy = dup(STDOUT_FILENO);
+    int fd_in = fileno(in);
+    int fd_out = fileno(out);
+    dup2(fd_in, STDIN_FILENO);
+    dup2(fd_out, STDOUT_FILENO);
     info("%p", jobs[0].type);
     int returnValue = 0;
     char *prompt = (in != stdin || out != stdout) ? "":"imp> ";
@@ -201,8 +201,6 @@ int run_cli(FILE *in, FILE *out)
     // fprintf(stderr, "You have to implement run_cli() before the application will function.\n");
     // abort();
 
-    // dup2(stdin_copy, STDIN_FILENO);
-    // dup2(stdout_copy, STDOUT_FILENO);
     while (jobs_done != 0)
         ;
     for (int i = 0; i < printer_count; i++) 
@@ -212,5 +210,7 @@ int run_cli(FILE *in, FILE *out)
             free(jobs[i].file);
         }
     }
+    dup2(stdin_copy, STDIN_FILENO);
+    dup2(stdout_copy, STDOUT_FILENO);
     return returnValue;
 }
