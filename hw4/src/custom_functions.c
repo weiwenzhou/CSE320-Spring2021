@@ -223,3 +223,18 @@ void job_handler(int sig) {
 
     errno = olderrno;
 }
+
+void scanner() {
+    for (int p_id = 0; p_id < printer_count; p_id++) {
+        int printer_mask = 1 << p_id;
+        for (int i = 0; i < MAX_JOBS; i++) {
+            if (((job_count >> i) & 0x1) && ((jobs[i].eligible & printer_mask) != 0) && jobs[i].status == JOB_CREATED && printers[p_id].status == PRINTER_IDLE) {
+                job_process_count++;
+                jobs_done = 1;
+                pid_t job = start_job(&printers[p_id], &jobs[i]);
+                printer_pids[p_id] = job;
+                job_pids[i] = job;
+            }
+        }
+    }
+}

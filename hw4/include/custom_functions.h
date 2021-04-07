@@ -118,9 +118,9 @@ void cancel_job(int id);
 void delete_job(int id);
 
 /**
- * Scans jobs array, with the given printer.
+ * Scans jobs array for each printer.
  */ 
-void scan_jobs(PRINTER *printer);
+void scanner();
 
 
 /**

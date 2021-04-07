@@ -20,6 +20,7 @@
 int run_cli(FILE *in, FILE *out)
 {
     signal(SIGCHLD, job_handler);
+    sf_set_readline_signal_hook(scanner);
     // TO BE IMPLEMENTED
     // int stdin_copy = dup(STDIN_FILENO);
     // int stdout_copy = dup(STDOUT_FILENO);
@@ -168,18 +169,18 @@ int run_cli(FILE *in, FILE *out)
             printer->status = PRINTER_IDLE;
             sf_printer_status(printer->name, PRINTER_IDLE);
 
-            int printer_mask = 1 << (printer-printers);
-            for (int i = 0; i < MAX_JOBS; i++) {
-                if (((job_count >> i) & 0x1) && ((jobs[i].eligible & printer_mask) != 0) && jobs[i].status == JOB_CREATED && printers[i].status == PRINTER_IDLE) {
-                    job_process_count++;
-                    jobs_done = 1;
-                    pid_t job = start_job(printer, &jobs[i]);
-                    printer_pids[printer-printers] = job;
-                    job_pids[i] = job;
-                    // int scan_status;
-                    // waitpid(job, &scan_status, 0);
-                }
-            }
+            // int printer_mask = 1 << (printer-printers);
+            // for (int i = 0; i < MAX_JOBS; i++) {
+            //     if (((job_count >> i) & 0x1) && ((jobs[i].eligible & printer_mask) != 0) && jobs[i].status == JOB_CREATED && printers[i].status == PRINTER_IDLE) {
+            //         job_process_count++;
+            //         jobs_done = 1;
+            //         pid_t job = start_job(printer, &jobs[i]);
+            //         printer_pids[printer-printers] = job;
+            //         job_pids[i] = job;
+            //         // int scan_status;
+            //         // waitpid(job, &scan_status, 0);
+            //     }
+            // }
         } else {
             printf("Unrecognized command: %s\n", *array);
             sf_cmd_error("unrecognized command");
