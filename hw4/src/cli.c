@@ -30,7 +30,7 @@ int run_cli(FILE *in, FILE *out)
     // dup2(fd_out, STDOUT_FILENO);
     info("%p", jobs[0].type);
     int returnValue = 0;
-    char *prompt = (in == stdin) ? "imp> ":"";
+    char *prompt = (in != stdin || out != stdout) ? "":"imp> ";
     while (1) {
         char *cmd = sf_readline(prompt); 
         if (cmd == NULL) { // for EOF
