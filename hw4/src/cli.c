@@ -170,7 +170,7 @@ int run_cli(FILE *in, FILE *out)
 
             int printer_mask = 1 << (printer-printers);
             for (int i = 0; i < MAX_JOBS; i++) {
-                if (((job_count >> i) & 0x1) && ((jobs[i].eligible & printer_mask) != 0) && jobs[i].status == JOB_CREATED) {
+                if (((job_count >> i) & 0x1) && ((jobs[i].eligible & printer_mask) != 0) && jobs[i].status == JOB_CREATED && printers[i].status == PRINTER_IDLE) {
                     job_process_count++;
                     jobs_done = 1;
                     pid_t job = start_job(printer, &jobs[i]);
