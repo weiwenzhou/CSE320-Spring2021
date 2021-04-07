@@ -174,9 +174,7 @@ void job_handler(int sig) {
     int olderrno = errno;
     int child_status;
     pid_t pid = waitpid(-1, &child_status, WNOHANG);
-    if (pid < 0)
-        debug("an error has occured");
-    else {
+    if (pid >= 0) {
         // might need to block other signals during this process of reading/writing
         // get job id from pid
         debug("REAPING %d", pid);
