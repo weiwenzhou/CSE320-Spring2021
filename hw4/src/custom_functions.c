@@ -82,18 +82,24 @@ pid_t start_job(PRINTER *printer, JOB *job) {
     sf_job_status(job-jobs, JOB_RUNNING);
     printer->status = PRINTER_BUSY;
     sf_printer_status(printer->name, printer->status);
-    // sf_job_started(job-jobs, printer->name, getpgrp(), NULL);
+    CONVERSION **path = find_conversion_path(job->type->name, printer->type->name);
+    int length = 0;
+    while (path[length] != NULL) {
+        // debug("%s->%s : %s", path[length]->from->name, path[length]->to->name, path[length]->cmd_and_args[0]);
+        length++;
+    }
+    // info("%d", length);
+    char **commands = calloc(length+1, sizeof(char *));
+    for (int i = 0; i < length; i++) {
+        commands[i] = path[i]->cmd_and_args[0];
+    }
+    commands[length] = NULL;
+    sf_job_started(job-jobs, printer->name, getpgrp(), commands);
+    free(commands);
     pid_t pid = fork();
     if (pid == 0) { // child (master of the pipeline)
         if (setpgid(0,0) == -1) // set group pid
             perror("setpgid error:");
-        CONVERSION **path = find_conversion_path(job->type->name, printer->type->name);
-        int length = 0;
-        while (path[length] != NULL) {
-            // debug("%s->%s : %s", path[length]->from->name, path[length]->to->name, path[length]->cmd_and_args[0]);
-            length++;
-        }
-        // info("%d", length);
         int fd_printer = -1;
         if (fd_printer == -1) 
             fd_printer = imp_connect_to_printer(printer->name, printer->type->name, PRINTER_NORMAL);
