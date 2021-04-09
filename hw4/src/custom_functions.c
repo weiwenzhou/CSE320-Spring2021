@@ -236,11 +236,14 @@ void scanner() {
         int printer_mask = 1 << p_id;
         for (int i = 0; i < MAX_JOBS; i++) {
             if (((job_count >> i) & 0x1) && ((jobs[i].eligible & printer_mask) != 0) && jobs[i].status == JOB_CREATED && printers[p_id].status == PRINTER_IDLE) {
-                job_process_count++;
-                jobs_done = 1;
-                pid_t job = start_job(&printers[p_id], &jobs[i]);
-                printer_pids[p_id] = job;
-                job_pids[i] = job;
+                // check type
+                if (find_conversion_path(jobs[i].type->name, printers[p_id].type->name) != NULL) {
+                    job_process_count++;
+                    jobs_done = 1;
+                    pid_t job = start_job(&printers[p_id], &jobs[i]);
+                    printer_pids[p_id] = job;
+                    job_pids[i] = job;
+                }
             }
         }
     }
