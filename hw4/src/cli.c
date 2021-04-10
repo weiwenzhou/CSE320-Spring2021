@@ -144,6 +144,7 @@ int run_cli(FILE *in, FILE *out)
                 goto bad_arg;
             }
             printf("JOB[%ld]: status=%s, eligible=%08x, file=%s\n", job-jobs, job_status_names[job->status], job->eligible, job->file);
+            sf_job_created(job-jobs, job->file, job->type->name);
             sf_cmd_ok();
         } else if (strcmp(*array, "cancel") == 0) {
             CHECK_ARG(length, 1);
