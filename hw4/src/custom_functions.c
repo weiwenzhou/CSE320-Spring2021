@@ -180,7 +180,7 @@ pid_t start_job(PRINTER *printer, JOB *job) {
 void job_handler(int sig) {
     int olderrno = errno;
     int child_status;
-    pid_t pid = waitpid(-1, &child_status, WNOHANG);
+    pid_t pid = waitpid(-1, &child_status, WNOHANG|WSTOPPED|WCONTINUED);
     if (pid >= 0) {
         // might need to block other signals during this process of reading/writing
         // get job id from pid
@@ -220,9 +220,27 @@ void job_handler(int sig) {
             }
             // job d
         } else if (WIFSTOPPED(child_status)) { // process stopped
-            // change job status to JOB_PAUSE if job status is JOB_RUNNING 
+            // change job status to JOB_PAUSE if job status is JOB_RUNNING
+            int job_id;
+            for (int i = 0; i < MAX_JOBS; i++) {
+                if (pid == job_pids[i]) {
+                    job_id = i;
+                    break;
+                }
+            } 
+            jobs[job_id].status = JOB_PAUSED;
+            sf_job_status(job_id, JOB_PAUSED);
         } else if (WIFCONTINUED(child_status)) { // process continued
             // change job status to JOB_RUNNING if job status is JOB_PAUSE
+            int job_id;
+            for (int i = 0; i < MAX_JOBS; i++) {
+                if (pid == job_pids[i]) {
+                    job_id = i;
+                    break;
+                }
+            } 
+            jobs[job_id].status = JOB_RUNNING;
+            sf_job_status(job_id, JOB_RUNNING);
         }
     }
     if (job_process_count == 0) 

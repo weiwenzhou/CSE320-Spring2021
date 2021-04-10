@@ -151,10 +151,26 @@ int run_cli(FILE *in, FILE *out)
             
         } else if (strcmp(*array, "pause") == 0) {
             CHECK_ARG(length, 1);
-            
+            int job_id = atoi(array[1]);
+            if (job_id >= MAX_JOBS) {
+                printf("Invalid job number %d\n", job_id);
+                sf_cmd_error("pause - invalid job number");
+                goto bad_arg;
+            }
+            info("id %d pid: %d", job_id, job_pids[job_id]);
+            killpg(job_pids[job_id], SIGSTOP);
+            sf_cmd_ok();
         } else if (strcmp(*array, "resume") == 0) {
             CHECK_ARG(length, 1);
-            
+            int job_id = atoi(array[1]);
+            if (job_id >= MAX_JOBS) {
+                printf("Invalid job number %d\n", job_id);
+                sf_cmd_error("resume - invalid job number");
+                goto bad_arg;
+            }
+            info("id %d pid: %d", job_id, job_pids[job_id]);
+            killpg(job_pids[job_id], SIGCONT);
+            sf_cmd_ok();
         } else if (strcmp(*array, "disable") == 0) {
             CHECK_ARG(length, 1);
             PRINTER *printer = find_printer_name(array[1]);
