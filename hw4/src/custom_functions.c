@@ -184,9 +184,9 @@ void job_handler(int sig) {
     if (pid >= 0) {
         // might need to block other signals during this process of reading/writing
         // get job id from pid
-        // debug("REAPING %d", pid);
+        // debug("FROM %d", pid);
         // info("%d", id);
-        if (WIFEXITED(child_status)) { // exited
+        if (WIFEXITED(child_status) || WIFSIGNALED(child_status)) { // exited
             job_process_count--;
             int printer_id, job_id;
             for (int i = 0; i < MAX_JOBS; i++) {
@@ -203,7 +203,7 @@ void job_handler(int sig) {
                     break;
                 }
             }
-            if (WEXITSTATUS(child_status) == EXIT_SUCCESS) {
+            if (!WIFSIGNALED(child_status) && WEXITSTATUS(child_status) == EXIT_SUCCESS) {
                 // change job status to JOB_FINISHED
                 jobs[job_id].status = JOB_FINISHED;
                 sf_job_status(job_id, JOB_FINISHED);
@@ -212,7 +212,7 @@ void job_handler(int sig) {
                 sf_printer_status(printers[printer_id].name, PRINTER_IDLE);
             } else { // EXIT_FAILURE
                 // change job status to JOB_ABORT
-                jobs[job_id].status = JOB_FINISHED;
+                jobs[job_id].status = JOB_ABORTED;
                 sf_job_status(job_id, JOB_ABORTED);
                 sf_job_aborted(job_id, WEXITSTATUS(child_status));
                 printers[printer_id].status = PRINTER_IDLE;
