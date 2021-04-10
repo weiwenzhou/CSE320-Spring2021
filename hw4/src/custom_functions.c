@@ -185,24 +185,24 @@ void job_handler(int sig) {
         // might need to block other signals during this process of reading/writing
         // get job id from pid
         // debug("REAPING %d", pid);
-        job_process_count--;
-        int printer_id, job_id;
-        for (int i = 0; i < MAX_JOBS; i++) {
-            if (pid == job_pids[i]) {
-                job_id = i;
-                job_pids[i] = 0;
-                break;
-            }
-        }
-        for (int i = 0; i < printer_count; i++) {
-            if (pid == printer_pids[i]) {
-                printer_id = i;
-                printer_pids[i] = 0;
-                break;
-            }
-        }
         // info("%d", id);
         if (WIFEXITED(child_status)) { // exited
+            job_process_count--;
+            int printer_id, job_id;
+            for (int i = 0; i < MAX_JOBS; i++) {
+                if (pid == job_pids[i]) {
+                    job_id = i;
+                    job_pids[i] = 0;
+                    break;
+                }
+            }
+            for (int i = 0; i < printer_count; i++) {
+                if (pid == printer_pids[i]) {
+                    printer_id = i;
+                    printer_pids[i] = 0;
+                    break;
+                }
+            }
             if (WEXITSTATUS(child_status) == EXIT_SUCCESS) {
                 // change job status to JOB_FINISHED
                 jobs[job_id].status = JOB_FINISHED;
