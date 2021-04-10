@@ -20,6 +20,7 @@
 int run_cli(FILE *in, FILE *out)
 {
     signal(SIGCHLD, job_handler);
+    signal(SIGINT, SIG_IGN);
     sf_set_readline_signal_hook(scanner);
     // TO BE IMPLEMENTED
     int stdin_copy = dup(STDIN_FILENO);
@@ -148,7 +149,15 @@ int run_cli(FILE *in, FILE *out)
             sf_cmd_ok();
         } else if (strcmp(*array, "cancel") == 0) {
             CHECK_ARG(length, 1);
-            
+            int job_id = atoi(array[1]);
+            if (job_id >= MAX_JOBS) {
+                printf("Invalid job number %d\n", job_id);
+                sf_cmd_error("pause - invalid job number");
+                goto bad_arg;
+            }
+            info("id %d pid: %d sig term", job_id, job_pids[job_id]);
+            debug("%d", killpg(job_pids[job_id], SIGTERM));
+            sf_cmd_ok();
         } else if (strcmp(*array, "pause") == 0) {
             CHECK_ARG(length, 1);
             int job_id = atoi(array[1]);
