@@ -191,7 +191,7 @@ void job_handler(int sig) {
         // get job id from pid
         // debug("FROM %d", pid);
         // info("%d", id);
-        sigfillset(&block_all_mask); \
+        sigfillset(&block_all_mask);
         sigprocmask(SIG_SETMASK, &block_all_mask, &prev_mask);
         if (WIFEXITED(child_status) || WIFSIGNALED(child_status)) { // exited
             job_process_count--;
