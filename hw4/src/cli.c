@@ -156,7 +156,8 @@ int run_cli(FILE *in, FILE *out)
                 goto bad_arg;
             }
             info("id %d pid: %d sig term", job_id, job_pids[job_id]);
-            debug("%d", killpg(job_pids[job_id], SIGTERM));
+            killpg(job_pids[job_id], SIGTERM);
+            killpg(job_pids[job_id], SIGCONT);
             sf_cmd_ok();
         } else if (strcmp(*array, "pause") == 0) {
             CHECK_ARG(length, 1);
