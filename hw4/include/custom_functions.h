@@ -107,16 +107,26 @@ PRINTER *find_printer_name(char *name);
 JOB *create_job(char *file, FILE_TYPE *type, int printer_set);
 
 /**
- * Process a job using the provided printer.
+ * Create a master process to process the job. The master process will
+ * create necessary conversion pipelines to convert the file in job to 
+ * the appropriate type for the printer to print.
+ * 
+ * @param printer A pointer to the PRINTER object that will print the file
+ * @param job A pointer to the JOB object that has the file to print
+ * 
+ * @return the pid of the master process, or -1 if error.
  */
 pid_t start_job(PRINTER *printer, JOB *job);
 
 /**
- * SIGCHLD handler that monitors the jobs.
+ * A SIGCHLD handler that monitors the jobs.
+ * 
+ * @param sig The signal number of the signal caught.
  */
 void job_handler(int sig);
 
 /**
- * Scans jobs array for each printer.
+ * A callback function use by sf_readline that 
+ * scans jobs array for each printer to start jobs.
  */ 
 void scanner();
