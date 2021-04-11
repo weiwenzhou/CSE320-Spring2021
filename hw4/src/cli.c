@@ -243,17 +243,18 @@ int run_cli(FILE *in, FILE *out)
     // fprintf(stderr, "You have to implement run_cli() before the application will function.\n");
     // abort();
 
-    while (jobs_done != 0)
-        ;
-    for (int i = 0; i < printer_count; i++) 
-        free(printers[i].name);
-    for (int i = 0; i < MAX_JOBS; i++) {
-        if ((job_count >> i) & 0x1) {
-            free(jobs[i].file);
+    // reset only if in interactive mode
+    if (in == stdin || returnValue) {
+        while (jobs_done != 0)
+            ;
+        for (int i = 0; i < printer_count; i++) 
+            free(printers[i].name);
+        for (int i = 0; i < MAX_JOBS; i++) {
+            if ((job_count >> i) & 0x1) {
+                free(jobs[i].file);
+            }
         }
     }
-    printer_count = 0;
-    job_count = 0;
     dup2(stdin_copy, STDIN_FILENO);
     dup2(stdout_copy, STDOUT_FILENO);
     return returnValue;
