@@ -215,8 +215,10 @@ int run_cli(FILE *in, FILE *out)
                 sf_cmd_error("enable - no printer");
                 goto bad_arg;
             }
-            printer->status = PRINTER_IDLE;
-            sf_printer_status(printer->name, PRINTER_IDLE);
+            // if printer_pid == 0 then go idle else go to busy
+            PRINTER_STATUS new_status = (printer_pids[printer-printers]) ? PRINTER_BUSY:PRINTER_IDLE;
+            printer->status = new_status;
+            sf_printer_status(printer->name, new_status);
 
         } else {
             printf("Unrecognized command: %s\n", *array);
