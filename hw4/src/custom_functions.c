@@ -143,6 +143,10 @@ pid_t start_job(PRINTER *printer, JOB *job) {
                 pid_t job_pid = fork();
                 if (job_pid == 0) { // child
                     // debug("%d: Executing %s->%s : %s", getpid(),path[i]->from->name, path[i]->to->name, path[i]->cmd_and_args[0]);
+                    sigset_t sigterm_mask;
+                    sigemptyset(&sigterm_mask);
+                    sigaddset(&sigterm_mask, SIGTERM);
+                    sigprocmask(SIG_UNBLOCK, &sigterm_mask, NULL);
                     close(pipe_fd[0]); // close read side;
                     if (i == 0)
                         dup2(fileno(input_file), STDIN_FILENO);
