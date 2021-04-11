@@ -60,7 +60,7 @@ int run_cli(FILE *in, FILE *out)
             sf_cmd_ok();
             returnValue = -1;
             break;
-            
+
         } else if (strcmp(*array, "type") == 0) {
             CHECK_ARG(length, 1);
             if (define_type(array[1]) == NULL)
@@ -231,6 +231,7 @@ int run_cli(FILE *in, FILE *out)
                 if (job_timestamps[i] != 0 && current - job_timestamps[i] >= 10) {
                     job_timestamps[i] = 0;
                     sf_job_status(i, JOB_DELETED);
+                    sf_job_deleted(i);
                     free(jobs[i].file);
                     job_count ^= 1 << i; // flip bit from 1 to 0.
                 }
