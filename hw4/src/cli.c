@@ -225,6 +225,7 @@ int run_cli(FILE *in, FILE *out)
             free(cmd);
             free(array);
             // check for job deletion
+            BLOCK_SIGNAL_WRAPPER(
             time_t current = time(NULL);
             for (int i = 0; i < MAX_JOBS; i++) {
                 if (job_timestamps[i] != 0 && current - job_timestamps[i] >= 10) {
@@ -233,7 +234,7 @@ int run_cli(FILE *in, FILE *out)
                     free(jobs[i].file);
                     job_count ^= 1 << i; // flip bit from 1 to 0.
                 }
-            }
+            });
 
     }
     // fprintf(stderr, "You have to implement run_cli() before the application will function.\n");

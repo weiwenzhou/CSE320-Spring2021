@@ -1,6 +1,17 @@
 #define WRONG_ARG_COUNT(length, required) printf("Wrong number of args (given: %d, required: %d) for CLI command 'help'\n", length, required); sf_cmd_error("arg count");
 #define CHECK_ARG(length, required) if (length != required) {WRONG_ARG_COUNT(length, required); goto bad_arg;}
 
+#define BLOCK_SIGNAL_WRAPPER(OPERATIONS) \
+    sigfillset(&block_all_mask); \
+    sigprocmask(SIG_SETMASK, &block_all_mask, &prev_mask); \
+    OPERATIONS \
+    sigprocmask(SIG_SETMASK, &prev_mask, NULL);
+
+/*
+ * Global mask for block signal wrapper macro
+ */
+sigset_t block_all_mask, prev_mask;
+
 /*
  * Structure that describes a printer.
  */
