@@ -89,14 +89,6 @@ pid_t start_job(PRINTER *printer, JOB *job) {
         // debug("%s->%s : %s", path[length]->from->name, path[length]->to->name, path[length]->cmd_and_args[0]);
         length++;
     }
-    // info("%d", length);
-    char **commands = calloc(length+1, sizeof(char *));
-    for (int i = 0; i < length; i++) {
-        commands[i] = path[i]->cmd_and_args[0];
-    }
-    commands[length] = NULL;
-    sf_job_started(job-jobs, printer->name, getpgrp(), commands);
-    free(commands);
     pid_t pid = fork();
     if (pid == 0) { // child (master of the pipeline)
         if (setpgid(0,0) == -1) // set group pid
@@ -179,6 +171,13 @@ pid_t start_job(PRINTER *printer, JOB *job) {
         }
         exit(1); // should never be reached by place here just in case
     } 
+    char **commands = calloc(length+1, sizeof(char *));
+    for (int i = 0; i < length; i++) {
+        commands[i] = path[i]->cmd_and_args[0];
+    }
+    commands[length] = NULL;
+    sf_job_started(job-jobs, printer->name, pid, commands);
+    free(commands);
     free(path);
     return pid;  
 }
