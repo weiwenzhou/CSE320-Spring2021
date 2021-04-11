@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "conversions.h"
@@ -222,7 +223,8 @@ void job_handler(int sig) {
                 printers[printer_id].status = PRINTER_IDLE;
                 sf_printer_status(printers[printer_id].name, PRINTER_IDLE);
             }
-            // job d
+            // job waits to be deleted
+            job_timestamps[job_id] = time(NULL); // time async safe
         } else if (WIFSTOPPED(child_status)) { // process stopped
             // change job status to JOB_PAUSE if job status is JOB_RUNNING
             int job_id;

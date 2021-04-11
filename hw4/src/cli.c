@@ -8,7 +8,8 @@
 #include <string.h>
 #include <signal.h>
 #include <sys/types.h>
-#include <sys/wait.h>
+#include <sys/wait.h> 
+#include <time.h>
 #include <unistd.h>
 
 #include "imprimer.h"
@@ -223,7 +224,16 @@ int run_cli(FILE *in, FILE *out)
         bad_arg:
             free(cmd);
             free(array);
-            
+            // check for job deletion
+            time_t current = time(NULL);
+            for (int i = 0; i < MAX_JOBS; i++) {
+                if (job_timestamps[i] != 0 && current - job_timestamps[i] >= 10) {
+                    job_timestamps[i] = 0;
+                    sf_job_status(i, JOB_DELETED);
+                    job_count ^= 1 << i; // flip bit from 1 to 0.
+                }
+            }
+
     }
     // fprintf(stderr, "You have to implement run_cli() before the application will function.\n");
     // abort();

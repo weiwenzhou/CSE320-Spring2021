@@ -45,6 +45,10 @@ int job_process_count;
 // Flag to keep track of when things are done.
 volatile sig_atomic_t jobs_done;
 
+/*
+ * Space to store the timestamps for deletion
+ */
+time_t job_timestamps[MAX_JOBS];
 
 /**
  * Splits a string using whitespaces as the delimiter. The 
