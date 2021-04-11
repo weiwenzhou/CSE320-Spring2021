@@ -230,6 +230,7 @@ int run_cli(FILE *in, FILE *out)
                 if (job_timestamps[i] != 0 && current - job_timestamps[i] >= 10) {
                     job_timestamps[i] = 0;
                     sf_job_status(i, JOB_DELETED);
+                    free(jobs[i].file);
                     job_count ^= 1 << i; // flip bit from 1 to 0.
                 }
             }
