@@ -250,10 +250,10 @@ void job_handler(int sig) {
             jobs[job_id].status = JOB_RUNNING;
             sf_job_status(job_id, JOB_RUNNING);
         }
+        if (job_process_count == 0) 
+            jobs_done = 0;
         sigprocmask(SIG_SETMASK, &prev_mask, NULL);
     }
-    if (job_process_count == 0) 
-        jobs_done = 0;
 
     errno = olderrno;
 }
