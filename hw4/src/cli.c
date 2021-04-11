@@ -46,6 +46,8 @@ int run_cli(FILE *in, FILE *out)
 
         // decrement length to account for command
         length--;
+        sigfillset(&block_all_mask); \
+        sigprocmask(SIG_SETMASK, &block_all_mask, &prev_mask);
         if (length < 0) // for an empty line
             goto bad_arg;
         else if (strcmp(*array, "help") == 0) {
@@ -225,7 +227,6 @@ int run_cli(FILE *in, FILE *out)
             free(cmd);
             free(array);
             // check for job deletion
-            BLOCK_SIGNAL_WRAPPER(
             time_t current = time(NULL);
             for (int i = 0; i < MAX_JOBS; i++) {
                 if (job_timestamps[i] != 0 && current - job_timestamps[i] >= 10) {
@@ -235,7 +236,8 @@ int run_cli(FILE *in, FILE *out)
                     free(jobs[i].file);
                     job_count ^= 1 << i; // flip bit from 1 to 0.
                 }
-            });
+            }
+        sigprocmask(SIG_SETMASK, &prev_mask, NULL);
 
     }
     // fprintf(stderr, "You have to implement run_cli() before the application will function.\n");
