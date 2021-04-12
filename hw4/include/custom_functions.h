@@ -41,7 +41,7 @@ size_t job_count;
 pid_t printer_pids[MAX_PRINTERS];
 pid_t job_pids[MAX_JOBS];
 // Counter for number jobs being processed
-int job_process_count;
+volatile int job_process_count;
 // Flag to keep track of when things are done.
 volatile sig_atomic_t jobs_done;
 
@@ -119,3 +119,7 @@ void job_handler(int sig);
  * scans jobs array for each printer to start jobs.
  */ 
 void scanner();
+
+void pipeline_handler(int sig);
+
+volatile int exitValue;

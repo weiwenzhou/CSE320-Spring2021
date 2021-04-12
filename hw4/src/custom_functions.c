@@ -94,6 +94,13 @@ pid_t start_job(PRINTER *printer, JOB *job) {
     if (pid == 0) { // child (master of the pipeline)
         if (setpgid(0,0) == -1) // set group pid
             perror("setpgid error:");
+        job_process_count = 0;
+        exitValue = 0;
+        sigset_t sigchld_mask;
+        sigemptyset(&sigchld_mask);
+        sigaddset(&sigchld_mask, SIGCHLD);
+        sigprocmask(SIG_UNBLOCK, &sigchld_mask, NULL);
+        signal(SIGCHLD, pipeline_handler);
         int fd_printer = imp_connect_to_printer(printer->name, printer->type->name, PRINTER_NORMAL);
         if (fd_printer == -1) 
             exit(1);
@@ -105,7 +112,7 @@ pid_t start_job(PRINTER *printer, JOB *job) {
 
         if (length == 0) {
             pid_t job_pid = fork();
-            int child_status;
+            // int child_status;
             if (job_pid == 0) {
                 char *cat[] = {
                     "/bin/cat",
@@ -120,17 +127,17 @@ pid_t start_job(PRINTER *printer, JOB *job) {
                 }
                 exit(0);
             } else {
-                waitpid(job_pid, &child_status, 0);
-                if (WIFEXITED(child_status) && WEXITSTATUS(child_status) == 0)
-                    exit(0);
-                else 
-                    exit(1);
+                // waitpid(job_pid, &child_status, 0);
+                // if (WIFEXITED(child_status) && WEXITSTATUS(child_status) == 0)
+                //     exit(0);
+                // else 
+                //     exit(1);
             }
         } else {
             int pipe_fd[2];
-            int in_fd;
+            int in_fd = input_fd;
             for (int i = 0; i < length; i++) {
-                int child_status;
+                // int child_status;
                 
                 pipe(pipe_fd);
                 // info("my pipes %d -> %d", pipe_fd[0], pipe_fd[1]);
@@ -159,18 +166,24 @@ pid_t start_job(PRINTER *printer, JOB *job) {
                     exit(0);
                 } else { // parent
                     close(pipe_fd[1]); // close write side;
-                    waitpid(job_pid, &child_status, 0);
-                    in_fd = pipe_fd[0]; // set next read as the read end of pipe
-                    if (WIFEXITED(child_status) && WEXITSTATUS(child_status) == 0) {
-                        if (i == length-1)
-                            exit(0);
-                    } else {
-                        exit(1);
-                    }
+                    // waitpid(job_pid, &child_status, 0);
+                    // in_fd = pipe_fd[0]; // set next read as the read end of pipe
+                    // if (WIFEXITED(child_status) && WEXITSTATUS(child_status) == 0) {
+                    //     if (i == length-1)
+                    //         exit(0);
+                    // } else {
+                    //     exit(1);
+                    // }
                 }
             }
         }
-        exit(1); // should never be reached by place here just in case
+        sigset_t waitsigchld_mask;
+        sigfillset(&waitsigchld_mask);
+        sigdelset(&waitsigchld_mask, SIGCHLD);
+        while (job_process_count != length) {
+            sigsuspend(&waitsigchld_mask);
+        }
+        exit(exitValue); // should never be reached by place here just in case
     } 
     char **commands = calloc(length+1, sizeof(char *));
     for (int i = 0; i < length; i++) {
@@ -274,4 +287,21 @@ void scanner() {
             }
         }
     }
+}
+
+void pipeline_handler(int sig) {
+    sigset_t blockall, prev;
+    sigfillset(&blockall);
+    sigprocmask(SIG_SETMASK, &blockall, &prev);
+    int olderrno = errno;
+    int child_status;
+    pid_t pid;
+    while ((pid = waitpid(-1, &child_status, WNOHANG)) > 0) {
+        job_process_count++;
+        if (!(WIFEXITED(child_status) && WEXITSTATUS(child_status) == 0)) {
+            exitValue = 1;
+        } 
+    }
+    errno = olderrno;
+    sigprocmask(SIG_SETMASK, &prev, NULL);
 }
