@@ -84,11 +84,13 @@ int run_cli(FILE *in, FILE *out)
                 sf_cmd_error("printer - unknown file type");
                 goto bad_arg;
             }
+            // block signal
             if ((printer = define_printer(array[1], type)) == NULL) {
                 printf("Too many printers (32 max)\n");
                 sf_cmd_error("printer - too many printers");
                 goto bad_arg;
             }
+            // end block signal
             sf_printer_defined(printer->name, printer->type->name);
             printf("PRINTER: id=%ld, name=%s, type=%s, status=%s\n", printer-printers, printer->name, printer->type->name, printer_status_names[printer->status]);
 
@@ -115,17 +117,21 @@ int run_cli(FILE *in, FILE *out)
 
         } else if (strcmp(*array, "printers") == 0) {
             CHECK_ARG(length, 0);
+            // block signal
             for (int i = 0; i < printer_count; i++)
                 printf("PRINTER: id=%d, name=%s, type=%s, status=%s\n", i, printers[i].name, printers[i].type->name, printer_status_names[printers[i].status]);
+            // end block signal
             sf_cmd_ok();
 
         } else if (strcmp(*array, "jobs") == 0) {
             CHECK_ARG(length, 0);
+            // block signal
             for (int i = 0; i < MAX_JOBS; i++) {
                 if ((job_count >> i) & 0x1) {
                     printf("JOB[%d]: status=%s, eligible=%x, file=%s\n", i, job_status_names[jobs[i].status], jobs[i].eligible, jobs[i].file);
                 }
             }
+            // end block signal
             sf_cmd_ok();
 
         } else if (strcmp(*array, "print") == 0) {
@@ -149,11 +155,13 @@ int run_cli(FILE *in, FILE *out)
                 }
                 printer_set |= 1 << (printer-printers);
             }
+            // block signal
             if ((job = create_job(array[1], type, printer_set)) == NULL) {
                 printf("Too many jobs (64 max)\n");
                 sf_cmd_error("printer - too many jobs");
                 goto bad_arg;
             }
+            // end block signal
             printf("JOB[%ld]: status=%s, eligible=%08x, file=%s\n", job-jobs, job_status_names[job->status], job->eligible, job->file);
             sf_job_created(job-jobs, job->file, job->type->name);
             sf_cmd_ok();
@@ -167,8 +175,10 @@ int run_cli(FILE *in, FILE *out)
                 goto bad_arg;
             }
             // info("id %d pid: %d sig term", job_id, job_pids[job_id]);
+            // block signal
             killpg(job_pids[job_id], SIGTERM);
             killpg(job_pids[job_id], SIGCONT);
+            // end block signal
             sf_cmd_ok();
             
         } else if (strcmp(*array, "pause") == 0) {
@@ -180,7 +190,9 @@ int run_cli(FILE *in, FILE *out)
                 goto bad_arg;
             }
             // info("id %d pid: %d", job_id, job_pids[job_id]);
+            // block signal
             killpg(job_pids[job_id], SIGSTOP);
+            // end block signal
             sf_cmd_ok();
 
         } else if (strcmp(*array, "resume") == 0) {
@@ -192,7 +204,9 @@ int run_cli(FILE *in, FILE *out)
                 goto bad_arg;
             }
             // info("id %d pid: %d", job_id, job_pids[job_id]);
+            // block signal
             killpg(job_pids[job_id], SIGCONT);
+            // end block signal
             sf_cmd_ok();
 
         } else if (strcmp(*array, "disable") == 0) {
@@ -203,8 +217,10 @@ int run_cli(FILE *in, FILE *out)
                 sf_cmd_error("enable - no printer");
                 goto bad_arg;
             }
+            // block signal
             printer->status = PRINTER_DISABLED;
             sf_printer_status(printer->name, PRINTER_DISABLED);
+            // end block signal
 
         } else if (strcmp(*array, "enable") == 0) {
             CHECK_ARG(length, 1);
@@ -215,10 +231,12 @@ int run_cli(FILE *in, FILE *out)
                 sf_cmd_error("enable - no printer");
                 goto bad_arg;
             }
+            // block signal
             // if printer_pid == 0 then go idle else go to busy
             PRINTER_STATUS new_status = (printer_pids[printer-printers]) ? PRINTER_BUSY:PRINTER_IDLE;
             printer->status = new_status;
             sf_printer_status(printer->name, new_status);
+            // end block signal
 
         } else {
             printf("Unrecognized command: %s\n", *array);
@@ -229,6 +247,7 @@ int run_cli(FILE *in, FILE *out)
             free(cmd);
             free(array);
             // check for job deletion
+            // block signal
             time_t current = time(NULL);
             for (int i = 0; i < MAX_JOBS; i++) {
                 if (job_timestamps[i] != 0 && current - job_timestamps[i] >= 10) {
@@ -239,12 +258,9 @@ int run_cli(FILE *in, FILE *out)
                     job_count ^= 1 << i; // flip bit from 1 to 0.
                 }
             }
-        // sigprocmask(SIG_SETMASK, &prev_mask, NULL);
+            // end block signal
 
     }
-    // fprintf(stderr, "You have to implement run_cli() before the application will function.\n");
-    // abort();
-
     // reset only if in interactive mode
     if (in == stdin || returnValue) {
         while (jobs_done != 0)
