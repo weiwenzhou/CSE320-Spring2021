@@ -53,8 +53,6 @@ int run_cli(FILE *in, FILE *out)
 
         // decrement length to account for command
         length--;
-        // sigfillset(&block_all_mask); 
-        // sigprocmask(SIG_SETMASK, &block_all_mask, &prev_mask);
         if (length < 0) // for an empty line
             goto bad_arg;
         else if (strcmp(*array, "help") == 0) {
