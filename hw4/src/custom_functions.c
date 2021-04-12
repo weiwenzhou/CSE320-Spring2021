@@ -94,10 +94,10 @@ pid_t start_job(PRINTER *printer, JOB *job) {
     if (pid == 0) { // child (master of the pipeline)
         if (setpgid(0,0) == -1) // set group pid
             perror("setpgid error:");
-        int fd_printer = -1;
+        int fd_printer = imp_connect_to_printer(printer->name, printer->type->name, PRINTER_NORMAL);
         if (fd_printer == -1) 
-            fd_printer = imp_connect_to_printer(printer->name, printer->type->name, PRINTER_NORMAL);
-        int input_fd = open(job->file, O_RDONLY);
+            exit(1);
+        int input_fd = open(job->file, O_RDONLY); // async
         if (input_fd == -1) {
             perror("input file");
             exit(1);
