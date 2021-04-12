@@ -191,8 +191,10 @@ void job_handler(int sig) {
         // get job id from pid
         // debug("FROM %d", pid);
         // info("%d", id);
-        sigfillset(&block_all_mask);
-        sigprocmask(SIG_SETMASK, &block_all_mask, &prev_mask);
+        // sigfillset(&block_all_mask);
+        // sigprocmask(SIG_SETMASK, &block_all_mask, &prev_mask);
+        // for (int i = 0; i < 20; i++)
+        //     debug("%d: comparing %d vs %d", i, sigismember(&block_all_mask, i), sigismember(&prev_mask,i));
         if (WIFEXITED(child_status) || WIFSIGNALED(child_status)) { // exited
             job_process_count--;
             int printer_id, job_id;
@@ -252,7 +254,7 @@ void job_handler(int sig) {
         }
         if (job_process_count == 0) 
             jobs_done = 0;
-        sigprocmask(SIG_SETMASK, &prev_mask, NULL);
+        // sigprocmask(SIG_SETMASK, &prev_mask, NULL);
     }
 
     errno = olderrno;

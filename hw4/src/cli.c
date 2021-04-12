@@ -20,8 +20,15 @@
 
 int run_cli(FILE *in, FILE *out)
 {
-    signal(SIGCHLD, job_handler);
-    signal(SIGINT, SIG_IGN);
+    struct sigaction sig_act;
+    memset(&sig_act, 0, sizeof(sig_act));
+    sig_act.sa_handler = job_handler;
+    sigfillset(&sig_act.sa_mask);
+    if (sigaction(SIGCHLD, &sig_act, 0) == -1) {
+        perror("Fail to install SIGCHLD handler");
+        return -1;
+    }
+    signal(SIGINT, SIG_IGN); // simply to avoid accidental termination by ctrl+c
     sf_set_readline_signal_hook(scanner);
     // TO BE IMPLEMENTED
     int stdin_copy = dup(STDIN_FILENO);
