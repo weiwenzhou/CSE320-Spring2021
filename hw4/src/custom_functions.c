@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -96,8 +97,8 @@ pid_t start_job(PRINTER *printer, JOB *job) {
         int fd_printer = -1;
         if (fd_printer == -1) 
             fd_printer = imp_connect_to_printer(printer->name, printer->type->name, PRINTER_NORMAL);
-        FILE *input_file = fopen(job->file, "r");
-        if (input_file == NULL) {
+        int input_fd = open(job->file, O_RDONLY);
+        if (input_fd == -1) {
             perror("input file");
             exit(1);
         }
@@ -111,7 +112,7 @@ pid_t start_job(PRINTER *printer, JOB *job) {
                     NULL,
                 };
                 // info("%d->%d", fileno(input_file), fd_printer);
-                dup2(fileno(input_file), STDIN_FILENO);
+                dup2(input_fd, STDIN_FILENO);
                 dup2(fd_printer, STDOUT_FILENO);
                 if (execvp(cat[0], cat) < 0) {
                     perror("WHY");
@@ -142,7 +143,7 @@ pid_t start_job(PRINTER *printer, JOB *job) {
                     sigprocmask(SIG_UNBLOCK, &sigterm_mask, NULL);
                     close(pipe_fd[0]); // close read side;
                     if (i == 0)
-                        dup2(fileno(input_file), STDIN_FILENO);
+                        dup2(input_fd, STDIN_FILENO);
                     else {// read in_fd
                         dup2(in_fd, STDIN_FILENO);
                         close(in_fd);
