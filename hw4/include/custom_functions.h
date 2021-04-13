@@ -102,10 +102,12 @@ JOB *create_job(char *file, FILE_TYPE *type, int printer_set);
  * 
  * @param printer A pointer to the PRINTER object that will print the file
  * @param job A pointer to the JOB object that has the file to print
+ * @param path A pointer to an array of CONVERSION objects to convert job file
+ * type to the printer file type.
  * 
  * @return the pid of the master process, or -1 if error.
  */
-pid_t start_job(PRINTER *printer, JOB *job);
+pid_t start_job(PRINTER *printer, JOB *job, CONVERSION **path);
 
 /**
  * A SIGCHLD handler that monitors the jobs.

@@ -78,14 +78,11 @@ JOB *create_job(char *file, FILE_TYPE *type, int printer_set) {
     return NULL; // it should never get here
 }
 
-pid_t start_job(PRINTER *printer, JOB *job) {
-    CONVERSION **path = find_conversion_path(job->type->name, printer->type->name);
-    int length = 0;
-    while (path[length] != NULL) {
-        // debug("%s->%s : %s", path[length]->from->name, path[length]->to->name, path[length]->cmd_and_args[0]);
+pid_t start_job(PRINTER *printer, JOB *job, CONVERSION **path) {
+    char **commands; // for sf_job_started
+    int length = 0; // length of path array excluding the NULL
+    while (path[length] != NULL)
         length++;
-    }
-    char **commands;
     pid_t pid = fork();
     switch (pid) {
         case -1: // can't create master process. ignore job start. 
@@ -201,7 +198,6 @@ pid_t start_job(PRINTER *printer, JOB *job) {
             commands[length] = NULL;
             sf_job_started(job-jobs, printer->name, pid, commands);
             free(commands);
-            free(path);
             return pid; 
             break;
     }
@@ -288,7 +284,7 @@ void scanner() {
                 // check type
                 CONVERSION **path = find_conversion_path(jobs[i].type->name, printers[p_id].type->name);
                 if (path != NULL) {
-                    pid_t job = start_job(&printers[p_id], &jobs[i]);
+                    pid_t job = start_job(&printers[p_id], &jobs[i], path);
                     if (job != -1) { // if job is started update the appropriate values.
                         job_process_count++;
                         jobs_done = 1;
