@@ -90,6 +90,7 @@ pid_t start_job(PRINTER *printer, JOB *job) {
         // debug("%s->%s : %s", path[length]->from->name, path[length]->to->name, path[length]->cmd_and_args[0]);
         length++;
     }
+    char **commands;
     pid_t pid = fork();
     switch (pid) {
         case -1: // can't create master process. ignore job start. need to reconsider here
@@ -109,20 +110,17 @@ pid_t start_job(PRINTER *printer, JOB *job) {
 
             if (length == 0) {
                 int child_status;
+                char *cat_command[] = {"/bin/cat", NULL};
                 pid_t job_pid = fork();
                 switch (job_pid) {
                     case -1: // error
                         break;
 
                     case 0: // child
-                        char *cat[] = {
-                            "/bin/cat",
-                            NULL,
-                        };
                         // info("%d->%d", fileno(input_file), fd_printer);
                         dup2(input_fd, STDIN_FILENO);
                         dup2(fd_printer, STDOUT_FILENO);
-                        if (execvp(cat[0], cat) < 0) {
+                        if (execvp(cat_command[0], cat_command) < 0) {
                             perror("WHY");
                             exit(1);
                         }
@@ -140,7 +138,7 @@ pid_t start_job(PRINTER *printer, JOB *job) {
             } else {
                 job_process_count = 0;
                 exitValue = 0;
-                sigset_t sigchld_mask;
+                sigset_t sigchld_mask, sigterm_mask;
                 sigemptyset(&sigchld_mask);
                 sigaddset(&sigchld_mask, SIGCHLD);
                 sigprocmask(SIG_UNBLOCK, &sigchld_mask, NULL);
@@ -156,7 +154,6 @@ pid_t start_job(PRINTER *printer, JOB *job) {
                             /* code */
                             break;
                         case 0: // child
-                            sigset_t sigterm_mask;
                             sigemptyset(&sigterm_mask);
                             sigaddset(&sigterm_mask, SIGTERM);
                             sigprocmask(SIG_UNBLOCK, &sigterm_mask, NULL);
@@ -196,7 +193,7 @@ pid_t start_job(PRINTER *printer, JOB *job) {
             break;
 
         default: // parent (fork sucessful. job is running and started now)
-            char **commands = calloc(length+1, sizeof(char *));
+            commands = calloc(length+1, sizeof(char *));
             for (int i = 0; i < length; i++) {
                 commands[i] = path[i]->cmd_and_args[0];
             }
