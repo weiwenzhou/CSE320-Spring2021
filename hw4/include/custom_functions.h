@@ -120,6 +120,16 @@ void job_handler(int sig);
  */ 
 void scanner();
 
+/**
+ * A SIGCHLD handler that monitors the pipelines and reaps 
+ * the child once it has terminated. This is installed in
+ * the master process.
+ * 
+ * @param sig The signal number of the signal caught.
+ */
 void pipeline_handler(int sig);
 
+/**
+ * Use to track the exit value of a master process.
+ */
 volatile int exitValue;
