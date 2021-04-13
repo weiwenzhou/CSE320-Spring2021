@@ -112,7 +112,7 @@ pid_t start_job(PRINTER *printer, JOB *job) {
 
         if (length == 0) {
             pid_t job_pid = fork();
-            // int child_status;
+            int child_status;
             if (job_pid == 0) {
                 char *cat[] = {
                     "/bin/cat",
@@ -127,11 +127,11 @@ pid_t start_job(PRINTER *printer, JOB *job) {
                 }
                 exit(0);
             } else {
-                // waitpid(job_pid, &child_status, 0);
-                // if (WIFEXITED(child_status) && WEXITSTATUS(child_status) == 0)
-                //     exit(0);
-                // else 
-                //     exit(1);
+                waitpid(job_pid, &child_status, 0);
+                if (WIFEXITED(child_status) && WEXITSTATUS(child_status) == 0)
+                    exit(0);
+                else 
+                    exit(1);
             }
         } else {
             int pipe_fd[2];
