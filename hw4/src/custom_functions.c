@@ -167,7 +167,7 @@ pid_t start_job(PRINTER *printer, JOB *job) {
                 } else { // parent
                     close(pipe_fd[1]); // close write side;
                     // waitpid(job_pid, &child_status, 0);
-                    // in_fd = pipe_fd[0]; // set next read as the read end of pipe
+                    in_fd = pipe_fd[0]; // set next read as the read end of pipe
                     // if (WIFEXITED(child_status) && WEXITSTATUS(child_status) == 0) {
                     //     if (i == length-1)
                     //         exit(0);
