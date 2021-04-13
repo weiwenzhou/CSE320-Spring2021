@@ -91,102 +91,123 @@ pid_t start_job(PRINTER *printer, JOB *job) {
         length++;
     }
     pid_t pid = fork();
-    if (pid == 0) { // child (master of the pipeline)
-        if (setpgid(0,0) == -1) // set group pid
-            perror("setpgid error:");
-        job_process_count = 0;
-        exitValue = 0;
-        sigset_t sigchld_mask;
-        sigemptyset(&sigchld_mask);
-        sigaddset(&sigchld_mask, SIGCHLD);
-        sigprocmask(SIG_UNBLOCK, &sigchld_mask, NULL);
-        signal(SIGCHLD, pipeline_handler);
-        int fd_printer = imp_connect_to_printer(printer->name, printer->type->name, PRINTER_NORMAL);
-        if (fd_printer == -1) 
-            exit(1);
-        int input_fd = open(job->file, O_RDONLY); // async
-        if (input_fd == -1) {
-            perror("input file");
-            exit(1);
-        }
+    switch (pid) {
+        case -1: // can't create master process. ignore job start. need to reconsider here
+            /* code */
+            break;
+        case 0: // child
+            if (setpgid(0,0) == -1) // set group pid
+                perror("setpgid error:");
+            job_process_count = 0;
+            exitValue = 0;
+            sigset_t sigchld_mask;
+            sigemptyset(&sigchld_mask);
+            sigaddset(&sigchld_mask, SIGCHLD);
+            sigprocmask(SIG_UNBLOCK, &sigchld_mask, NULL);
+            signal(SIGCHLD, pipeline_handler);
+            int fd_printer = imp_connect_to_printer(printer->name, printer->type->name, PRINTER_NORMAL);
+            if (fd_printer == -1) 
+                exit(1);
+            int input_fd = open(job->file, O_RDONLY); // async
+            if (input_fd == -1) {
+                perror("input file");
+                exit(1);
+            }
 
-        if (length == 0) {
-            pid_t job_pid = fork();
-            int child_status;
-            if (job_pid == 0) {
-                char *cat[] = {
-                    "/bin/cat",
-                    NULL,
-                };
-                // info("%d->%d", fileno(input_file), fd_printer);
-                dup2(input_fd, STDIN_FILENO);
-                dup2(fd_printer, STDOUT_FILENO);
-                if (execvp(cat[0], cat) < 0) {
-                    perror("WHY");
-                    exit(1);
-                }
-                exit(0);
-            } else {
-                waitpid(job_pid, &child_status, 0);
-                if (WIFEXITED(child_status) && WEXITSTATUS(child_status) == 0)
-                    exit(0);
-                else 
-                    exit(1);
-            }
-        } else {
-            int pipe_fd[2];
-            int in_fd = input_fd;
-            for (int i = 0; i < length; i++) {
-                // int child_status;
-                
-                pipe(pipe_fd);
-                // info("my pipes %d -> %d", pipe_fd[0], pipe_fd[1]);
+            if (length == 0) {
+                int child_status;
                 pid_t job_pid = fork();
-                if (job_pid == 0) { // child
-                    // debug("%d: Executing %s->%s : %s", getpid(),path[i]->from->name, path[i]->to->name, path[i]->cmd_and_args[0]);
-                    sigset_t sigterm_mask;
-                    sigemptyset(&sigterm_mask);
-                    sigaddset(&sigterm_mask, SIGTERM);
-                    sigprocmask(SIG_UNBLOCK, &sigterm_mask, NULL);
-                    close(pipe_fd[0]); // close read side;
-                    if (i == 0)
+                switch (job_pid) {
+                    case -1: // error
+                        break;
+
+                    case 0: // child
+                        char *cat[] = {
+                            "/bin/cat",
+                            NULL,
+                        };
+                        // info("%d->%d", fileno(input_file), fd_printer);
                         dup2(input_fd, STDIN_FILENO);
-                    else {// read in_fd
-                        dup2(in_fd, STDIN_FILENO);
-                        close(in_fd);
-                    }
-                    if (i == length-1)
                         dup2(fd_printer, STDOUT_FILENO);
-                    else // write to pipe[1]
-                        dup2(pipe_fd[1], STDOUT_FILENO);
-                    if (execvp(path[i]->cmd_and_args[0], path[i]->cmd_and_args) < 0) {
-                        perror("WHY");
-                        exit(1);
+                        if (execvp(cat[0], cat) < 0) {
+                            perror("WHY");
+                            exit(1);
+                        }
+                        exit(0);
+                        break;
+
+                    default: // parent
+                        waitpid(job_pid, &child_status, 0);
+                        if (WIFEXITED(child_status) && WEXITSTATUS(child_status) == 0)
+                            exit(0);
+                        else 
+                            exit(1);
+                        break;   
+                }
+            } else {
+                int pipe_fd[2];
+                int in_fd = input_fd;
+                for (int i = 0; i < length; i++) {
+                    // int child_status;
+                    
+                    pipe(pipe_fd);
+                    // info("my pipes %d -> %d", pipe_fd[0], pipe_fd[1]);
+                    pid_t job_pid = fork();
+                    switch (job_pid) {
+                        case -1: // error
+                            /* code */
+                            break;
+                        case 0: // child
+                            sigset_t sigterm_mask;
+                            sigemptyset(&sigterm_mask);
+                            sigaddset(&sigterm_mask, SIGTERM);
+                            sigprocmask(SIG_UNBLOCK, &sigterm_mask, NULL);
+                            close(pipe_fd[0]); // close read side;
+                            if (i == 0)
+                                dup2(input_fd, STDIN_FILENO);
+                            else {// read in_fd
+                                dup2(in_fd, STDIN_FILENO);
+                                close(in_fd);
+                            }
+                            if (i == length-1)
+                                dup2(fd_printer, STDOUT_FILENO);
+                            else // write to pipe[1]
+                                dup2(pipe_fd[1], STDOUT_FILENO);
+                            if (execvp(path[i]->cmd_and_args[0], path[i]->cmd_and_args) < 0) {
+                                perror("WHY");
+                                exit(1);
+                            }
+                            exit(0);
+                            break;
+                        
+                        default: // parent
+                            close(pipe_fd[1]); // close write side;
+                            in_fd = pipe_fd[0]; // set next read as the read end of pipe
+                            break;
                     }
-                    exit(0);
-                } else { // parent
-                    close(pipe_fd[1]); // close write side;
-                    in_fd = pipe_fd[0]; // set next read as the read end of pipe
                 }
             }
-        }
-        sigset_t waitsigchld_mask;
-        sigfillset(&waitsigchld_mask);
-        sigdelset(&waitsigchld_mask, SIGCHLD);
-        while (job_process_count != length) {
-            sigsuspend(&waitsigchld_mask);
-        }
-        exit(exitValue); // should never be reached by place here just in case
-    } 
-    char **commands = calloc(length+1, sizeof(char *));
-    for (int i = 0; i < length; i++) {
-        commands[i] = path[i]->cmd_and_args[0];
+            sigset_t waitsigchld_mask;
+            sigfillset(&waitsigchld_mask);
+            sigdelset(&waitsigchld_mask, SIGCHLD);
+            while (job_process_count != length) {
+                sigsuspend(&waitsigchld_mask);
+            }
+            exit(exitValue); // should never be reached by place here just in case
+            break;
+
+        default: // parent (fork sucessful. job is running and started now)
+            char **commands = calloc(length+1, sizeof(char *));
+            for (int i = 0; i < length; i++) {
+                commands[i] = path[i]->cmd_and_args[0];
+            }
+            commands[length] = NULL;
+            sf_job_started(job-jobs, printer->name, pid, commands);
+            free(commands);
+            free(path);
+            return pid; 
+            break;
     }
-    commands[length] = NULL;
-    sf_job_started(job-jobs, printer->name, pid, commands);
-    free(commands);
-    free(path);
-    return pid;  
 }
 
 void job_handler(int sig) {
