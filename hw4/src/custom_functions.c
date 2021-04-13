@@ -98,13 +98,6 @@ pid_t start_job(PRINTER *printer, JOB *job) {
         case 0: // child
             if (setpgid(0,0) == -1) // set group pid
                 perror("setpgid error:");
-            job_process_count = 0;
-            exitValue = 0;
-            sigset_t sigchld_mask;
-            sigemptyset(&sigchld_mask);
-            sigaddset(&sigchld_mask, SIGCHLD);
-            sigprocmask(SIG_UNBLOCK, &sigchld_mask, NULL);
-            signal(SIGCHLD, pipeline_handler);
             int fd_printer = imp_connect_to_printer(printer->name, printer->type->name, PRINTER_NORMAL);
             if (fd_printer == -1) 
                 exit(1);
@@ -145,11 +138,16 @@ pid_t start_job(PRINTER *printer, JOB *job) {
                         break;   
                 }
             } else {
+                job_process_count = 0;
+                exitValue = 0;
+                sigset_t sigchld_mask;
+                sigemptyset(&sigchld_mask);
+                sigaddset(&sigchld_mask, SIGCHLD);
+                sigprocmask(SIG_UNBLOCK, &sigchld_mask, NULL);
+                signal(SIGCHLD, pipeline_handler);
                 int pipe_fd[2];
                 int in_fd = input_fd;
                 for (int i = 0; i < length; i++) {
-                    // int child_status;
-                    
                     pipe(pipe_fd);
                     // info("my pipes %d -> %d", pipe_fd[0], pipe_fd[1]);
                     pid_t job_pid = fork();
@@ -186,14 +184,15 @@ pid_t start_job(PRINTER *printer, JOB *job) {
                             break;
                     }
                 }
+                sigset_t waitsigchld_mask;
+                sigfillset(&waitsigchld_mask);
+                sigdelset(&waitsigchld_mask, SIGCHLD);
+                while (job_process_count != length) {
+                    sigsuspend(&waitsigchld_mask);
+                }
+                exit(exitValue); 
             }
-            sigset_t waitsigchld_mask;
-            sigfillset(&waitsigchld_mask);
-            sigdelset(&waitsigchld_mask, SIGCHLD);
-            while (job_process_count != length) {
-                sigsuspend(&waitsigchld_mask);
-            }
-            exit(exitValue); // should never be reached by place here just in case
+            // should never be reached by this point but just in case
             break;
 
         default: // parent (fork sucessful. job is running and started now)
