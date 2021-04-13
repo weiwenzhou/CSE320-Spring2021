@@ -93,8 +93,9 @@ pid_t start_job(PRINTER *printer, JOB *job) {
     char **commands;
     pid_t pid = fork();
     switch (pid) {
-        case -1: // can't create master process. ignore job start. need to reconsider here
-            /* code */
+        case -1: // can't create master process. ignore job start. 
+            perror("Can't fork to start master process.");
+            return -1;
             break;
         case 0: // child
             if (setpgid(0,0) == -1) // set group pid
@@ -189,7 +190,8 @@ pid_t start_job(PRINTER *printer, JOB *job) {
                 }
                 exit(exitValue); 
             }
-            // should never be reached by this point but just in case
+            // this point should never be reached but just in case.
+            return -1; // shouldn't be return but added in order to compile without warnings
             break;
 
         default: // parent (fork sucessful. job is running and started now)
@@ -287,11 +289,13 @@ void scanner() {
                 // check type
                 CONVERSION **path = find_conversion_path(jobs[i].type->name, printers[p_id].type->name);
                 if (path != NULL) {
-                    job_process_count++;
-                    jobs_done = 1;
                     pid_t job = start_job(&printers[p_id], &jobs[i]);
-                    printer_pids[p_id] = job;
-                    job_pids[i] = job;
+                    if (job != -1) { // if job is started update the appropriate values.
+                        job_process_count++;
+                        jobs_done = 1;
+                        printer_pids[p_id] = job;
+                        job_pids[i] = job;
+                    }
                 }
                 free(path);
             }
