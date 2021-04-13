@@ -79,11 +79,6 @@ JOB *create_job(char *file, FILE_TYPE *type, int printer_set) {
 }
 
 pid_t start_job(PRINTER *printer, JOB *job) {
-    // debug("Starting job %ld", job-jobs);
-    job->status = JOB_RUNNING;
-    sf_job_status(job-jobs, JOB_RUNNING);
-    printer->status = PRINTER_BUSY;
-    sf_printer_status(printer->name, printer->status);
     CONVERSION **path = find_conversion_path(job->type->name, printer->type->name);
     int length = 0;
     while (path[length] != NULL) {
@@ -195,6 +190,10 @@ pid_t start_job(PRINTER *printer, JOB *job) {
             break;
 
         default: // parent (fork sucessful. job is running and started now)
+            job->status = JOB_RUNNING;
+            sf_job_status(job-jobs, JOB_RUNNING);
+            printer->status = PRINTER_BUSY;
+            sf_printer_status(printer->name, printer->status);
             commands = calloc(length+1, sizeof(char *));
             for (int i = 0; i < length; i++) {
                 commands[i] = path[i]->cmd_and_args[0];
