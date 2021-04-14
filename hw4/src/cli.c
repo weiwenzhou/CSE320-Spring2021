@@ -254,6 +254,7 @@ int run_cli(FILE *in, FILE *out)
             sf_printer_status(printer->name, PRINTER_DISABLED);
             // end block signal
             sigprocmask(SIG_SETMASK, &prev_mask, NULL);
+            sf_cmd_ok();
 
         } else if (strcmp(*array, "enable") == 0) {
             CHECK_ARG(length, 1);
@@ -272,6 +273,7 @@ int run_cli(FILE *in, FILE *out)
             sf_printer_status(printer->name, new_status);
             // end block signal
             sigprocmask(SIG_SETMASK, &prev_mask, NULL);
+            sf_cmd_ok();
 
         } else {
             printf("Unrecognized command: %s\n", *array);
