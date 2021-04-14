@@ -190,9 +190,10 @@ int run_cli(FILE *in, FILE *out)
 
         } else if (strcmp(*array, "cancel") == 0) {
             CHECK_ARG(length, 1);
-            int job_id = atoi(array[1]);
-            if (job_id >= MAX_JOBS) {
-                printf("Invalid job number %d\n", job_id);
+            char *leftover;
+            int job_id = strtol(array[1], &leftover, 10);
+            if (strlen(leftover) != 0 || job_id >= MAX_JOBS || job_id < 0) {
+                printf("Invalid job number %s\n", array[1]);
                 sf_cmd_error("pause - invalid job number");
                 goto bad_arg;
             }
@@ -207,9 +208,10 @@ int run_cli(FILE *in, FILE *out)
             
         } else if (strcmp(*array, "pause") == 0) {
             CHECK_ARG(length, 1);
-            int job_id = atoi(array[1]);
-            if (job_id >= MAX_JOBS) {
-                printf("Invalid job number %d\n", job_id);
+            char *leftover;
+            int job_id = strtol(array[1], &leftover, 10);
+            if (strlen(leftover) != 0 || job_id >= MAX_JOBS || job_id < 0) {
+                printf("Invalid job number %s\n", array[1]);
                 sf_cmd_error("pause - invalid job number");
                 goto bad_arg;
             }
@@ -223,9 +225,10 @@ int run_cli(FILE *in, FILE *out)
 
         } else if (strcmp(*array, "resume") == 0) {
             CHECK_ARG(length, 1);
-            int job_id = atoi(array[1]);
-            if (job_id >= MAX_JOBS) {
-                printf("Invalid job number %d\n", job_id);
+            char *leftover;
+            int job_id = strtol(array[1], &leftover, 10);
+            if (strlen(leftover) != 0 || job_id >= MAX_JOBS || job_id < 0) {
+                printf("Invalid job number %s\n", array[1]);
                 sf_cmd_error("resume - invalid job number");
                 goto bad_arg;
             }
