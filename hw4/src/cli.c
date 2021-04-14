@@ -95,7 +95,9 @@ int run_cli(FILE *in, FILE *out)
             // block signal
             sigprocmask(SIG_SETMASK, &mask_all, &prev_mask);
             if ((printer = define_printer(array[1], type)) == NULL) {
-                if (!program_failure) { // not memory allocation error
+                if (program_failure) { // memory allocation error
+                    sf_cmd_error("printer - memory allocation error");
+                } else {
                     printf("Too many printers (32 max)\n");
                     sf_cmd_error("printer - too many printers");
                 }
@@ -175,9 +177,11 @@ int run_cli(FILE *in, FILE *out)
             // block signal
             sigprocmask(SIG_SETMASK, &mask_all, &prev_mask);
             if ((job = create_job(array[1], type, printer_set)) == NULL) {
-                if (!program_failure) { // not memory allocation error
+                if (program_failure) { // memory allocation error
+                    sf_cmd_error("print - memory allocation error");
+                } else {
                     printf("Too many jobs (64 max)\n");
-                    sf_cmd_error("printer - too many jobs");
+                    sf_cmd_error("print - too many jobs");
                 }
                 sigprocmask(SIG_SETMASK, &prev_mask, NULL);
                 goto bad_arg;
