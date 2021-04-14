@@ -161,7 +161,14 @@ pid_t start_job(PRINTER *printer, JOB *job, CONVERSION **path) {
                     exit(1);
                 if (sigprocmask(SIG_UNBLOCK, &sigchld_mask, NULL) == -1) // async
                     exit(1);
-                signal(SIGCHLD, pipeline_handler); // replace with sigaction
+                struct sigaction sig_act;
+                memset(&sig_act, 0, sizeof(sig_act));
+                sig_act.sa_handler = pipeline_handler;
+                sigfillset(&sig_act.sa_mask);
+                if (sigaction(SIGCHLD, &sig_act, 0) == -1) { // async
+                    perror("Fail to install SIGCHLD handler");
+                    return -1;
+                }
                 int pipe_fd[2];
                 int in_fd = input_fd;
                 for (int i = 0; i < length && exitValue != 1; i++) { // stop forking if job is determined to be aborted
@@ -339,9 +346,6 @@ void scanner() {
 }
 
 void pipeline_handler(int sig) {
-    sigset_t blockall, prev;
-    sigfillset(&blockall);
-    sigprocmask(SIG_SETMASK, &blockall, &prev);
     int olderrno = errno;
     int child_status;
     pid_t pid;
@@ -352,5 +356,4 @@ void pipeline_handler(int sig) {
         } 
     }
     errno = olderrno;
-    sigprocmask(SIG_SETMASK, &prev, NULL);
 }
