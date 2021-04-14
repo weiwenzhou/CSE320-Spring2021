@@ -86,20 +86,18 @@ pid_t start_job(PRINTER *printer, JOB *job, CONVERSION **path) {
     pid_t pid = fork();
     switch (pid) {
         case -1: // can't create master process. ignore job start. 
-            perror("Can't fork to start master process.");
+            // perror("Can't fork to start master process.");
             return -1;
             break;
-        case 0: // child
+        case 0: // child - master process
             if (setpgid(0,0) == -1) // set group pid
                 perror("setpgid error:");
             int fd_printer = imp_connect_to_printer(printer->name, printer->type->name, PRINTER_NORMAL);
-            if (fd_printer == -1) 
+            if (fd_printer == -1) // can't connect to printer -> abort job
                 exit(1);
             int input_fd = open(job->file, O_RDONLY); // async
-            if (input_fd == -1) {
-                perror("input file");
+            if (input_fd == -1) // can't open fail -> abort job
                 exit(1);
-            }
 
             if (length == 0) {
                 int child_status;
@@ -107,23 +105,24 @@ pid_t start_job(PRINTER *printer, JOB *job, CONVERSION **path) {
                 pid_t job_pid = fork();
                 switch (job_pid) {
                     case -1: // error
+                        exit(1); // can't fork -> abort job
                         break;
 
-                    case 0: // child
-                        // info("%d->%d", fileno(input_file), fd_printer);
-                        dup2(input_fd, STDIN_FILENO);
-                        dup2(fd_printer, STDOUT_FILENO);
-                        if (execvp(cat_command[0], cat_command) < 0) {
-                            perror("WHY");
-                            exit(1);
-                        }
-                        exit(0);
+                    case 0: // child - pipeline
+                        if (dup2(input_fd, STDIN_FILENO) == -1) // async
+                            exit(1); // dup fail -> abort job
+                        if (dup2(fd_printer, STDOUT_FILENO) == -1) // async
+                            exit(1); // dup fail -> abort job
+                        if (execvp(cat_command[0], cat_command) == -1) 
+                            exit(1); // exec fail -> abort job
+                        // execvp does not return when it runs successfully
                         break;
 
                     default: // parent
-                        waitpid(job_pid, &child_status, 0);
+                        if (waitpid(job_pid, &child_status, 0) == -1) // async
+                            exit(1); // waitpid fail -> abort job
                         if (WIFEXITED(child_status) && WEXITSTATUS(child_status) == 0)
-                            exit(0);
+                            exit(0); // child exited with 0
                         else 
                             exit(1);
                         break;   
@@ -132,53 +131,66 @@ pid_t start_job(PRINTER *printer, JOB *job, CONVERSION **path) {
                 job_process_count = 0;
                 exitValue = 0;
                 sigset_t sigchld_mask, sigterm_mask;
-                sigemptyset(&sigchld_mask);
-                sigaddset(&sigchld_mask, SIGCHLD);
-                sigprocmask(SIG_UNBLOCK, &sigchld_mask, NULL);
-                signal(SIGCHLD, pipeline_handler);
+                if (sigemptyset(&sigchld_mask) == -1) // async
+                    exit(1);
+                if (sigaddset(&sigchld_mask, SIGCHLD) == -1) // async
+                    exit(1);
+                if (sigprocmask(SIG_UNBLOCK, &sigchld_mask, NULL) == -1) // async
+                    exit(1);
+                signal(SIGCHLD, pipeline_handler); // replace with sigaction
                 int pipe_fd[2];
                 int in_fd = input_fd;
-                for (int i = 0; i < length; i++) {
+                for (int i = 0; i < length && exitValue != 1; i++) { // stop forking if job is determined to be aborted
                     pipe(pipe_fd);
                     // info("my pipes %d -> %d", pipe_fd[0], pipe_fd[1]);
-                    pid_t job_pid = fork();
+                    pid_t job_pid = fork(); // async
                     switch (job_pid) {
                         case -1: // error
-                            /* code */
+                            exit(1); // can't fork -> abort job
                             break;
                         case 0: // child
-                            sigemptyset(&sigterm_mask);
-                            sigaddset(&sigterm_mask, SIGTERM);
-                            sigprocmask(SIG_UNBLOCK, &sigterm_mask, NULL);
-                            close(pipe_fd[0]); // close read side;
+                            if (sigemptyset(&sigterm_mask) == -1) // async
+                                exit(1);
+                            if (sigaddset(&sigterm_mask, SIGTERM) == -1) // async
+                                exit(1);
+                            if (sigprocmask(SIG_UNBLOCK, &sigterm_mask, NULL) == -1) // async
+                                exit(1);
+                            if (close(pipe_fd[0]) == -1) // close read side; // async
+                                exit(1);
                             if (i == 0)
-                                dup2(input_fd, STDIN_FILENO);
+                                if (dup2(input_fd, STDIN_FILENO) == -1) // async
+                                    exit(1); 
                             else {// read in_fd
-                                dup2(in_fd, STDIN_FILENO);
-                                close(in_fd);
+                                if (dup2(in_fd, STDIN_FILENO) == -1) // async
+                                    exit(1);
+                                if (close(in_fd) == -1) // async
+                                    exit(1);
                             }
                             if (i == length-1)
-                                dup2(fd_printer, STDOUT_FILENO);
+                                if (dup2(fd_printer, STDOUT_FILENO) == -1) // async
+                                    exit(1);
                             else // write to pipe[1]
-                                dup2(pipe_fd[1], STDOUT_FILENO);
-                            if (execvp(path[i]->cmd_and_args[0], path[i]->cmd_and_args) < 0) {
-                                perror("WHY");
+                                if (dup2(pipe_fd[1], STDOUT_FILENO) == -1) // async
+                                    exit(1);
+                            if (execvp(path[i]->cmd_and_args[0], path[i]->cmd_and_args) == -1) 
                                 exit(1);
-                            }
-                            exit(0);
+                            // execvp does not return when it runs successfully
                             break;
                         
                         default: // parent
-                            close(pipe_fd[1]); // close write side;
+                            if (close(pipe_fd[1]) == -1) // close write side;
+                                exit(1);
                             in_fd = pipe_fd[0]; // set next read as the read end of pipe
                             break;
                     }
                 }
                 sigset_t waitsigchld_mask;
-                sigfillset(&waitsigchld_mask);
-                sigdelset(&waitsigchld_mask, SIGCHLD);
+                if (sigfillset(&waitsigchld_mask) == -1) // async
+                    exit(1);
+                if (sigdelset(&waitsigchld_mask, SIGCHLD) == -1) // async
+                    exit(1);
                 while (job_process_count != length) {
-                    sigsuspend(&waitsigchld_mask);
+                    sigsuspend(&waitsigchld_mask); // always return -1 - async
                 }
                 exit(exitValue); 
             }
@@ -187,11 +199,13 @@ pid_t start_job(PRINTER *printer, JOB *job, CONVERSION **path) {
             break;
 
         default: // parent (fork sucessful. job is running and started now)
+            commands = calloc(length+1, sizeof(char *));
+            if (commands == NULL) // might need to reconsider how to handle this error
+                return -1;
             job->status = JOB_RUNNING;
             sf_job_status(job-jobs, JOB_RUNNING);
             printer->status = PRINTER_BUSY;
             sf_printer_status(printer->name, printer->status);
-            commands = calloc(length+1, sizeof(char *));
             for (int i = 0; i < length; i++) {
                 commands[i] = path[i]->cmd_and_args[0];
             }
