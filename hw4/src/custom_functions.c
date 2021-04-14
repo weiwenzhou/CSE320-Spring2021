@@ -167,7 +167,7 @@ pid_t start_job(PRINTER *printer, JOB *job, CONVERSION **path) {
                 sigfillset(&sig_act.sa_mask);
                 if (sigaction(SIGCHLD, &sig_act, 0) == -1) { // async
                     perror("Fail to install SIGCHLD handler");
-                    return -1;
+                    exit(1);
                 }
                 int pipe_fd[2];
                 int in_fd = input_fd;
