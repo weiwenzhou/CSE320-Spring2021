@@ -90,7 +90,7 @@ JOB *create_job(char *file, FILE_TYPE *type, int printer_set) {
                 program_failure = 1;
                 return NULL;
             }
-            job_count |= 1 << i;
+            job_count |= ((uint64_t)1) << i;
             JOB *new_job = &jobs[i];
             new_job->file = file_copy;
             new_job->type = type;

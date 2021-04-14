@@ -172,7 +172,7 @@ int run_cli(FILE *in, FILE *out)
                     sf_cmd_error("print - unknown printer");
                     goto bad_arg;
                 }
-                printer_set |= 1 << (printer-printers);
+                printer_set |= ((uint32_t)1) << (printer-printers);
             }
             // block signal
             sigprocmask(SIG_SETMASK, &mask_all, &prev_mask);
