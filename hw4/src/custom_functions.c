@@ -55,9 +55,14 @@ PRINTER *define_printer(char *name, FILE_TYPE *type) {
     // info("%d", printer_count);
     if (printer_count == MAX_PRINTERS)
         return NULL;
-    PRINTER *new_printer = &printers[printer_count++];
     char *name_copy = malloc(strlen(name)+1); // minimum length + 1 for \0
+    if (name_copy == NULL) {
+        perror("Memory allocation failed. Start terminating...");
+        program_failure = 1;
+        return NULL;
+    }
     strcpy(name_copy, name);
+    PRINTER *new_printer = &printers[printer_count++];
     new_printer->name = name_copy;
     new_printer->type = type;
     new_printer->status = PRINTER_DISABLED;
@@ -78,10 +83,15 @@ JOB *create_job(char *file, FILE_TYPE *type, int printer_set) {
     size_t temp = ~job_count; // bits that are 1 are open slots
     for (int i = 0; i < MAX_JOBS; i++) {
         if ((temp >> i) & 0x1) {
-            job_count |= 1 << i;
-            JOB *new_job = &jobs[i];
             char *file_copy = malloc(strlen(file)+1); // length + 1 for \0
             strcpy(file_copy, file);
+            if (file_copy == NULL) {
+                perror("Memory allocation failed. Start terminating...");
+                program_failure = 1;
+                return NULL;
+            }
+            job_count |= 1 << i;
+            JOB *new_job = &jobs[i];
             new_job->file = file_copy;
             new_job->type = type;
             new_job->status = JOB_CREATED;
