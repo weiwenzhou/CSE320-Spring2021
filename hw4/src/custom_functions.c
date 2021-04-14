@@ -21,6 +21,8 @@ char **split_string(char *string, int *length) {
     char *updated = malloc(strlen(string)+1);
     strcpy(updated, string);
     char *token = strtok(updated, " ");
+    if (token == NULL)
+        return NULL;
     // get the length of the array
     while ((token = strtok(NULL, " ")) != NULL) 
         length_temp++;
