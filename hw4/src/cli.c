@@ -198,12 +198,17 @@ int run_cli(FILE *in, FILE *out)
             int job_id = strtol(array[1], &leftover, 10);
             if (strlen(leftover) != 0 || job_id >= MAX_JOBS || job_id < 0) {
                 printf("Invalid job number %s\n", array[1]);
-                sf_cmd_error("pause - invalid job number");
+                sf_cmd_error("cancel - invalid job number");
                 goto bad_arg;
             }
             // info("id %d pid: %d sig term", job_id, job_pids[job_id]);
             // block signal
             sigprocmask(SIG_SETMASK, &mask_all, &prev_mask);
+            if (job_pids[job_id] == 0) {
+                sf_cmd_error("cancel - invalid job number");
+                sigprocmask(SIG_SETMASK, &prev_mask, NULL);
+                goto bad_arg;
+            }
             killpg(job_pids[job_id], SIGTERM);
             killpg(job_pids[job_id], SIGCONT);
             // end block signal
@@ -222,6 +227,11 @@ int run_cli(FILE *in, FILE *out)
             // info("id %d pid: %d", job_id, job_pids[job_id]);
             // block signal
             sigprocmask(SIG_SETMASK, &mask_all, &prev_mask);
+            if (job_pids[job_id] == 0) {
+                sf_cmd_error("pause - invalid job number");
+                sigprocmask(SIG_SETMASK, &prev_mask, NULL);
+                goto bad_arg;
+            }
             killpg(job_pids[job_id], SIGSTOP);
             // end block signal
             sigprocmask(SIG_SETMASK, &prev_mask, NULL);
@@ -239,6 +249,12 @@ int run_cli(FILE *in, FILE *out)
             // info("id %d pid: %d", job_id, job_pids[job_id]);
             // block signal
             sigprocmask(SIG_SETMASK, &mask_all, &prev_mask);
+            if (job_pids[job_id] == 0) {
+                sf_cmd_error("resume - invalid job number");
+                sigprocmask(SIG_SETMASK, &prev_mask, NULL);
+                goto bad_arg;
+
+            }
             killpg(job_pids[job_id], SIGCONT);
             // end block signal
             sigprocmask(SIG_SETMASK, &prev_mask, NULL);
