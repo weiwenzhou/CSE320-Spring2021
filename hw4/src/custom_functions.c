@@ -157,21 +157,23 @@ pid_t start_job(PRINTER *printer, JOB *job, CONVERSION **path) {
                                 exit(1);
                             if (close(pipe_fd[0]) == -1) // close read side; // async
                                 exit(1);
-                            if (i == 0)
+                            if (i == 0) {
                                 if (dup2(input_fd, STDIN_FILENO) == -1) // async
                                     exit(1); 
-                            else {// read in_fd
+                            } else {// read in_fd
                                 if (dup2(in_fd, STDIN_FILENO) == -1) // async
                                     exit(1);
                                 if (close(in_fd) == -1) // async
                                     exit(1);
                             }
-                            if (i == length-1)
+                            if (i == length-1) {
                                 if (dup2(fd_printer, STDOUT_FILENO) == -1) // async
                                     exit(1);
-                            else // write to pipe[1]
+                            }
+                            else { // write to pipe[1]
                                 if (dup2(pipe_fd[1], STDOUT_FILENO) == -1) // async
                                     exit(1);
+                            }
                             if (execvp(path[i]->cmd_and_args[0], path[i]->cmd_and_args) == -1) 
                                 exit(1);
                             // execvp does not return when it runs successfully
