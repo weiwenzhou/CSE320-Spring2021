@@ -285,7 +285,7 @@ void job_handler(int sig) {
                 // change job status to JOB_ABORT
                 jobs[job_id].status = JOB_ABORTED;
                 sf_job_status(job_id, JOB_ABORTED);
-                sf_job_aborted(job_id, WEXITSTATUS(child_status));
+                sf_job_aborted(job_id, child_status);
             }
             if (printers[printer_id].status == PRINTER_BUSY) {
                 printers[printer_id].status = PRINTER_IDLE;
