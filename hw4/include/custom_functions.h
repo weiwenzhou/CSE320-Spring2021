@@ -135,3 +135,9 @@ void pipeline_handler(int sig);
  * Use to track the exit value of a master process.
  */
 volatile int exitValue;
+
+/**
+ * Use to track if library function fails causing the
+ * main process to start terminating gracefully.
+ */
+int program_failure;

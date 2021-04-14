@@ -19,15 +19,28 @@ char **split_string(char *string, int *length) {
         return NULL;
     int length_temp = 1;
     char *updated = malloc(strlen(string)+1);
+    if (updated == NULL) {
+        perror("Memory allocation failed. Start terminating...");
+        program_failure = 1;
+        return NULL;
+    }
     strcpy(updated, string);
     char *token = strtok(updated, " ");
-    if (token == NULL)
+    if (token == NULL) {
+        free(updated);
         return NULL;
+    }
     // get the length of the array
     while ((token = strtok(NULL, " ")) != NULL) 
         length_temp++;
     // create an array of the proper
+    free(updated);
     char **array = calloc(length_temp+1, sizeof(char *));
+    if (array == NULL) {
+        perror("Memory allocation failed. Start terminating...");
+        program_failure = 1;
+        return NULL;
+    }
     *length = length_temp;
     length_temp = 0;
     token = strtok(string, " ");
@@ -35,7 +48,6 @@ char **split_string(char *string, int *length) {
     while ((token = strtok(NULL, " ")) != NULL) 
         array[length_temp++] = token;
     array[length_temp] = NULL;
-    free(updated);
     return array;
 }
 

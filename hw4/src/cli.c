@@ -56,7 +56,7 @@ int run_cli(FILE *in, FILE *out)
 
         // decrement length to account for command
         length--;
-        if (length < 0) // for an empty line
+        if (array == NULL) // for an empty line
             goto bad_arg;
         else if (strcmp(*array, "help") == 0) {
             CHECK_ARG(length, 0);
@@ -287,10 +287,14 @@ int run_cli(FILE *in, FILE *out)
             }
             // end block signal
             sigprocmask(SIG_SETMASK, &prev_mask, NULL);
+            if (program_failure == 1) {
+                debug("HERE?");
+                break;
+            }
 
     }
     // reset only if in interactive mode
-    if (in == stdin || returnValue) {
+    if (in == stdin || returnValue || program_failure == 1) {
         while (jobs_done != 0)
             ;
         for (int i = 0; i < printer_count; i++) 
@@ -303,5 +307,10 @@ int run_cli(FILE *in, FILE *out)
     }
     dup2(stdin_copy, STDIN_FILENO);
     dup2(stdout_copy, STDOUT_FILENO);
+    if (program_failure == 1) {
+        conversions_fini();
+        sf_fini();
+        exit(EXIT_FAILURE);
+    }
     return returnValue;
 }
