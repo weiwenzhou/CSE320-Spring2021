@@ -329,6 +329,17 @@ int run_cli(FILE *in, FILE *out)
         sigset_t waitsigchld_mask;
         sigfillset(&waitsigchld_mask);
         sigdelset(&waitsigchld_mask, SIGCHLD); 
+        // block signal
+        sigprocmask(SIG_SETMASK, &mask_all, &prev_mask);
+        // for all pause process -> cancel
+        for (int i = 0; i < MAX_JOBS; i++) {
+            if (jobs[i].status == JOB_PAUSED) {
+                killpg(job_pids[i], SIGTERM);
+                killpg(job_pids[i], SIGCONT);
+            }
+        }
+        // end block signal
+        sigprocmask(SIG_SETMASK, &prev_mask, NULL);
         while (jobs_done != 0) {
             sigsuspend(&waitsigchld_mask);
         }
