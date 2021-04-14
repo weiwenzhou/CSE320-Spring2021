@@ -326,8 +326,12 @@ int run_cli(FILE *in, FILE *out)
     }
     // reset only if in interactive mode
     if (in == stdin || returnValue || program_failure == 1) {
-        while (jobs_done != 0)
-            ;
+        sigset_t waitsigchld_mask;
+        sigfillset(&waitsigchld_mask);
+        sigdelset(&waitsigchld_mask, SIGCHLD); 
+        while (jobs_done != 0) {
+            sigsuspend(&waitsigchld_mask);
+        }
         for (int i = 0; i < printer_count; i++) 
             free(printers[i].name);
         for (int i = 0; i < MAX_JOBS; i++) {
