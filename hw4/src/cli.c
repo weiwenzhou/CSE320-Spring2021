@@ -312,7 +312,7 @@ int run_cli(FILE *in, FILE *out)
                     sf_job_status(i, JOB_DELETED);
                     sf_job_deleted(i);
                     free(jobs[i].file);
-                    job_count ^= 1 << i; // flip bit from 1 to 0.
+                    job_count ^= ((uint64_t)1)<< i; // flip bit from 1 to 0.
                 }
             }
             // end block signal
