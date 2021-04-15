@@ -104,12 +104,11 @@ int run_cli(FILE *in, FILE *out)
                 sigprocmask(SIG_SETMASK, &prev_mask, NULL);
                 goto bad_arg;
             }
-            // end block signal
-            sigprocmask(SIG_SETMASK, &prev_mask, NULL);
             sf_printer_defined(printer->name, printer->type->name);
             printf("PRINTER: id=%ld, name=%s, type=%s, status=%s\n", printer-printers, printer->name, printer->type->name, printer_status_names[printer->status]);
-
             sf_cmd_ok();
+            // end block signal
+            sigprocmask(SIG_SETMASK, &prev_mask, NULL);
 
         } else if (strcmp(*array, "conversion") == 0) {
             if (length <= 3)
@@ -136,9 +135,9 @@ int run_cli(FILE *in, FILE *out)
             sigprocmask(SIG_SETMASK, &mask_all, &prev_mask);
             for (int i = 0; i < printer_count; i++)
                 printf("PRINTER: id=%d, name=%s, type=%s, status=%s\n", i, printers[i].name, printers[i].type->name, printer_status_names[printers[i].status]);
+            sf_cmd_ok();
             // end block signal
             sigprocmask(SIG_SETMASK, &prev_mask, NULL);
-            sf_cmd_ok();
 
         } else if (strcmp(*array, "jobs") == 0) {
             CHECK_ARG(length, 0);
@@ -149,9 +148,9 @@ int run_cli(FILE *in, FILE *out)
                     printf("JOB[%d]: status=%s, eligible=%x, file=%s\n", i, job_status_names[jobs[i].status], jobs[i].eligible, jobs[i].file);
                 }
             }
+            sf_cmd_ok();
             // end block signal
             sigprocmask(SIG_SETMASK, &prev_mask, NULL);
-            sf_cmd_ok();
 
         } else if (strcmp(*array, "print") == 0) {
             if (length <= 1)
@@ -186,11 +185,11 @@ int run_cli(FILE *in, FILE *out)
                 sigprocmask(SIG_SETMASK, &prev_mask, NULL);
                 goto bad_arg;
             }
-            // end block signal
-            sigprocmask(SIG_SETMASK, &prev_mask, NULL);
             printf("JOB[%ld]: status=%s, eligible=%08x, file=%s\n", job-jobs, job_status_names[job->status], job->eligible, job->file);
             sf_job_created(job-jobs, job->file, job->type->name);
             sf_cmd_ok();
+            // end block signal
+            sigprocmask(SIG_SETMASK, &prev_mask, NULL);
 
         } else if (strcmp(*array, "cancel") == 0) {
             CHECK_ARG(length, 1);
@@ -211,9 +210,9 @@ int run_cli(FILE *in, FILE *out)
             }
             killpg(job_pids[job_id], SIGTERM);
             killpg(job_pids[job_id], SIGCONT);
+            sf_cmd_ok();
             // end block signal
             sigprocmask(SIG_SETMASK, &prev_mask, NULL);
-            sf_cmd_ok();
             
         } else if (strcmp(*array, "pause") == 0) {
             CHECK_ARG(length, 1);
@@ -233,9 +232,9 @@ int run_cli(FILE *in, FILE *out)
                 goto bad_arg;
             }
             killpg(job_pids[job_id], SIGSTOP);
+            sf_cmd_ok();
             // end block signal
             sigprocmask(SIG_SETMASK, &prev_mask, NULL);
-            sf_cmd_ok();
 
         } else if (strcmp(*array, "resume") == 0) {
             CHECK_ARG(length, 1);
@@ -256,9 +255,9 @@ int run_cli(FILE *in, FILE *out)
 
             }
             killpg(job_pids[job_id], SIGCONT);
+            sf_cmd_ok();
             // end block signal
             sigprocmask(SIG_SETMASK, &prev_mask, NULL);
-            sf_cmd_ok();
 
         } else if (strcmp(*array, "disable") == 0) {
             CHECK_ARG(length, 1);
@@ -272,9 +271,9 @@ int run_cli(FILE *in, FILE *out)
             sigprocmask(SIG_SETMASK, &mask_all, &prev_mask);
             printer->status = PRINTER_DISABLED;
             sf_printer_status(printer->name, PRINTER_DISABLED);
+            sf_cmd_ok();
             // end block signal
             sigprocmask(SIG_SETMASK, &prev_mask, NULL);
-            sf_cmd_ok();
 
         } else if (strcmp(*array, "enable") == 0) {
             CHECK_ARG(length, 1);
@@ -291,9 +290,9 @@ int run_cli(FILE *in, FILE *out)
             PRINTER_STATUS new_status = (printer_pids[printer-printers]) ? PRINTER_BUSY:PRINTER_IDLE;
             printer->status = new_status;
             sf_printer_status(printer->name, new_status);
+            sf_cmd_ok();
             // end block signal
             sigprocmask(SIG_SETMASK, &prev_mask, NULL);
-            sf_cmd_ok();
 
         } else {
             printf("Unrecognized command: %s\n", *array);
