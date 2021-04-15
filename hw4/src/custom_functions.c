@@ -263,16 +263,16 @@ void job_handler(int sig) {
             job_process_count--;
             int printer_id, job_id;
             for (int i = 0; i < MAX_JOBS; i++) {
-                if (pid == job_pids[i]) {
+                if (pid == jobs[i].pid) {
                     job_id = i;
-                    job_pids[i] = 0;
+                    jobs[i].pid = 0;
                     break;
                 }
             }
             for (int i = 0; i < printer_count; i++) {
-                if (pid == printer_pids[i]) {
+                if (pid == printers[i].pid) {
                     printer_id = i;
-                    printer_pids[i] = 0;
+                    printers[i].pid = 0;
                     break;
                 }
             }
@@ -292,12 +292,12 @@ void job_handler(int sig) {
                 sf_printer_status(printers[printer_id].name, PRINTER_IDLE);
             }
             // job waits to be deleted
-            job_timestamps[job_id] = time(NULL); // time async safe
+            jobs[job_id].timestamp = time(NULL); // time async safe
         } else if (WIFSTOPPED(child_status)) { // process stopped
             // change job status to JOB_PAUSE if job status is JOB_RUNNING
             int job_id;
             for (int i = 0; i < MAX_JOBS; i++) {
-                if (pid == job_pids[i]) {
+                if (pid == jobs[i].pid) {
                     job_id = i;
                     break;
                 }
@@ -308,7 +308,7 @@ void job_handler(int sig) {
             // change job status to JOB_RUNNING if job status is JOB_PAUSE
             int job_id;
             for (int i = 0; i < MAX_JOBS; i++) {
-                if (pid == job_pids[i]) {
+                if (pid == jobs[i].pid) {
                     job_id = i;
                     break;
                 }
@@ -335,8 +335,8 @@ void scanner() {
                     if (job != -1) { // if job is started update the appropriate values.
                         job_process_count++;
                         jobs_done = 1;
-                        printer_pids[p_id] = job;
-                        job_pids[i] = job;
+                        printers[p_id].pid = job;
+                        jobs[i].pid = job;
                     }
                 }
                 free(path);

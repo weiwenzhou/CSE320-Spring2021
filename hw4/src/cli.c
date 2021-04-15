@@ -200,16 +200,16 @@ int run_cli(FILE *in, FILE *out)
                 sf_cmd_error("cancel - invalid job number");
                 goto bad_arg;
             }
-            // info("id %d pid: %d sig term", job_id, job_pids[job_id]);
+            // info("id %d pid: %d sig term", job_id, jobs[job_id].pid);
             // block signal
             sigprocmask(SIG_SETMASK, &mask_all, &prev_mask);
-            if (job_pids[job_id] == 0) {
+            if (jobs[job_id].pid == 0) {
                 sf_cmd_error("cancel - invalid job number");
                 sigprocmask(SIG_SETMASK, &prev_mask, NULL);
                 goto bad_arg;
             }
-            killpg(job_pids[job_id], SIGTERM);
-            killpg(job_pids[job_id], SIGCONT);
+            killpg(jobs[job_id].pid, SIGTERM);
+            killpg(jobs[job_id].pid, SIGCONT);
             sf_cmd_ok();
             // end block signal
             sigprocmask(SIG_SETMASK, &prev_mask, NULL);
@@ -223,15 +223,15 @@ int run_cli(FILE *in, FILE *out)
                 sf_cmd_error("pause - invalid job number");
                 goto bad_arg;
             }
-            // info("id %d pid: %d", job_id, job_pids[job_id]);
+            // info("id %d pid: %d", job_id, jobs[job_id].pid);
             // block signal
             sigprocmask(SIG_SETMASK, &mask_all, &prev_mask);
-            if (job_pids[job_id] == 0) {
+            if (jobs[job_id].pid == 0) {
                 sf_cmd_error("pause - invalid job number");
                 sigprocmask(SIG_SETMASK, &prev_mask, NULL);
                 goto bad_arg;
             }
-            killpg(job_pids[job_id], SIGSTOP);
+            killpg(jobs[job_id].pid, SIGSTOP);
             sf_cmd_ok();
             // end block signal
             sigprocmask(SIG_SETMASK, &prev_mask, NULL);
@@ -245,16 +245,16 @@ int run_cli(FILE *in, FILE *out)
                 sf_cmd_error("resume - invalid job number");
                 goto bad_arg;
             }
-            // info("id %d pid: %d", job_id, job_pids[job_id]);
+            // info("id %d pid: %d", job_id, jobs[job_id].pid);
             // block signal
             sigprocmask(SIG_SETMASK, &mask_all, &prev_mask);
-            if (job_pids[job_id] == 0) {
+            if (jobs[job_id].pid == 0) {
                 sf_cmd_error("resume - invalid job number");
                 sigprocmask(SIG_SETMASK, &prev_mask, NULL);
                 goto bad_arg;
 
             }
-            killpg(job_pids[job_id], SIGCONT);
+            killpg(jobs[job_id].pid, SIGCONT);
             sf_cmd_ok();
             // end block signal
             sigprocmask(SIG_SETMASK, &prev_mask, NULL);
@@ -287,7 +287,7 @@ int run_cli(FILE *in, FILE *out)
             // block signal
             sigprocmask(SIG_SETMASK, &mask_all, &prev_mask);
             // if printer_pid == 0 then go idle else go to busy
-            PRINTER_STATUS new_status = (printer_pids[printer-printers]) ? PRINTER_BUSY:PRINTER_IDLE;
+            PRINTER_STATUS new_status = (printers[printer-printers].pid) ? PRINTER_BUSY:PRINTER_IDLE;
             printer->status = new_status;
             sf_printer_status(printer->name, new_status);
             sf_cmd_ok();
@@ -307,8 +307,8 @@ int run_cli(FILE *in, FILE *out)
             sigprocmask(SIG_SETMASK, &mask_all, &prev_mask);
             time_t current = time(NULL);
             for (int i = 0; i < MAX_JOBS; i++) {
-                if (job_timestamps[i] != 0 && current - job_timestamps[i] >= 10) {
-                    job_timestamps[i] = 0;
+                if (jobs[i].timestamp != 0 && current - jobs[i].timestamp >= 10) {
+                    jobs[i].timestamp = 0;
                     sf_job_status(i, JOB_DELETED);
                     sf_job_deleted(i);
                     free(jobs[i].file);
@@ -333,8 +333,8 @@ int run_cli(FILE *in, FILE *out)
         // for all pause process -> cancel
         for (int i = 0; i < MAX_JOBS; i++) {
             if (jobs[i].status == JOB_PAUSED) {
-                killpg(job_pids[i], SIGTERM);
-                killpg(job_pids[i], SIGCONT);
+                killpg(jobs[i].pid, SIGTERM);
+                killpg(jobs[i].pid, SIGCONT);
             }
         }
         // end block signal

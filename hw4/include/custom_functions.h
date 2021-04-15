@@ -8,6 +8,7 @@ typedef struct printer {
     char *name;
     FILE_TYPE *type;
     PRINTER_STATUS status;
+    volatile pid_t pid;
 } PRINTER;
 
 /*
@@ -26,6 +27,8 @@ typedef struct job {
     uint32_t eligible; // 32 bits. One for each printer (1 if eligible)
     FILE_TYPE *type;
     JOB_STATUS status;
+    volatile pid_t pid;
+    volatile time_t timestamp;
 } JOB;
 
 /*
@@ -35,20 +38,10 @@ JOB jobs[MAX_JOBS];
 // Global counter to keep track of the number of jobs. (64 bits - if bit is 1 then it is taken)
 uint64_t job_count;
 
-/*
- * Space to store the PRINTER/JOB group pids.
- */
-pid_t printer_pids[MAX_PRINTERS];
-pid_t job_pids[MAX_JOBS];
 // Counter for number jobs being processed
 volatile int job_process_count;
 // Flag to keep track of when things are done.
 volatile sig_atomic_t jobs_done;
-
-/*
- * Space to store the timestamps for deletion
- */
-time_t job_timestamps[MAX_JOBS];
 
 /**
  * Splits a string using whitespaces as the delimiter. The 
