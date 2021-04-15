@@ -352,6 +352,8 @@ int run_cli(FILE *in, FILE *out)
     }
     dup2(stdin_copy, STDIN_FILENO);
     dup2(stdout_copy, STDOUT_FILENO);
+    close(stdin_copy);
+    close(stdout_copy);
     if (program_failure == 1) {
         conversions_fini();
         sf_fini();
