@@ -204,13 +204,22 @@ int run_cli(FILE *in, FILE *out)
             // block signal
             sigprocmask(SIG_SETMASK, &mask_all, &prev_mask);
             if (jobs[job_id].pid == 0) {
-                sf_cmd_error("cancel - invalid job number");
-                sigprocmask(SIG_SETMASK, &prev_mask, NULL);
-                goto bad_arg;
+                if (jobs[job_id].status == JOB_CREATED) {
+                    // change job status to JOB_ABORT
+                    jobs[job_id].status = JOB_ABORTED;
+                    sf_job_status(job_id, JOB_ABORTED);
+                    sf_job_aborted(job_id, 0);
+                    jobs[job_id].timestamp = time(NULL);
+                } else {
+                    sf_cmd_error("cancel - invalid job number");
+                    sigprocmask(SIG_SETMASK, &prev_mask, NULL);
+                    goto bad_arg;
+                }
+            } else {
+                killpg(jobs[job_id].pid, SIGTERM);
+                killpg(jobs[job_id].pid, SIGCONT);
+                sf_cmd_ok();
             }
-            killpg(jobs[job_id].pid, SIGTERM);
-            killpg(jobs[job_id].pid, SIGCONT);
-            sf_cmd_ok();
             // end block signal
             sigprocmask(SIG_SETMASK, &prev_mask, NULL);
             
