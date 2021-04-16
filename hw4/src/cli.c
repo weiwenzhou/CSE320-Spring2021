@@ -204,7 +204,7 @@ int run_cli(FILE *in, FILE *out)
             // block signal
             sigprocmask(SIG_SETMASK, &mask_all, &prev_mask);
             if (jobs[job_id].pid == 0) {
-                if (jobs[job_id].status == JOB_CREATED) {
+                if (((((uint64_t)1) << job_id) & job_count) != 0) {
                     // change job status to JOB_ABORT
                     jobs[job_id].status = JOB_ABORTED;
                     sf_job_status(job_id, JOB_ABORTED);
