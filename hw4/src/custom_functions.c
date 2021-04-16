@@ -126,6 +126,7 @@ pid_t start_job(PRINTER *printer, JOB *job, CONVERSION **path) {
             if (length == 0) {
                 int child_status;
                 char *cat_command[] = {"/bin/cat", NULL};
+                sigset_t sigterm_mask;
                 pid_t job_pid = fork();
                 switch (job_pid) {
                     case -1: // error
@@ -133,6 +134,12 @@ pid_t start_job(PRINTER *printer, JOB *job, CONVERSION **path) {
                         break;
 
                     case 0: // child - pipeline
+                        if (sigemptyset(&sigterm_mask) == -1) // async
+                                exit(1);
+                        if (sigaddset(&sigterm_mask, SIGTERM) == -1) // async
+                            exit(1);
+                        if (sigprocmask(SIG_UNBLOCK, &sigterm_mask, NULL) == -1) // async
+                            exit(1);
                         if (dup2(input_fd, STDIN_FILENO) == -1) // async
                             exit(1); // dup fail -> abort job
                         if (dup2(fd_printer, STDOUT_FILENO) == -1) // async
