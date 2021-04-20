@@ -39,7 +39,7 @@ int main(int argc, char* argv[]){
             case 'p':
                 info("HERE?");
                 port = strtol(optarg, &leftover, 10);
-                if (strlen(leftover) != 0) {
+                if (strlen(leftover) != 0 || port <= 0 || port > 65535) {
                     fprintf(stderr, "Invalid port: %s\n", optarg);
                     exit(EXIT_FAILURE);
                 }
