@@ -8,6 +8,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/types.h>
+#include <netdb.h>
 
 #include "debug.h"
 #include "server.h"
@@ -24,7 +26,31 @@ int main(int argc, char* argv[]){
     // Option processing should be performed here.
     // Option '-p <port>' is required in order to specify the port number
     // on which the server should listen.
+    char optval;
+    char *leftover;
+    int port;
+    if (optind >= argc) {
+        fprintf(stderr, "Usage: %s -p <port>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+    do {
+        optval = getopt(argc, argv, "p:");
+        switch (optval) {
+            case 'p':
+                info("HERE?");
+                port = strtol(optarg, &leftover, 10);
+                if (strlen(leftover) != 0) {
+                    fprintf(stderr, "Invalid port: %s\n", optarg);
+                    exit(EXIT_FAILURE);
+                }
+                break;
 
+            default: // includes '?' invalid option and ':' missing port
+                fprintf(stderr, "Usage: %s -p <port>\n", argv[0]);
+                exit(EXIT_FAILURE);
+                break;
+        }
+    } while (optind < argc);
     // Perform required initializations of the client_registry and
     // player_registry.
     user_registry = ureg_init();
