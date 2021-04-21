@@ -61,6 +61,42 @@ int main(int argc, char* argv[]){
     // run function charla_client_service().  In addition, you should install
     // a SIGHUP handler, so that receipt of SIGHUP will perform a clean
     // shutdown of the server.
+    int socket_fd, *connfdp;
+    struct sockaddr_in address;
+    pthread_t tid;
+
+    if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1) { // create socket fd
+        perror("Socket failed");
+        terminate(EXIT_FAILURE);
+    }
+
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(port);
+
+    if (bind(socket_fd, (struct sockaddr *)&address, sizeof(address)) == -1) { // bind socket to address, port
+        perror("Bind failed");
+        terminate(EXIT_FAILURE);
+    }
+
+    if (listen(socket_fd, 4) == -1) { // listen on socket
+        perror("Listen failed");
+        terminate(EXIT_FAILURE);
+    }
+
+    while (1) {
+        connfdp = malloc(sizeof(int));
+        if (connfdp == NULL) {
+            perror("Malloc failed");
+            terminate(EXIT_FAILURE);
+        }
+        *connfdp = accept(socket_fd, NULL, NULL);
+        if (*connfdp == -1) {
+            perror("Accept failure");
+            terminate(EXIT_FAILURE);
+        }
+        pthread_create(&tid, NULL, chla_client_service, connfdp);
+    }
 
     fprintf(stderr, "You have to finish implementing main() "
 	    "before the server will function.\n");
