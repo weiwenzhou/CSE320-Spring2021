@@ -37,7 +37,6 @@ int main(int argc, char* argv[]){
         optval = getopt(argc, argv, "p:");
         switch (optval) {
             case 'p':
-                info("HERE?");
                 port = strtol(optarg, &leftover, 10);
                 if (strlen(leftover) != 0 || port <= 0 || port > 65535) {
                     fprintf(stderr, "Invalid port: %s\n", optarg);
@@ -61,12 +60,17 @@ int main(int argc, char* argv[]){
     // run function charla_client_service().  In addition, you should install
     // a SIGHUP handler, so that receipt of SIGHUP will perform a clean
     // shutdown of the server.
-    int socket_fd, *connfdp;
+    int socket_fd, opt, *connfdp;
     struct sockaddr_in address;
     pthread_t tid;
 
     if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1) { // create socket fd
         perror("Socket failed");
+        terminate(EXIT_FAILURE);
+    }
+
+    if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, (const void *)&opt, sizeof(int)) == -1) { // prevent Address already in use
+        perror("Setsockopt failed");
         terminate(EXIT_FAILURE);
     }
 
@@ -97,9 +101,6 @@ int main(int argc, char* argv[]){
         }
         pthread_create(&tid, NULL, chla_client_service, connfdp);
     }
-
-    fprintf(stderr, "You have to finish implementing main() "
-	    "before the server will function.\n");
 
     terminate(EXIT_FAILURE);
 }
