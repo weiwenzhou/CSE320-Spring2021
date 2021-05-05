@@ -11,7 +11,7 @@ int proto_send_packet(int fd, CHLA_PACKET_HEADER *hdr, void *payload) {
 
     // write the header (keep track of partial writes)
     header_size = sizeof(CHLA_PACKET_HEADER);
-    current_buffer = hdr;
+    current_buffer = (char *) hdr;
     while (header_size != 0) {
         amount_written = write(fd, current_buffer, header_size);
         if (amount_written <= 0) { // write error or wrote 0 byte 
@@ -41,7 +41,7 @@ int proto_recv_packet(int fd, CHLA_PACKET_HEADER *hdr, void **payload) {
     char *current_buffer;
     // read the header (keep track of partial reads)
     header_size = sizeof(CHLA_PACKET_HEADER);
-    current_buffer = hdr;
+    current_buffer = (char *) hdr;
     while (header_size != 0) {
         amount_read = write(fd, current_buffer, header_size);
         if (amount_read <= 0) { // write error or wrote 0 byte 
