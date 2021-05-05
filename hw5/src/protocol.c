@@ -1,9 +1,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "debug.h"
 #include "protocol.h"
 
+char *packet_names[] = {
+    "",
+    "login", "logout", "users", "send",
+    "ack", "nack", "mesg", "rcvd", "bounce"
+};
+
 int proto_send_packet(int fd, CHLA_PACKET_HEADER *hdr, void *payload) {
+    info("SEND packet: type=%s, msgid=%d, payload_length=%d, payload=[%s]", packet_names[hdr->type], ntohl(hdr->msgid), ntohl(hdr->payload_length), (char *) payload);
     uint32_t header_size, payload_size, amount_written;
     char *current_buffer;
     // get the payload size (convert from network byte order using ntohl)
@@ -20,7 +28,6 @@ int proto_send_packet(int fd, CHLA_PACKET_HEADER *hdr, void *payload) {
         header_size -= amount_written;
         current_buffer += amount_written;
     }
-
     // write the payload (keep track of partial writes)
     current_buffer = payload;
     while (payload_size != 0) {
@@ -31,7 +38,6 @@ int proto_send_packet(int fd, CHLA_PACKET_HEADER *hdr, void *payload) {
         payload_size -= amount_written;
         current_buffer += amount_written;
     }
-
     return 0;
 }
 
@@ -53,12 +59,10 @@ int proto_recv_packet(int fd, CHLA_PACKET_HEADER *hdr, void **payload) {
 
     // get the payload size (convert from network byte order using ntohl)
     payload_size = ntohl(hdr->payload_length);
-    // if the payload is non-zero create a buffer of size payload
-    if (payload_size) {
-        payload_buffer = malloc(payload_size);
-        if (payload_buffer == NULL) { // malloc error
-            return -1;
-        }
+    // create a buffer of size payload
+    payload_buffer = malloc(payload_size);
+    if (payload_buffer == NULL) { // malloc error
+        return -1;
     }
 
     // read the payload (keep track of partial reads)
@@ -74,5 +78,6 @@ int proto_recv_packet(int fd, CHLA_PACKET_HEADER *hdr, void **payload) {
     }
     // put payload buffer in payload pointer
     *payload = payload_buffer;
+    info("packet: type=%s, msgid=%d, payload_length=%d, payload=[%s]", packet_names[hdr->type], ntohl(hdr->msgid), payload_size, (char *) *payload);
     return 0;
 }
