@@ -17,6 +17,13 @@
 
 static void terminate(int);
 
+/**
+ * A SIGHUP signal handler that terminates the program with a successful status.
+ */
+void sighup_handler(int sig) {
+    terminate(EXIT_SUCCESS);
+}
+
 /*
  * "Charla" chat server.
  *
@@ -60,6 +67,17 @@ int main(int argc, char* argv[]){
     // run function charla_client_service().  In addition, you should install
     // a SIGHUP handler, so that receipt of SIGHUP will perform a clean
     // shutdown of the server.
+    
+    // install SIGHUP handler
+    struct sigaction sig_act;
+    memset(&sig_act, 0, sizeof(sig_act));
+    sig_act.sa_handler = sighup_handler;
+    if (sigaction(SIGHUP, &sig_act, 0) == -1) {
+        perror("Fail to install SIGHUP handler");
+        terminate(EXIT_FAILURE);
+    }
+
+    // set up server socket
     int socket_fd, opt, *connfdp;
     struct sockaddr_in address;
     pthread_t tid;
