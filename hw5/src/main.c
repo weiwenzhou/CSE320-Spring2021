@@ -78,7 +78,7 @@ int main(int argc, char* argv[]){
     }
 
     // set up server socket
-    int socket_fd, opt, *connfdp;
+    int socket_fd, *connfdp;
     struct sockaddr_in address;
     pthread_t tid;
 
@@ -87,6 +87,7 @@ int main(int argc, char* argv[]){
         terminate(EXIT_FAILURE);
     }
 
+    int opt = 1;
     if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, (const void *)&opt, sizeof(int)) == -1) { // prevent Address already in use
         perror("Setsockopt failed");
         terminate(EXIT_FAILURE);
