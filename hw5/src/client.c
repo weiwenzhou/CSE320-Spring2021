@@ -98,6 +98,7 @@ int client_login(CLIENT *client, char *handle) {
             }
         client_unref(clients[i], "for reference in clients list being discarded");
     }
+    free(clients);
     if (already_exists) { // unref because user_registry entry is not new.
         user_unref(user, "because login could not be completed");
         pthread_mutex_unlock(&login_mutex);
