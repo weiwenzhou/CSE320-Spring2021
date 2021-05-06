@@ -109,25 +109,44 @@ int client_send_packet(CLIENT *user, CHLA_PACKET_HEADER *pkt, void *data) {
 }
 
 int client_send_ack(CLIENT *client, uint32_t msgid, void *data, size_t datalen) {
-    // lock client
-    // malloc CHLA_PACKET_HEADER
-    // set type to be ACK
-    // set payload_length (htonl)
-    // set msgid (htonl)
-    // get timestamp in seconds and nanoseconds (htonl)
-    // call client_send_packet
-    // unlock client
-    return 0;
+    pthread_mutex_lock(client->mutex);
+    CHLA_PACKET_HEADER *header = malloc(sizeof(CHLA_PACKET_HEADER));
+    if (header == NULL) // error
+        return -1;
+    header->type = CHLA_ACK_PKT;
+    header->payload_length = datalen;
+    header->msgid = msgid;
+    struct timespec timestamp;
+    if (clock_gettime(CLOCK_REALTIME, &timestamp) == -1) { // error
+        free(header);
+        return -1;
+    }
+    header->timestamp_sec = timestamp.tv_sec;
+    header->timestamp_nsec = timestamp.tv_nsec;
+    int status = client_send_packet(client, header, data);
+    free(header);
+    pthread_mutex_unlock(client->mutex);
+    return status;
 }
 
 int client_send_nack(CLIENT *client, uint32_t msgid) {
-    // lock client
-    // malloc CHLA_PACKET_HEADER
-    // set type to be NACK
-    // set payload_length (htonl)
-    // set msgid (htonl)
-    // get timestamp in seconds and nanoseconds (htonl)
-    // call client_send_packet
-    // unlock client
+    pthread_mutex_lock(client->mutex);
+    CHLA_PACKET_HEADER *header = malloc(sizeof(CHLA_PACKET_HEADER));
+    if (header == NULL) // error
+        return -1;
+    header->type = CHLA_NACK_PKT;
+    header->payload_length = 0;
+    header->msgid = msgid;
+    struct timespec timestamp;
+    if (clock_gettime(CLOCK_REALTIME, &timestamp) == -1) { // error
+        free(header);
+        return -1;
+    }
+    header->timestamp_sec = timestamp.tv_sec;
+    header->timestamp_nsec = timestamp.tv_nsec;
+    int status = client_send_packet(client, header, NULL);
+    free(header);
+    pthread_mutex_unlock(client->mutex);
+    return status;
     return 0;
 }
