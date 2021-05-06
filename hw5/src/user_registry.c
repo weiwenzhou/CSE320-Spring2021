@@ -42,24 +42,29 @@ void ureg_fini(USER_REGISTRY *ureg) {
 }
 
 USER *ureg_register(USER_REGISTRY *ureg, char *handle) {
+    info("ureg_register");
     pthread_mutex_lock(ureg->mutex);
     USER_REGISTRY *head, *current;
     head = ureg;
     current = ureg;
     while (current->next != head) {
+        warn("HERE");
         current = current->next;
         if (strcmp(user_get_handle(current->user), handle) == 0) { // found handle
             user_ref(current->user, "ureg_register return existing user");
+            pthread_mutex_unlock(ureg->mutex);
             return current->user;
         }
     }
     USER *user = user_create(handle);
     if (user == NULL) {
+        pthread_mutex_unlock(ureg->mutex);
         return NULL;
     }
     USER_REGISTRY *new = malloc(sizeof(USER_REGISTRY));
     if (new == NULL) {
         user_unref(user, "ureg_register malloc failed"); // free user
+        pthread_mutex_unlock(ureg->mutex);
         return NULL;
     }
     new->user = user;
@@ -73,6 +78,7 @@ USER *ureg_register(USER_REGISTRY *ureg, char *handle) {
 }
 
 void ureg_unregister(USER_REGISTRY *ureg, char *handle) {
+    info("ureg_unregister");
     pthread_mutex_lock(ureg->mutex);
     USER_REGISTRY *head, *current;
     head = ureg;
