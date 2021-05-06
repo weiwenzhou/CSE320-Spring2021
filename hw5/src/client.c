@@ -74,8 +74,10 @@ int client_login(CLIENT *client, char *handle) {
     // check if client is logged in 
     if (client->status == LOGGED_IN)
         return -1;
+    pthread_mutex_lock(client->mutex);
     USER *user = ureg_register(user_registry, handle);
     if (user == NULL) // error
+        pthread_mutex_unlock(client->mutex);
         return -1;
     // check if the handle is unique
     int already_exists = 0;
@@ -90,22 +92,26 @@ int client_login(CLIENT *client, char *handle) {
     }
     if (already_exists) { // unref because user_registry entry is not new.
         user_unref(user, "because login could not be completed");
+        pthread_mutex_unlock(client->mutex);
         return -1;
     }
     MAILBOX *mailbox = mb_init(handle);
     if (mailbox == NULL) { // error
         ureg_unregister(user_registry, handle);
+        pthread_mutex_unlock(client->mutex);
         return -1;
     }
     client->status = LOGGED_IN;
     client->user = user;
     client->mailbox = mailbox;
+    pthread_mutex_unlock(client->mutex);
     return 0;
 }
 
 int client_logout(CLIENT *client) {
     if (client->status == NO_USER) // not logged in
         return -1;
+    pthread_mutex_lock(client->mutex);
     info("Log out client %p", client);
     mb_shutdown(client_get_mailbox(client, 1));
     mb_unref(client_get_mailbox(client, 1), "for reference being removed from now-logged-out client");
@@ -113,6 +119,7 @@ int client_logout(CLIENT *client) {
     client->status = NO_USER;
     client->mailbox = NULL;
     client->user = NULL;
+    pthread_mutex_unlock(client->mutex);
     return 0;
 }
 
