@@ -23,11 +23,24 @@ CLIENT *client_create(CLIENT_REGISTRY *creg, int fd) {
 }
 
 CLIENT *client_ref(CLIENT *client, char *why) {
+    pthread_mutex_lock(client->mutex);
+    info("Increase reference count on client %p [%d] (%d -> %d) %s", client, client->fd, client->referenceCount, client->referenceCount+1, why);
+    client->referenceCount++;
+    pthread_mutex_unlock(client->mutex);
     return client;
 }
 
 void client_unref(CLIENT *client, char *why) {
-
+    pthread_mutex_lock(client->mutex);
+    info("Decrease reference count on client %p [%d] (%d -> %d) %s", client, client->fd, client->referenceCount, client->referenceCount-1, why);
+    client->referenceCount--;
+    pthread_mutex_unlock(client->mutex);
+    if (client->referenceCount == 0) {
+        user_unref(client->user, "freeing client");
+        mb_unref(client->mailbox, "freeing client");
+        free(client->mutex);
+        free(client);
+    }
 }
 
 int client_login(CLIENT *client, char *handle) {
