@@ -59,12 +59,18 @@ CLIENT *creg_register(CLIENT_REGISTRY *cr, int fd) {
 }
 
 int creg_unregister(CLIENT_REGISTRY *cr, CLIENT *client) {
-    // lock mutex
-    // search for client
-    // if found unref and remove from array decrement count
-    // else error
-    // unlock mutex
-    return 0;
+    pthread_mutex_lock(cr->mutex);
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (cr->clients[i] == client) {
+            client_unref(cr->clients[i], "because client is being unregistered");
+            cr->clients[i] = NULL;
+            cr->count--;
+            pthread_mutex_unlock(cr->mutex);
+            return 0;
+        }
+    }
+    pthread_mutex_unlock(cr->mutex);
+    return -1;
 }
 
 CLIENT **creg_all_clients(CLIENT_REGISTRY *cr) {
