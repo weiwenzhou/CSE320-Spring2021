@@ -20,6 +20,13 @@ typedef struct client {
 } CLIENT;
 
 CLIENT *client_create(CLIENT_REGISTRY *creg, int fd) {
+    // malloc client object
+    // set fd to fd
+    // set status to no_user
+    // set user and mailbox to NULL
+    // set referenceCount to 1
+    // malloc mutex
+    // init mutex
     return NULL;
 }
 
@@ -55,25 +62,49 @@ int client_logout(CLIENT *client) {
 }
 
 USER *client_get_user(CLIENT *client, int no_ref) {
+    // check if client is logged in
+    // if yes then check no_ref if nonzero don't increment
     return client->user;
 }
 
 MAILBOX *client_get_mailbox(CLIENT *client, int no_ref) {
+    // check if client is logged in
+    // if yes then check no_ref if nonzero don't increment
     return client->mailbox;
 }
 
 int client_get_fd(CLIENT *client) {
+    // fd is read only so no need to lock
     return client->fd;
 }
 
 int client_send_packet(CLIENT *user, CHLA_PACKET_HEADER *pkt, void *data) {
+    // lock client
+    // call proto_send_packet
+    // unlock client
     return 0;
 }
 
 int client_send_ack(CLIENT *client, uint32_t msgid, void *data, size_t datalen) {
+    // lock client
+    // malloc CHLA_PACKET_HEADER
+    // set type to be ACK
+    // set payload_length (htonl)
+    // set msgid (htonl)
+    // get timestamp in seconds and nanoseconds (htonl)
+    // call client_send_packet
+    // unlock client
     return 0;
 }
 
 int client_send_nack(CLIENT *client, uint32_t msgid) {
+    // lock client
+    // malloc CHLA_PACKET_HEADER
+    // set type to be NACK
+    // set payload_length (htonl)
+    // set msgid (htonl)
+    // get timestamp in seconds and nanoseconds (htonl)
+    // call client_send_packet
+    // unlock client
     return 0;
 }
