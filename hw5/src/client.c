@@ -82,14 +82,19 @@ int client_logout(CLIENT *client) {
 }
 
 USER *client_get_user(CLIENT *client, int no_ref) {
-    // check if client is logged in
-    // if yes then check no_ref if nonzero don't increment
+    if (client->status == NO_USER)
+        return NULL;
+    if (no_ref == 0)
+        user_ref(client->user, "for reference being retained by client_get_user()");
     return client->user;
 }
 
 MAILBOX *client_get_mailbox(CLIENT *client, int no_ref) {
     // check if client is logged in
-    // if yes then check no_ref if nonzero don't increment
+    if (client->status == NO_USER)
+        return NULL;
+    if (no_ref == 0)
+        mb_ref(client->mailbox, "for reference being retained by client_get_mailbox()");
     return client->mailbox;
 }
 
