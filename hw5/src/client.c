@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "client_registry.h"
+#include "debug.h"
 
 typedef enum {
     NO_USER, LOGGED_IN
