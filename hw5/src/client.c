@@ -20,14 +20,27 @@ typedef struct client {
 } CLIENT;
 
 CLIENT *client_create(CLIENT_REGISTRY *creg, int fd) {
-    // malloc client object
-    // set fd to fd
-    // set status to no_user
-    // set user and mailbox to NULL
-    // set referenceCount to 1
-    // malloc mutex
-    // init mutex
-    return NULL;
+    CLIENT *client = malloc(sizeof(CLIENT));
+    if (client == NULL) // error
+        return NULL;
+    client->fd = fd;
+    client->status = NO_USER;
+    client->user = NULL;
+    client->mailbox = NULL;
+    client->referenceCount = 1;
+    pthread_mutex_t *mutex = malloc(sizeof(pthread_mutex_t));
+    if (mutex == NULL) { // error
+        free(client);
+        return NULL;
+    }
+    if ((errno = pthread_mutex_init(mutex, NULL)) != 0) { // error
+        free(client);
+        free(mutex);
+        return NULL;
+    }
+    client->mutex = mutex;
+    info("Increase reference count on client %p [%d] (0 -> 1) for newly created user", client, client->fd);
+    return client;
 }
 
 CLIENT *client_ref(CLIENT *client, char *why) {
@@ -54,6 +67,11 @@ void client_unref(CLIENT *client, char *why) {
 }
 
 int client_login(CLIENT *client, char *handle) {
+    // check if client is logged in 
+    // yes -> return -1
+    // else 
+    // ureg_register the user with the handle
+    // create a mailbox
     return 0;
 }
 
