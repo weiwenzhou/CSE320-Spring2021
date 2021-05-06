@@ -1,4 +1,5 @@
 #include <pthread.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "user.h"
@@ -10,13 +11,31 @@ typedef struct user {
 } USER;
 
 USER *user_create(char *handle) {
-    // malloc a user object
-    // initialize reference count to 1
-    // malloc a buffer for the handle (size of handle + 1)
-    // copy the handle
-    // malloc a mutex
-    // init the mutex
-    return NULL; // return the userp
+    USER *user = malloc(sizeof(USER));
+    if (user == NULL) // error
+        return NULL;
+    user->referenceCount = 1;
+    char *handle_copy = malloc(strlen(handle)+1);
+    if (handle_copy == NULL) { // error
+        free(user);
+        return NULL;
+    }
+    strcpy(handle_copy, handle);
+    user->handle = handle_copy;
+    pthread_mutex_t *mutex = malloc(sizeof(pthread_mutex_t));
+    if (mutex == NULL) { // error
+        free(user);
+        free(handle_copy);
+        return NULL;
+    }
+    if (pthread_mutex_init(mutex, NULL) != 0) { // error
+        free(user);
+        free(handle_copy);
+        free(mutex);
+        return NULL;
+    }
+    user->mutex = mutex;
+    return user; 
 }
 
 USER *user_ref(USER *user, char *why) {
