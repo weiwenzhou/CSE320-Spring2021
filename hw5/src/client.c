@@ -6,6 +6,8 @@
 #include "client_registry.h"
 #include "debug.h"
 
+extern char *packet_names[];
+
 typedef enum {
     NO_USER, LOGGED_IN
 } CLIENT_STATUS;
@@ -103,6 +105,7 @@ int client_send_packet(CLIENT *user, CHLA_PACKET_HEADER *pkt, void *data) {
     pkt->payload_length = htonl(pkt->payload_length);
     pkt->timestamp_nsec = htonl(pkt->timestamp_nsec);
     pkt->timestamp_sec = htonl(pkt->timestamp_sec);
+    info("Send packet (clientfd=%d, type=%s) for client %p", client_get_fd(user), packet_names[pkt->type], user);
     status = proto_send_packet(client_get_fd(user), pkt, data);
     pthread_mutex_unlock(user->mutex);
     return status;
