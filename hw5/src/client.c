@@ -76,9 +76,10 @@ int client_login(CLIENT *client, char *handle) {
         return -1;
     pthread_mutex_lock(client->mutex);
     USER *user = ureg_register(user_registry, handle);
-    if (user == NULL) // error
+    if (user == NULL) { // error
         pthread_mutex_unlock(client->mutex);
         return -1;
+    }
     // check if the handle is unique
     int already_exists = 0;
     CLIENT **clients = creg_all_clients(client_registry);
