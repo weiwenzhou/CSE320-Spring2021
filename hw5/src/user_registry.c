@@ -101,7 +101,7 @@ void ureg_unregister(USER_REGISTRY *ureg, char *handle) {
             current->prev->next = current->next;
             current->next->prev = current->prev;
             free(current);
-            pthread_mutex_lock(ureg->mutex);
+            pthread_mutex_unlock(ureg->mutex);
             return;
         }
     }
