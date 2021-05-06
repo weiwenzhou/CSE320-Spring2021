@@ -97,9 +97,9 @@ int client_get_fd(CLIENT *client) {
 }
 
 int client_send_packet(CLIENT *user, CHLA_PACKET_HEADER *pkt, void *data) {
-    // lock client
-    // call proto_send_packet
-    // unlock client
+    pthread_mutex_lock(user->mutex);
+    proto_send_packet(client_get_fd(user), pkt, data);
+    pthread_mutex_unlock(user->mutex);
     return 0;
 }
 
