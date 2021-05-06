@@ -40,10 +40,11 @@ USER *user_create(char *handle) {
 }
 
 USER *user_ref(USER *user, char *why) {
-    // lock mutex
-    // increment the reference count
-    // unlock mutex
-    return NULL;
+    // ignore lock and unlock failure (undefined behavior for program)
+    pthread_mutex_lock(user->mutex);
+    user->referenceCount++;
+    pthread_mutex_unlock(user->mutex);
+    return user;
 }
 
 void user_unref(USER *user, char *why) {
