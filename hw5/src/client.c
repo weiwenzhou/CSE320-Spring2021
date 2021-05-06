@@ -109,7 +109,6 @@ int client_send_packet(CLIENT *user, CHLA_PACKET_HEADER *pkt, void *data) {
 }
 
 int client_send_ack(CLIENT *client, uint32_t msgid, void *data, size_t datalen) {
-    pthread_mutex_lock(client->mutex);
     CHLA_PACKET_HEADER *header = malloc(sizeof(CHLA_PACKET_HEADER));
     if (header == NULL) // error
         return -1;
@@ -125,12 +124,10 @@ int client_send_ack(CLIENT *client, uint32_t msgid, void *data, size_t datalen) 
     header->timestamp_nsec = timestamp.tv_nsec;
     int status = client_send_packet(client, header, data);
     free(header);
-    pthread_mutex_unlock(client->mutex);
     return status;
 }
 
 int client_send_nack(CLIENT *client, uint32_t msgid) {
-    pthread_mutex_lock(client->mutex);
     CHLA_PACKET_HEADER *header = malloc(sizeof(CHLA_PACKET_HEADER));
     if (header == NULL) // error
         return -1;
@@ -146,7 +143,5 @@ int client_send_nack(CLIENT *client, uint32_t msgid) {
     header->timestamp_nsec = timestamp.tv_nsec;
     int status = client_send_packet(client, header, NULL);
     free(header);
-    pthread_mutex_unlock(client->mutex);
     return status;
-    return 0;
 }
