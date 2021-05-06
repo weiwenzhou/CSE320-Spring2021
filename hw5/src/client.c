@@ -104,6 +104,15 @@ int client_login(CLIENT *client, char *handle) {
 }
 
 int client_logout(CLIENT *client) {
+    if (client->status == NO_USER) // not logged in
+        return -1;
+    info("Log out client %p", client);
+    mb_shutdown(client_get_mailbox(client, 1));
+    mb_unref(client_get_mailbox(client, 1), "for reference being removed from now-logged-out client");
+    user_unref(client_get_user(client, 1), "for reference being removed from now-logged-out client");
+    client->status = NO_USER;
+    client->mailbox = NULL;
+    client->user = NULL;
     return 0;
 }
 
