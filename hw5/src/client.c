@@ -139,12 +139,9 @@ int client_get_fd(CLIENT *client) {
 }
 
 int client_send_packet(CLIENT *user, CHLA_PACKET_HEADER *pkt, void *data) {
+    // pkt is network byte order
     int status;
     pthread_mutex_lock(user->mutex);
-    pkt->msgid = htonl(pkt->msgid);
-    pkt->payload_length = htonl(pkt->payload_length);
-    pkt->timestamp_nsec = htonl(pkt->timestamp_nsec);
-    pkt->timestamp_sec = htonl(pkt->timestamp_sec);
     info("Send packet (clientfd=%d, type=%s) for client %p", client_get_fd(user), packet_names[pkt->type], user);
     status = proto_send_packet(client_get_fd(user), pkt, data);
     pthread_mutex_unlock(user->mutex);
@@ -156,15 +153,15 @@ int client_send_ack(CLIENT *client, uint32_t msgid, void *data, size_t datalen) 
     if (header == NULL) // error
         return -1;
     header->type = CHLA_ACK_PKT;
-    header->payload_length = datalen;
-    header->msgid = msgid;
+    header->payload_length = htonl(datalen);
+    header->msgid = htonl(msgid);
     struct timespec timestamp;
     if (clock_gettime(CLOCK_REALTIME, &timestamp) == -1) { // error
         free(header);
         return -1;
     }
-    header->timestamp_sec = timestamp.tv_sec;
-    header->timestamp_nsec = timestamp.tv_nsec;
+    header->timestamp_sec = htonl(timestamp.tv_sec);
+    header->timestamp_nsec = htonl(timestamp.tv_nsec);
     int status = client_send_packet(client, header, data);
     free(header);
     return status;
@@ -176,14 +173,14 @@ int client_send_nack(CLIENT *client, uint32_t msgid) {
         return -1;
     header->type = CHLA_NACK_PKT;
     header->payload_length = 0;
-    header->msgid = msgid;
+    header->msgid = htonl(msgid);
     struct timespec timestamp;
     if (clock_gettime(CLOCK_REALTIME, &timestamp) == -1) { // error
         free(header);
         return -1;
     }
-    header->timestamp_sec = timestamp.tv_sec;
-    header->timestamp_nsec = timestamp.tv_nsec;
+    header->timestamp_sec = htonl(timestamp.tv_sec);
+    header->timestamp_nsec = htonl(timestamp.tv_nsec);
     int status = client_send_packet(client, header, NULL);
     free(header);
     return status;
