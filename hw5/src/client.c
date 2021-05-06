@@ -3,9 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "client.h"
-#include "mailbox.h"
-#include "user.h"
+#include "client_registry.h"
 
 typedef enum {
     NO_USER, LOGGED_IN
