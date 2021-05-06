@@ -5,6 +5,8 @@
 
 #include "client_registry.h"
 #include "debug.h"
+#include "globals.h"
+#include "user_registry.h"
 
 extern char *packet_names[];
 
@@ -70,10 +72,20 @@ void client_unref(CLIENT *client, char *why) {
 
 int client_login(CLIENT *client, char *handle) {
     // check if client is logged in 
-    // yes -> return -1
-    // else 
+    if (client->status == LOGGED_IN)
+        return -1;
+    USER *user = ureg_register(user_registry, handle);
+    if (user == NULL) // error
+        return -1;
     // ureg_register the user with the handle
-    // create a mailbox
+    MAILBOX *mailbox = mb_init(handle);
+    if (mailbox == NULL) { // error
+        ureg_unregister(user_registry, handle);
+        return -1;
+    }
+    client->status = LOGGED_IN;
+    client->user = user;
+    client->mailbox = mailbox;
     return 0;
 }
 
