@@ -168,6 +168,7 @@ int client_send_packet(CLIENT *user, CHLA_PACKET_HEADER *pkt, void *data) {
 
 int client_send_ack(CLIENT *client, uint32_t msgid, void *data, size_t datalen) {
     CHLA_PACKET_HEADER *header = malloc(sizeof(CHLA_PACKET_HEADER));
+    memset(header, 0, sizeof(CHLA_PACKET_HEADER));
     if (header == NULL) // error
         return -1;
     header->type = CHLA_ACK_PKT;
@@ -187,6 +188,7 @@ int client_send_ack(CLIENT *client, uint32_t msgid, void *data, size_t datalen) 
 
 int client_send_nack(CLIENT *client, uint32_t msgid) {
     CHLA_PACKET_HEADER *header = malloc(sizeof(CHLA_PACKET_HEADER));
+    memset(header, 0, sizeof(CHLA_PACKET_HEADER));
     if (header == NULL) // error
         return -1;
     header->type = CHLA_NACK_PKT;
