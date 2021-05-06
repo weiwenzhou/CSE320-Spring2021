@@ -71,12 +71,22 @@ void client_unref(CLIENT *client, char *why) {
 }
 
 int client_login(CLIENT *client, char *handle) {
+    static pthread_mutex_t login_mutex;
+    static int init = 0;
+    if (init == 0) { // initialize login_mutex only for the first call
+        if ((errno = pthread_mutex_init(&login_mutex, NULL)) != 0) // error
+            return -1;
+        init = 1;
+    }
     // check if client is logged in 
     if (client->status == LOGGED_IN)
         return -1;
+    pthread_mutex_lock(&login_mutex);
     USER *user = ureg_register(user_registry, handle);
-    if (user == NULL) // error
+    if (user == NULL) { // error
+        pthread_mutex_unlock(&login_mutex);
         return -1;
+    }
     // check if the handle is unique
     int already_exists = 0;
     CLIENT **clients = creg_all_clients(client_registry);
@@ -90,11 +100,13 @@ int client_login(CLIENT *client, char *handle) {
     }
     if (already_exists) { // unref because user_registry entry is not new.
         user_unref(user, "because login could not be completed");
+        pthread_mutex_unlock(&login_mutex);
         return -1;
     }
     MAILBOX *mailbox = mb_init(handle);
     if (mailbox == NULL) { // error
         ureg_unregister(user_registry, handle);
+        pthread_mutex_unlock(&login_mutex);
         return -1;
     }
     pthread_mutex_lock(client->mutex);
@@ -102,6 +114,7 @@ int client_login(CLIENT *client, char *handle) {
     client->user = user;
     client->mailbox = mailbox;
     pthread_mutex_unlock(client->mutex);
+    pthread_mutex_unlock(&login_mutex);
     return 0;
 }
 
