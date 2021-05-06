@@ -9,12 +9,13 @@
 
 typedef struct client_registry {
     int count; // number of clients registered
-    CLIENT *client[MAX_CLIENTS]; 
+    CLIENT *clients[MAX_CLIENTS]; 
     pthread_mutex_t *mutex; // mutex for thread-safe operations
 } CLIENT_REGISTRY;
 
 CLIENT_REGISTRY *creg_init() {
     CLIENT_REGISTRY *store = malloc(sizeof(CLIENT_REGISTRY));
+    memset(store, 0, sizeof(CLIENT_REGISTRY)); // zero out the array to check for NULL 
     if (store == NULL) // error
         return NULL;
     pthread_mutex_t *mutex = malloc(sizeof(pthread_mutex_t));
@@ -40,12 +41,20 @@ void creg_fini(CLIENT_REGISTRY *cr) {
 }
 
 CLIENT *creg_register(CLIENT_REGISTRY *cr, int fd) {
-    // lock mutex
-    // if count < max_client
-        // create client
-        // add to next free spot in array
-        // increment count
-    // unlock mutex
+    pthread_mutex_lock(cr->mutex);
+    if (cr->count < MAX_CLIENTS) {
+        CLIENT *client = client_create(cr, fd);
+        for (int i = 0; i < MAX_CLIENTS; i++) {
+            if (cr->clients[i] == NULL) {
+                cr->clients[i] = client;
+                cr->count++;
+                info("Register client fd %d (total connected: %d)", fd, cr->count);
+                pthread_mutex_unlock(cr->mutex);
+                return client;
+            }
+        }
+    }
+    pthread_mutex_unlock(cr->mutex);
     return NULL;
 }
 
