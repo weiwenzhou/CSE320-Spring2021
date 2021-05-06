@@ -77,7 +77,21 @@ int client_login(CLIENT *client, char *handle) {
     USER *user = ureg_register(user_registry, handle);
     if (user == NULL) // error
         return -1;
-    // ureg_register the user with the handle
+    // check if the handle is unique
+    int already_exists = 0;
+    CLIENT **clients = creg_all_clients(client_registry);
+    for (int i = 0; clients[i] != NULL; i++) {
+        if (clients[i]->status == LOGGED_IN)
+            if (user == client_get_user(clients[i], 1)) {
+                warn("User %s is already logged in", handle);
+                already_exists = 1;
+            }
+        client_unref(client, "for reference in clients list being discarded");
+    }
+    if (already_exists) { // unref because user_registry entry is not new.
+        user_unref(user, "because login could not be completed");
+        return -1;
+    }
     MAILBOX *mailbox = mb_init(handle);
     if (mailbox == NULL) { // error
         ureg_unregister(user_registry, handle);
