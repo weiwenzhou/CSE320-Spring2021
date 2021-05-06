@@ -37,8 +37,10 @@ void client_unref(CLIENT *client, char *why) {
     client->referenceCount--;
     pthread_mutex_unlock(client->mutex);
     if (client->referenceCount == 0) {
-        user_unref(client->user, "freeing client");
-        mb_unref(client->mailbox, "freeing client");
+        if (client->status == LOGGED_IN) {
+            user_unref(client->user, "freeing client");
+            mb_unref(client->mailbox, "freeing client");
+        }
         free(client->mutex);
         free(client);
     }
