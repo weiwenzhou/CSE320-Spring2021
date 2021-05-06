@@ -39,6 +39,17 @@ USER_REGISTRY *ureg_init(void) {
 
 void ureg_fini(USER_REGISTRY *ureg) {
     // for each USER_REGISTRY 
+    info("ureg_fini");
+    USER_REGISTRY *head, *current;
+    head = ureg;
+    current = ureg->next;
+    while (current != head) {
+        user_unref(current->user, "ureg_fini");
+        current = current->next;
+        free(current->prev);
+    }
+    free(ureg->mutex);
+    free(ureg);
 }
 
 USER *ureg_register(USER_REGISTRY *ureg, char *handle) {
