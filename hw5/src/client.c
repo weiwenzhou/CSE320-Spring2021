@@ -96,7 +96,7 @@ int client_login(CLIENT *client, char *handle) {
                 warn("User %s is already logged in", handle);
                 already_exists = 1;
             }
-        client_unref(client, "for reference in clients list being discarded");
+        client_unref(clients[i], "for reference in clients list being discarded");
     }
     if (already_exists) { // unref because user_registry entry is not new.
         user_unref(user, "because login could not be completed");
