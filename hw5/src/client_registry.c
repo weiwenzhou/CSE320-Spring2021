@@ -74,11 +74,24 @@ int creg_unregister(CLIENT_REGISTRY *cr, CLIENT *client) {
 }
 
 CLIENT **creg_all_clients(CLIENT_REGISTRY *cr) {
-    // lock mutex
-    // calloc an array of size count + 1 (for null)
-    // client_ref each pointer
-    // unlock mutex
-    return NULL;
+    pthread_mutex_lock(cr->mutex);
+    CLIENT **clients = calloc(cr->count+1, sizeof(CLIENT *));
+    if (clients == NULL) {
+        pthread_mutex_unlock(cr->mutex);
+        return NULL;
+    }
+    int client_count = 0;
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (cr->clients[i] != NULL) {
+            clients[client_count] = client_ref(cr->clients[i], "for reference being added to clients list");
+            client_count++;
+        }
+        if (client_count == cr->count)
+            break;
+    }
+    clients[cr->count] = NULL;
+    pthread_mutex_unlock(cr->mutex);
+    return clients;
 }
 
 void creg_shutdown_all(CLIENT_REGISTRY *cr) {
