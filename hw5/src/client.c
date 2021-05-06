@@ -97,10 +97,15 @@ int client_get_fd(CLIENT *client) {
 }
 
 int client_send_packet(CLIENT *user, CHLA_PACKET_HEADER *pkt, void *data) {
+    int status;
     pthread_mutex_lock(user->mutex);
-    proto_send_packet(client_get_fd(user), pkt, data);
+    pkt->msgid = htonl(pkt->msgid);
+    pkt->payload_length = htonl(pkt->payload_length);
+    pkt->timestamp_nsec = htonl(pkt->timestamp_nsec);
+    pkt->timestamp_sec = htonl(pkt->timestamp_sec);
+    status = proto_send_packet(client_get_fd(user), pkt, data);
     pthread_mutex_unlock(user->mutex);
-    return 0;
+    return status;
 }
 
 int client_send_ack(CLIENT *client, uint32_t msgid, void *data, size_t datalen) {
