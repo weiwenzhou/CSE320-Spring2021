@@ -73,8 +73,19 @@ USER *ureg_register(USER_REGISTRY *ureg, char *handle) {
 }
 
 void ureg_unregister(USER_REGISTRY *ureg, char *handle) {
-    // check if the handle is register
-    // if yes then
-    // decrement ref count on user and remove user_registry
-
+    pthread_mutex_lock(ureg->mutex);
+    USER_REGISTRY *head, *current;
+    head = ureg;
+    current = ureg;
+    while (current->next != head) {
+        current = current->next;
+        if (strcmp(user_get_handle(current->user), handle) == 0) { // found handle
+            user_unref(current->user, "ureg_unregister");
+            current->prev->next = current->next;
+            current->next->prev = current->prev;
+            free(current);
+            pthread_mutex_lock(ureg->mutex);
+            return;
+        }
+    }
 }
