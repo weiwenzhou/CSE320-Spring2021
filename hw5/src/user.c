@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <pthread.h>
 #include <string.h>
 #include <unistd.h>
@@ -28,7 +29,7 @@ USER *user_create(char *handle) {
         free(handle_copy);
         return NULL;
     }
-    if (pthread_mutex_init(mutex, NULL) != 0) { // error
+    if ((errno = pthread_mutex_init(mutex, NULL)) != 0) { // error
         free(user);
         free(handle_copy);
         free(mutex);
