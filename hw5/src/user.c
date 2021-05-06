@@ -48,11 +48,16 @@ USER *user_ref(USER *user, char *why) {
 }
 
 void user_unref(USER *user, char *why) {
-    // lock the mutex
-    // decrement the reference count
-    // unlock the mutext
-    // if reference count == 0 then free the USER
+    // ignore lock and unlock failure (undefined behavior for program)
+    pthread_mutex_lock(user->mutex);
+    user->referenceCount--;
+    pthread_mutex_unlock(user->mutex);
+    if (user->referenceCount == 0) {
         // this only occurs when user_registry is being freed so it should
+        free(user->handle);
+        free(user->mutex);
+        free(user);
+    }
 }
 
 char *user_get_handle(USER *user) {
