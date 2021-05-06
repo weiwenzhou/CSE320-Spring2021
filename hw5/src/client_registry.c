@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "client_registry.h" 
+#include "debug.h"
 #include "globals.h"
 
 typedef struct client_registry {
@@ -13,7 +14,23 @@ typedef struct client_registry {
 } CLIENT_REGISTRY;
 
 CLIENT_REGISTRY *creg_init() {
-    return NULL;
+    CLIENT_REGISTRY *store = malloc(sizeof(CLIENT_REGISTRY));
+    if (store == NULL) // error
+        return NULL;
+    pthread_mutex_t *mutex = malloc(sizeof(pthread_mutex_t));
+    if (mutex == NULL) { // error
+        free(store);
+        return NULL;
+    }
+    if ((errno = pthread_mutex_init(mutex, NULL)) != 0) { // error
+        free(store);
+        free(mutex);
+        return NULL;
+    }
+    store->count = 0;
+    store->mutex = mutex;
+    info("Initialize client registry");
+    return store;
 }
 
 void creg_fini(CLIENT_REGISTRY *cr) {
