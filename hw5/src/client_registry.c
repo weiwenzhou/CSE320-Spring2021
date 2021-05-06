@@ -35,9 +35,20 @@ CLIENT_REGISTRY *creg_init() {
 }
 
 void creg_fini(CLIENT_REGISTRY *cr) {
-    // lock mutex
-    // loop through array and free every non null entry until count is 0
-    // unlock mutex
+    pthread_mutex_lock(cr->mutex);
+    info("Finalize client registry");
+    // for (int i = 0; i < MAX_CLIENTS; i++) {
+    //     if (cr->clients[i] != NULL) {
+    //         client_unref(cr->clients[i], )
+    //         cr->clients[i] = client;
+    //         cr->count++;
+    //         info("Register client fd %d (total connected: %d)", fd, cr->count);
+    //         pthread_mutex_unlock(cr->mutex);
+    //     }
+    // }
+    pthread_mutex_unlock(cr->mutex);
+    free(cr->mutex);
+    free(cr);
 }
 
 CLIENT *creg_register(CLIENT_REGISTRY *cr, int fd) {
