@@ -17,7 +17,13 @@ typedef struct user_registry {
 USER_REGISTRY *ureg_init(void) {
     // initialize the head of doubly linked list
     USER_REGISTRY *head = malloc(sizeof(USER_REGISTRY));
+    if (head == NULL) // error
+        return NULL;
     pthread_mutex_t *mutex = malloc(sizeof(pthread_mutex_t));
+    if (mutex == NULL) { // error
+        free(head);
+        return NULL;
+    }
     if ((errno = pthread_mutex_init(mutex, NULL)) != 0) { // error
         free(head);
         free(mutex);
