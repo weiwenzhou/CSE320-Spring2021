@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "debug.h"
 #include "user.h"
 
 typedef struct user {
@@ -37,12 +38,14 @@ USER *user_create(char *handle) {
         return NULL;
     }
     user->mutex = mutex;
+    info("Increase reference count on user %p [%s] (0 -> 1) for newly created user", user, user->handle);
     return user; 
 }
 
 USER *user_ref(USER *user, char *why) {
     // ignore lock and unlock failure (undefined behavior for program)
     pthread_mutex_lock(user->mutex);
+    info("Increase reference count on user %p [%s] (%d -> %d) %s", user, user->handle, user->referenceCount, user->referenceCount+1, why);
     user->referenceCount++;
     pthread_mutex_unlock(user->mutex);
     return user;
@@ -51,6 +54,7 @@ USER *user_ref(USER *user, char *why) {
 void user_unref(USER *user, char *why) {
     // ignore lock and unlock failure (undefined behavior for program)
     pthread_mutex_lock(user->mutex);
+    info("Decrease reference count on user %p [%s] (%d -> %d) %s", user, user->handle, user->referenceCount, user->referenceCount-1, why);
     user->referenceCount--;
     pthread_mutex_unlock(user->mutex);
     if (user->referenceCount == 0) {
