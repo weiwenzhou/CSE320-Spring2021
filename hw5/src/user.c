@@ -62,5 +62,5 @@ void user_unref(USER *user, char *why) {
 
 char *user_get_handle(USER *user) {
     // user handle is read-only so do not need to lock
-    return NULL;
+    return user->handle;
 }
