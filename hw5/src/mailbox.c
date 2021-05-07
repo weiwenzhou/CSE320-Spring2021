@@ -116,10 +116,10 @@ void mb_unref(MAILBOX *mb, char *why) {
 }
 
 void mb_shutdown(MAILBOX *mb) {
-    // lock mutex
-    // modify status
-    // sem_post for producer for mb_next_entry to check status, free, and terminate
-    // unlock mutex
+    pthread_mutex_lock(mb->mutex);
+    mb->status = DEFUNCT;
+    sem_post(mb->store);
+    pthread_mutex_unlock(mb->mutex);
 }
 
 char *mb_get_handle(MAILBOX *mb) {
