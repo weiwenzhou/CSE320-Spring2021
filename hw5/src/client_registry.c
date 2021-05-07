@@ -67,8 +67,9 @@ CLIENT *creg_register(CLIENT_REGISTRY *cr, int fd) {
                 cr->clients[i] = client;
                 cr->count++;
                 info("Register client fd %d (total connected: %d)", fd, cr->count);
+                client_ref(client, "for pointer being returned by creg_register()");
                 pthread_mutex_unlock(cr->mutex);
-                return client_ref(client, "for pointer being returned by creg_register()");
+                return client;
             }
         }
     }
