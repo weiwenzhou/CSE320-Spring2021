@@ -89,7 +89,9 @@ MAILBOX *mb_init(char *handle) {
 }
 
 void mb_set_discard_hook(MAILBOX *mb, MAILBOX_DISCARD_HOOK *func) {
-
+    pthread_mutex_lock(mb->mutex);
+    mb->hook = func;
+    pthread_mutex_unlock(mb->mutex);
 }
 
 void mb_ref(MAILBOX *mb, char *why) {
@@ -122,7 +124,7 @@ void mb_shutdown(MAILBOX *mb) {
 
 char *mb_get_handle(MAILBOX *mb) {
     // read only handle
-    return NULL;
+    return mb->handle;
 }
 
 void mb_add_message(MAILBOX *mb, int msgid, MAILBOX *from, void *body, int length) {
