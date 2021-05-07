@@ -149,13 +149,20 @@ void mb_add_message(MAILBOX *mb, int msgid, MAILBOX *from, void *body, int lengt
 }
 
 void mb_add_notice(MAILBOX *mb, NOTICE_TYPE ntype, int msgid) {
-    // lock mutex
-    // malloc notice
-    // malloc mailbox entry
-    // malloc mailbox queue
-    // adds message to the end of mb->box
-    // sem_post semaphore
-    // unlock mutex
+    // ignore errors because behavior is undefined in program
+    pthread_mutex_lock(mb->mutex);
+    MAILBOX_ENTRY *entry = malloc(sizeof(MAILBOX_ENTRY));
+    entry->type = NOTICE_ENTRY_TYPE;
+    entry->content.notice.type = ntype;
+    entry->content.notice.msgid = msgid;
+    MAILBOX_QUEUE *item = malloc(sizeof(MAILBOX_QUEUE));
+    item->content = entry;
+    item->next = mb->box;
+    item->prev = mb->box->prev;
+    mb->box->prev->next = item;
+    mb->box->prev = item;
+    sem_post(mb->store);
+    pthread_mutex_unlock(mb->mutex);
 }
 
 MAILBOX_ENTRY *mb_next_entry(MAILBOX *mb) {
