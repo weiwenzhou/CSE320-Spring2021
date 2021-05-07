@@ -13,22 +13,79 @@ typedef enum {
 
 typedef struct mailbox_queue {
     MAILBOX_ENTRY *content;
-    MAILBOX_QUEUE *next;
-    MAILBOX_QUEUE *prev;
+    struct mailbox_queue *next;
+    struct mailbox_queue *prev;
 } MAILBOX_QUEUE;
 
 typedef struct mailbox {
     char *handle;
     MAILBOX_DISCARD_HOOK *hook;
     MAILBOX_STATUS status;
-    MAILBOX_QUEUE box; // holds the 
+    MAILBOX_QUEUE *box; // holds the messages/notices
     int referenceCount; // number of references
     pthread_mutex_t *mutex; // mutex for thread-safe operations
     sem_t *store; // for producer/consumer model
 } MAILBOX;
 
 MAILBOX *mb_init(char *handle) {
-    return NULL;
+    MAILBOX *mailbox = malloc(sizeof(MAILBOX));
+    if (mailbox == NULL) // error
+        return NULL;
+    mailbox->referenceCount = 1;
+    mailbox->status = ACTIVE;
+
+    char *handle_copy = malloc(strlen(handle)+1);
+    if (handle_copy == NULL) { // error
+        free(mailbox);
+        return NULL;
+    }
+    strcpy(handle_copy, handle);
+    mailbox->handle = handle_copy;
+
+    pthread_mutex_t *mutex = malloc(sizeof(pthread_mutex_t));
+    if (mutex == NULL) { // error
+        free(mailbox);
+        free(handle_copy);
+        return NULL;
+    }
+    if ((errno = pthread_mutex_init(mutex, NULL)) != 0) { // error
+        free(mailbox);
+        free(handle_copy);
+        free(mutex);
+        return NULL;
+    }
+    mailbox->mutex = mutex;
+
+    sem_t *store = malloc(sizeof(sem_t));
+    if (store == NULL) { // error
+        free(mailbox);
+        free(handle_copy);
+        free(mutex);
+        return NULL;
+    }
+    if (sem_init(store, 0, 0) == -1) { // error
+        free(mailbox);
+        free(handle_copy);
+        free(mutex);
+        free(store);
+        return NULL;
+    }
+    mailbox->store = store;
+    
+    MAILBOX_QUEUE *head = malloc(sizeof(MAILBOX_QUEUE));
+    if (head == NULL) {
+        free(mailbox);
+        free(handle_copy);
+        free(mutex);
+        free(store);
+        return NULL;
+    }
+    head->content = NULL;
+    head->next = head;
+    head->prev = head;
+    mailbox->box = head;
+
+    return mailbox;
 }
 
 void mb_set_discard_hook(MAILBOX *mb, MAILBOX_DISCARD_HOOK *func) {
@@ -59,6 +116,7 @@ void mb_shutdown(MAILBOX *mb) {
 
 char *mb_get_handle(MAILBOX *mb) {
     // read only handle
+    return NULL;
 }
 
 void mb_add_message(MAILBOX *mb, int msgid, MAILBOX *from, void *body, int length) {
