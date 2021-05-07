@@ -128,14 +128,24 @@ char *mb_get_handle(MAILBOX *mb) {
 }
 
 void mb_add_message(MAILBOX *mb, int msgid, MAILBOX *from, void *body, int length) {
-    // lock mutex
-    // malloc message
-    // if from != mb then mb_ref mailbox to persist
-    // malloc mailbox entry
-    // malloc mailbox queue
-    // adds message to the end of mb->box
-    // sem_post semaphore
-    // unlock mutex
+    // ignore errors because behavior is undefined in program
+    pthread_mutex_lock(mb->mutex);
+    MAILBOX_ENTRY *entry = malloc(sizeof(MAILBOX_ENTRY));
+    entry->type = MESSAGE_ENTRY_TYPE;
+    entry->content.message.msgid = msgid;
+    entry->content.message.from = from;
+    entry->content.message.body = body;
+    entry->content.message.length = length;
+    if (mb != from)
+        mb_ref(from, "for newly created message with mailbox as sender"); 
+    MAILBOX_QUEUE *item = malloc(sizeof(MAILBOX_QUEUE));
+    item->content = entry;
+    item->next = mb->box;
+    item->prev = mb->box->prev;
+    mb->box->prev->next = item;
+    mb->box->prev = item;
+    sem_post(mb->store);
+    pthread_mutex_unlock(mb->mutex);
 }
 
 void mb_add_notice(MAILBOX *mb, NOTICE_TYPE ntype, int msgid) {
