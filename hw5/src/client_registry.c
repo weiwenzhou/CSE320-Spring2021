@@ -36,7 +36,7 @@ CLIENT_REGISTRY *creg_init() {
         free(mutex);
         return NULL;
     }
-    if ((errno = pthread_mutex_init(mutex, NULL)) != 0) { // error
+    if ((errno = pthread_mutex_init(terminate, NULL)) != 0) { // error
         free(store);
         free(mutex);
         free(terminate);
