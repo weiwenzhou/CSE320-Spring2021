@@ -93,18 +93,24 @@ void mb_set_discard_hook(MAILBOX *mb, MAILBOX_DISCARD_HOOK *func) {
 }
 
 void mb_ref(MAILBOX *mb, char *why) {
-    // lock mutex
-    // info statement
-    // increment reference count
-    // unlock mutex
+    pthread_mutex_lock(mb->mutex);
+    info("Increase reference count on mailbox %p (%d -> %d) %s", mb, mb->referenceCount, mb->referenceCount+1, why);
+    mb->referenceCount++;
+    pthread_mutex_unlock(mb->mutex);
 }
 
 void mb_unref(MAILBOX *mb, char *why) {
-    // lock mutex
-    // info statement
-    // decrement reference count
-    // unlock mutex
-    // free mailbox if referenceCount == 0
+    pthread_mutex_lock(mb->mutex);
+    info("Decrease reference count on mailbox %p (%d -> %d) %s", mb, mb->referenceCount, mb->referenceCount-1, why);
+    mb->referenceCount--;
+    pthread_mutex_unlock(mb->mutex);
+    if (mb->referenceCount == 0) {
+        free(mb->handle);
+        free(mb->mutex);
+        free(mb->box); // need to clean up box content
+        free(mb->store);
+        free(mb);
+    }
 }
 
 void mb_shutdown(MAILBOX *mb) {
