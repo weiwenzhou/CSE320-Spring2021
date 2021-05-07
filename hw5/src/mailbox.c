@@ -5,6 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "debug.h"
 #include "mailbox.h"
 
 typedef enum {
@@ -167,6 +168,19 @@ void mb_add_notice(MAILBOX *mb, NOTICE_TYPE ntype, int msgid) {
 
 MAILBOX_ENTRY *mb_next_entry(MAILBOX *mb) {
     // sem_wait for semaphore
-    // check mailbox status
+    sem_wait(mb->store);
+    pthread_mutex_lock(mb->mutex);
+    if (mb->status == ACTIVE) {
+        MAILBOX_QUEUE *item = mb->box->next;
+        item->next->prev = mb->box;
+        mb->box->next = item->next;
+        if (item->content->type == MESSAGE_ENTRY_TYPE) {
+            if (mb != item->content->content.message.from)
+                mb_unref(item->content->content.message.from, "for reference to sender's mailbox held by message being removed"); 
+        }
+        pthread_mutex_unlock(mb->mutex);
+        return item->content;
+    } 
+    pthread_mutex_unlock(mb->mutex);
     return NULL;
 }
