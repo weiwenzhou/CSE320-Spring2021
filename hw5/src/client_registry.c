@@ -54,6 +54,7 @@ void creg_fini(CLIENT_REGISTRY *cr) {
     info("Finalize client registry");
     pthread_mutex_unlock(cr->mutex);
     free(cr->mutex);
+    free(cr->terminate);
     free(cr);
 }
 
