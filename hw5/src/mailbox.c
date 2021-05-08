@@ -178,8 +178,10 @@ MAILBOX_ENTRY *mb_next_entry(MAILBOX *mb) {
             if (mb != item->content->content.message.from)
                 mb_unref(item->content->content.message.from, "for reference to sender's mailbox held by message being removed"); 
         }
+        MAILBOX_ENTRY *entry = item->content;
+        free(item);
         pthread_mutex_unlock(mb->mutex);
-        return item->content;
+        return entry;
     } 
     pthread_mutex_unlock(mb->mutex);
     return NULL;
