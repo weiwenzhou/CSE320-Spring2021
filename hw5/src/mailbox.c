@@ -110,17 +110,18 @@ void mb_unref(MAILBOX *mb, char *why) {
     if (mb->referenceCount == 0) {
         free(mb->handle);
         free(mb->mutex);
-        if (mb->hook != NULL) {
-            MAILBOX_QUEUE *head, *current;
-            MAILBOX_ENTRY *item;
-            head = mb->box;
-            current = mb->box->next;
-            while (current != head) {
-                item = current->content;
+        MAILBOX_QUEUE *head, *current;
+        MAILBOX_ENTRY *item;
+        head = mb->box;
+        current = mb->box->next;
+        while (current != head) {
+            item = current->content;
+            if (mb->hook != NULL) {
                 mb->hook(item);
-                current = current->next;
-                free(current->prev);
             }
+            free(item);
+            current = current->next;
+            free(current->prev);
         }
         free(mb->box); 
         free(mb->store);
