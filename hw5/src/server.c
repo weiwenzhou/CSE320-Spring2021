@@ -16,7 +16,8 @@ void discard_hook(MAILBOX_ENTRY *entry) {
     // add bounce notice to the mailbox
 }
 
-void chla_mailbox_service(void *arg) {
+void *chla_mailbox_service(void *arg) {
+    // pass client
     // get client (increase ref)
     // get mailbox of client client_get_mailbox(,0)
 
@@ -39,10 +40,12 @@ void chla_mailbox_service(void *arg) {
     // unref client
     // mb unref 
     // pthread exit
+    return NULL;
 }
 
 void *chla_client_service(void *arg) {
     CHLA_PACKET_HEADER packet, sender;
+    pthread_t mailbox_tid;
     void *payload;
     int connfd = *((int *)arg);
     free(arg);
@@ -53,15 +56,19 @@ void *chla_client_service(void *arg) {
     while ((proto_recv_packet(connfd, &packet, &payload)) != -1) {
         switch (packet.type) {
             case CHLA_LOGIN_PKT:
-                /* code */
                 success("LOGIN");
+                char *handle, *saved_pointer;
+                handle = strtok_r(payload, "\r\n", &saved_pointer);
+                // info("|%s,%s|%ld|%s|", (char *)payload, handle, strlen(saved_pointer), saved_pointer);
                 // parse string payload
-                // client_login()
-                    // if sucessful
-                    // pthread_create(client) for mailbox thread
-                    // send ack to client
-                // else send nack
-                // free payload
+                int status = client_login(self, handle);
+                if (status == 0) { // success
+                    pthread_create(&mailbox_tid, NULL, chla_mailbox_service, self);
+                    client_send_ack(self, packet.msgid, NULL, 0);
+                } else {
+                    client_send_nack(self, packet.msgid);
+                }
+                free(payload);
                 break;
             
             case CHLA_LOGOUT_PKT:
@@ -76,7 +83,6 @@ void *chla_client_service(void *arg) {
             case CHLA_USERS_PKT:
                 success("USERS");
                 CLIENT **clients = creg_all_clients(client_registry);
-                // while loop
                 int payload_length = 0;
                 char *send_payload;
                 USER *temp;
