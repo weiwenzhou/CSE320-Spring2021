@@ -4,7 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "client.h"
+#include "client_registry.h"
 #include "debug.h"
 #include "globals.h"
 #include "mailbox.h"
@@ -66,7 +66,7 @@ void *chla_client_service(void *arg) {
             
             case CHLA_LOGOUT_PKT:
                 /* code */
-                success("LOGOUT")
+                success("LOGOUT");
                 // client logout
                     // sucess ack
                     // fail nack
@@ -74,22 +74,28 @@ void *chla_client_service(void *arg) {
                 break;
 
             case CHLA_USERS_PKT:
-                success("USERS")
+                success("USERS");
                 CLIENT **clients = creg_all_clients(client_registry);
                 // while loop
                 int payload_length = 0;
                 char *send_payload;
+                USER *temp;
                 for (int i = 0; clients[i] != NULL; i++) {
                     // get length of handle + 2 for \r\n
-                    payload_length += strlen(user_get_handle(client_get_user(clients[i], 1))) + 2;
+                    temp = client_get_user(clients[i], 1);
+                    if (temp != NULL)
+                        payload_length += strlen(user_get_handle(temp)) + 2;
                 }
                 if (payload_length > 0) {
                     send_payload = malloc(payload_length-1);
                     for (int i = 0; clients[i] != NULL; i++) {
                         // copy handles
-                        if (i != 0)
-                            strcat(send_payload, "\r\n");
-                        strcat(send_payload, user_get_handle(client_get_user(clients[i], 1)));
+                        temp = client_get_user(clients[i], 1);
+                        if (temp != NULL) {
+                            if (i != 0)
+                                strcat(send_payload, "\r\n");
+                            strcat(send_payload, user_get_handle(temp));
+                        }
                         client_unref(clients[i], "for reference in clients list being discarded");
                     }
                     free(clients);
@@ -112,7 +118,7 @@ void *chla_client_service(void *arg) {
 
             case CHLA_SEND_PKT:
                 /* code */
-                success("SEND")
+                success("SEND");
                 // client_send_packet()
                     // client_send_ack
                 // free payload
@@ -129,4 +135,5 @@ void *chla_client_service(void *arg) {
     // client unref
     // creg unregister
     // pthread exit
+    return NULL;
 }
