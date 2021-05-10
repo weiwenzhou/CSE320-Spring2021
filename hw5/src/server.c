@@ -1,3 +1,9 @@
+#include <errno.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "client.h"
 #include "debug.h"
 #include "globals.h"
@@ -36,14 +42,14 @@ void chla_mailbox_service(void *arg) {
 }
 
 void *chla_client_service(void *arg) {
-    CHLA_PACKET_HEADER packet;
+    CHLA_PACKET_HEADER packet, sender;
     void *payload;
     int connfd = *((int *)arg);
     free(arg);
 
-    creg_register(client_registry, connfd);
+    CLIENT *self = creg_register(client_registry, connfd);
     
-
+    int end; // for error handling
     while ((proto_recv_packet(connfd, &packet, &payload)) != -1) {
         switch (packet.type) {
             case CHLA_LOGIN_PKT:
@@ -68,10 +74,40 @@ void *chla_client_service(void *arg) {
                 break;
 
             case CHLA_USERS_PKT:
-                /* code */
                 success("USERS")
                 CLIENT **clients = creg_all_clients(client_registry);
                 // while loop
+                int payload_length = 0;
+                char *send_payload;
+                for (int i = 0; clients[i] != NULL; i++) {
+                    // get length of handle + 2 for \r\n
+                    payload_length += strlen(user_get_handle(client_get_user(clients[i], 1))) + 2;
+                }
+                if (payload_length > 0) {
+                    send_payload = malloc(payload_length-1);
+                    for (int i = 0; clients[i] != NULL; i++) {
+                        // copy handles
+                        if (i != 0)
+                            strcat(send_payload, "\r\n");
+                        strcat(send_payload, user_get_handle(client_get_user(clients[i], 1)));
+                        client_unref(clients[i], "for reference in clients list being discarded");
+                    }
+                    free(clients);
+                    sender.payload_length = payload_length-1;
+                } else {
+                    sender.payload_length = 0;
+                }
+                sender.msgid = packet.msgid;
+                struct timespec timestamp;
+                if (clock_gettime(CLOCK_REALTIME, &timestamp) == -1) { // error
+                    end = 1;
+                    break;
+                }
+                sender.timestamp_sec = htonl(timestamp.tv_sec);
+                sender.timestamp_nsec = htonl(timestamp.tv_nsec);
+                sender.type = CHLA_USERS_PKT;
+                client_send_packet(self, &sender, send_payload);
+                free(send_payload);
                 break;
 
             case CHLA_SEND_PKT:
@@ -81,6 +117,9 @@ void *chla_client_service(void *arg) {
                     // client_send_ack
                 // free payload
                 break;
+        }
+        if (end == 1) {
+
         }
     }
 
