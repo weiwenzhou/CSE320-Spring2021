@@ -50,8 +50,10 @@ void *chla_client_service(void *arg) {
     int connfd = *((int *)arg);
     free(arg);
 
+    success("Starting client service for fd: %d", connfd);
     CLIENT *self = creg_register(client_registry, connfd);
     
+    int status; // for login and logout
     int end; // for error handling
     while ((proto_recv_packet(connfd, &packet, &payload)) != -1) {
         switch (packet.type) {
@@ -61,7 +63,7 @@ void *chla_client_service(void *arg) {
                 handle = strtok_r(payload, "\r\n", &saved_pointer);
                 // info("|%s,%s|%ld|%s|", (char *)payload, handle, strlen(saved_pointer), saved_pointer);
                 // parse string payload
-                int status = client_login(self, handle);
+                status = client_login(self, handle);
                 if (status == 0) { // success
                     pthread_create(&mailbox_tid, NULL, chla_mailbox_service, self);
                     client_send_ack(self, packet.msgid, NULL, 0);
@@ -74,10 +76,15 @@ void *chla_client_service(void *arg) {
             case CHLA_LOGOUT_PKT:
                 /* code */
                 success("LOGOUT");
-                // client logout
-                    // sucess ack
-                    // fail nack
-                // free payload
+                status = client_logout(self);
+                if (status == 0) {
+                    client_send_ack(self, packet.msgid, NULL, 0);
+                    success("Waiting for mailbox service thread (%ld) to terminate", mailbox_tid);
+                    pthread_join(mailbox_tid, NULL);
+                } else {
+                    client_send_nack(self, packet.msgid);
+                }
+                free(payload);
                 break;
 
             case CHLA_USERS_PKT:
