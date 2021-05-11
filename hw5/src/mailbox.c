@@ -116,8 +116,10 @@ void mb_unref(MAILBOX *mb, char *why) {
         current = mb->box->next;
         while (current != head) {
             item = current->content;
-            if (mb->hook != NULL) {
-                mb->hook(item);
+            if (mb->hook != NULL && item->type == MESSAGE_ENTRY_TYPE) {
+                if (item->content.message.from != mb) {
+                    mb->hook(item);
+                }
             }
             free(item);
             current = current->next;

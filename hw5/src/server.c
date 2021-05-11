@@ -14,6 +14,7 @@
 
 void discard_hook(MAILBOX_ENTRY *entry) {
     // add bounce notice to the mailbox
+    mb_add_notice(entry->content.message.from, BOUNCE_NOTICE_TYPE, 0);
 }
 
 void *chla_mailbox_service(void *arg) {
@@ -69,7 +70,7 @@ void *chla_mailbox_service(void *arg) {
 
 void *chla_client_service(void *arg) {
     CHLA_PACKET_HEADER packet;
-    pthread_t mailbox_tid;
+    pthread_t mailbox_tid = -1;
     void *payload;
     int connfd = *((int *)arg);
     free(arg);
@@ -146,7 +147,7 @@ void *chla_client_service(void *arg) {
                 success("SEND");
                 char *receiver, *body;
                 receiver = strtok_r(payload, "\r\n", &body);
-                info("|%s|%s|", receiver, body+1);
+                // info("|%s|%s|", receiver, body+1);
                 if (client_get_user(self, 1) != NULL) {
                     CLIENT *endpoint = NULL;
                     USER *temp;
@@ -168,7 +169,7 @@ void *chla_client_service(void *arg) {
                         // lenght of message = payload - length of receiver -2 (\r\n)
                         int message_length = ntohl(packet.payload_length)-strlen(receiver)-2;
                         int send_message_length = strlen(user_get_handle(client_get_user(self, 1)))+message_length+3;
-                        warn("%d, %d, %d", ntohl(packet.payload_length), message_length, send_message_length);
+                        // warn("%d, %d, %d", ntohl(packet.payload_length), message_length, send_message_length);
                         char *send_message = malloc(send_message_length);
                         memset(send_message, 0, 1); // set first byte to \0
                         strcat(send_message, user_get_handle(client_get_user(self, 1)));
@@ -187,12 +188,11 @@ void *chla_client_service(void *arg) {
 
         }
     }
-
-    // logout client
-    // pthread t
-    // pthread join if the mailbox is started
-    // client unref
-    // creg unregister
-    // pthread exit
-    return NULL;
+    client_logout(self);
+    if (mailbox_tid != -1) {
+        pthread_join(mailbox_tid, NULL);
+    }
+    client_unref(self, "for reference being discarded by terminating client service thread");
+    creg_unregister(client_registry, self);
+    pthread_exit(NULL);
 }
