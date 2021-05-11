@@ -66,7 +66,7 @@ void *chla_mailbox_service(void *arg) {
 }
 
 void *chla_client_service(void *arg) {
-    CHLA_PACKET_HEADER packet, sender;
+    CHLA_PACKET_HEADER packet;
     pthread_t mailbox_tid;
     void *payload;
     int connfd = *((int *)arg);
@@ -132,7 +132,7 @@ void *chla_client_service(void *arg) {
                         client_unref(clients[i], "for reference in clients list being discarded");
                     }
                     free(clients);
-                    client_send_ack(self, packet.msgid, payload_length, send_payload);
+                    client_send_ack(self, packet.msgid, send_payload, payload_length);
                 } else {
                     client_send_ack(self, packet.msgid, NULL, 0);
                 }
