@@ -148,7 +148,9 @@ void mb_add_message(MAILBOX *mb, int msgid, MAILBOX *from, void *body, int lengt
     entry->type = MESSAGE_ENTRY_TYPE;
     entry->content.message.msgid = msgid;
     entry->content.message.from = from;
-    entry->content.message.body = body;
+    char *body_copy = malloc(strlen(body)+1);
+    strcpy(body_copy, body);
+    entry->content.message.body = body_copy;
     entry->content.message.length = length;
     if (mb != from)
         mb_ref(from, "for newly created message with mailbox as sender"); 
