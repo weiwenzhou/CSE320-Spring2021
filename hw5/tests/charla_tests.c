@@ -28,9 +28,12 @@ void *system_thread(void *arg) {
     return (void *)ret;
 }
 
+// NOTE: This suite has to be run with sufficient concurrency to allow the tests to all run
+// at the same time (e.g. -j9).
+
 // Criterion seems to sort tests by name.  This one can't be delayed
 // or others will time out.
-Test(student_suite, 00_start_server, .timeout = 30) {
+Test(blackbox_suite, 00_start_server, .timeout = 30) {
     fprintf(stderr, "server_suite/00_start_server\n");
     int server_pid = 0;
     int ret = system("netstat -an | fgrep '0.0.0.0:9999' > /dev/null");
@@ -66,8 +69,23 @@ Test(student_suite, 00_start_server, .timeout = 30) {
     cr_assert_eq(WEXITSTATUS(ret), 0, "Server exit status was not 0");
 }
 
-Test(student_suite, 01_connect, .init = init, .fini = fini, .timeout = 5) {
+Test(blackbox_suite, 01_connect, .init = init, .fini = fini, .timeout = 10) {
     fprintf(stderr, "server_suite/01_connect\n");
     int ret = system("util/client -p 9999 </dev/null | grep 'Connected to server'");
+    cr_assert_eq(ret, 0, "expected %d, was %d\n", 0, ret);
+}
+
+Test(blackbox_suite, 02_connect_alice, .init = init, .fini = fini, .timeout = 10) {
+    int ret = system("(echo login alice ; sleep 1 ; echo send bob hello; sleep 1) | util/client -p 9999");
+    cr_assert_eq(ret, 0, "expected %d, was %d\n", 0, ret);
+}
+
+Test(blackbox_suite, 03_connect_bob, .init = init, .fini = fini, .timeout = 10) {
+    int ret = system("(echo login bob ; sleep 1 ; echo send alice hello; sleep 1) | util/client -p 9999");
+    cr_assert_eq(ret, 0, "expected %d, was %d\n", 0, ret);
+}
+
+Test(blackbox_suite, 04_connect_carol, .init = init, .fini = fini, .timeout = 10) {
+    int ret = system("(echo login carol ; sleep 1 ; echo send carol hello; sleep 1) | util/client -p 9999");
     cr_assert_eq(ret, 0, "expected %d, was %d\n", 0, ret);
 }

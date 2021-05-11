@@ -31,12 +31,13 @@ STD := -std=gnu11
 TEST_LIB := -lcriterion
 LIBS := $(LIB) -lpthread -lm
 LIBS_DB := $(LIB_DB) -lpthread -lm
+EXCLUDES := $(INCD)/excludes.h
 
 CFLAGS += $(STD)
 
 .PHONY: clean all setup debug
 
-all: setup $(EXEC) $(TEST_EXEC)
+all: setup $(EXEC) $(EXCLUDES) $(TEST_EXEC)
 
 setup:
 	mkdir -p $(BIND) $(BLDD)
@@ -56,6 +57,34 @@ $(BLDD)/%.o: $(SRCD)/%.c
 
 clean:
 	rm -rf $(BLDD) $(BIND)
+
+$(EXCLUDES): $(EXEC)
+	rm -f $@
+	touch $@
+	if nm $(BIND)/$(EXEC) | grep INSTRUCTOR_CLIENT > /dev/null; then \
+           echo "#define NO_CLIENT" >> $@; \
+        fi
+	if nm $(BIND)/$(EXEC) | grep INSTRUCTOR_CLIENT_REGISTRY > /dev/null; then \
+           echo "#define NO_CLIENT_REGISTRY" >> $@; \
+        fi
+	if nm $(BIND)/$(EXEC) | grep INSTRUCTOR_MAILBOX > /dev/null; then \
+           echo "#define NO_MAILBOX" >> $@; \
+        fi
+	if nm $(BIND)/$(EXEC) | grep INSTRUCTOR_MAIN > /dev/null; then \
+           echo "#define NO_MAIN" >> $@; \
+        fi
+	if nm $(BIND)/$(EXEC) | grep INSTRUCTOR_PROTOCOL > /dev/null; then \
+           echo "#define NO_PROTOCOL" >> $@; \
+        fi
+	if nm $(BIND)/$(EXEC) | grep INSTRUCTOR_SERVER > /dev/null; then \
+           echo "#define NO_SERVER" >> $@; \
+        fi
+	if nm $(BIND)/$(EXEC) | grep INSTRUCTOR_USER > /dev/null; then \
+           echo "#define NO_USER" >> $@; \
+        fi
+	if nm $(BIND)/$(EXEC) | grep INSTRUCTOR_USER_REGISTRY > /dev/null; then \
+           echo "#define NO_USER_REGISTRY" >> $@; \
+        fi
 
 .PRECIOUS: $(BLDD)/*.d
 -include $(BLDD)/*.d
