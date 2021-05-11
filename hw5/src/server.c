@@ -32,6 +32,7 @@ void *chla_mailbox_service(void *arg) {
             if (clock_gettime(CLOCK_REALTIME, &timestamp) == -1) { // error
                 goto bad_message;
             }
+            packet.type = CHLA_MESG_PKT;
             packet.payload_length = htonl(entry->content.message.length);
             packet.timestamp_sec = htonl(timestamp.tv_sec);
             packet.timestamp_nsec = htonl(timestamp.tv_nsec);
@@ -42,6 +43,7 @@ void *chla_mailbox_service(void *arg) {
                 bad_message:
                 mb_add_notice(entry->content.message.from, BOUNCE_NOTICE_TYPE, entry->content.message.msgid);
             }
+            free(entry->content.message.body);
         } else { // notice entry type
             packet.msgid = entry->content.notice.msgid;
             struct timespec timestamp;
@@ -113,7 +115,7 @@ void *chla_client_service(void *arg) {
                 CLIENT **clients = creg_all_clients(client_registry);
                 int payload_length = 0;
                 char *send_payload;
-                USER *temp;
+                USER *temp = NULL;
                 for (int i = 0; clients[i] != NULL; i++) {
                     // get length of handle + 2 for \r\n
                     temp = client_get_user(clients[i], 1);
@@ -142,8 +144,42 @@ void *chla_client_service(void *arg) {
             case CHLA_SEND_PKT:
                 /* code */
                 success("SEND");
-                // add message
-                    // client_send_ack
+                char *receiver, *body;
+                receiver = strtok_r(payload, "\r\n", &body);
+                info("|%s|%s|", receiver, body+1);
+                if (client_get_user(self, 1) != NULL) {
+                    CLIENT *endpoint = NULL;
+                    USER *temp;
+                    CLIENT **clients = creg_all_clients(client_registry);
+                    for (int i = 0; clients[i] != NULL; i++) {
+                        temp = client_get_user(clients[i], 1);
+                        if (temp != NULL) {
+                            if (strcmp(user_get_handle(temp), receiver) == 0) {
+                                endpoint = clients[i];
+                            }
+                        }
+                        client_unref(clients[i], "for reference in clients list being discarded");
+                    }
+                    free(clients);
+                    if (endpoint == NULL) {
+                        client_send_nack(self, packet.msgid);
+                    } else {
+                        // length of user handle + length of message + \r\n + \0
+                        // lenght of message = payload - length of receiver -2 (\r\n)
+                        int message_length = ntohl(packet.payload_length)-strlen(receiver)-2;
+                        int send_message_length = strlen(user_get_handle(client_get_user(self, 1)))+message_length+3;
+                        warn("%d, %d, %d", ntohl(packet.payload_length), message_length, send_message_length);
+                        char *send_message = malloc(send_message_length);
+                        memset(send_message, 0, 1); // set first byte to \0
+                        strcat(send_message, user_get_handle(client_get_user(self, 1)));
+                        strcat(send_message, "\r\n");
+                        strncat(send_message, body+1, message_length);
+                        mb_add_message(client_get_mailbox(endpoint, 1), packet.msgid, client_get_mailbox(self, 1), send_message, send_message_length);
+                        client_send_ack(self, packet.msgid, NULL, 0);
+                    }
+                } else {
+                    client_send_nack(self, packet.msgid);
+                }
                 // free payload
                 break;
         }
