@@ -79,7 +79,6 @@ void *chla_client_service(void *arg) {
     CLIENT *self = creg_register(client_registry, connfd);
     
     int status; // for login and logout
-    int end; // for error handling
     while ((proto_recv_packet(connfd, &packet, &payload)) != -1) {
         switch (packet.type) {
             case CHLA_LOGIN_PKT:
@@ -176,16 +175,14 @@ void *chla_client_service(void *arg) {
                         strcat(send_message, "\r\n");
                         strncat(send_message, body+1, message_length);
                         mb_add_message(client_get_mailbox(endpoint, 1), packet.msgid, client_get_mailbox(self, 1), send_message, send_message_length);
+                        free(send_message);
                         client_send_ack(self, packet.msgid, NULL, 0);
                     }
                 } else {
                     client_send_nack(self, packet.msgid);
                 }
-                // free payload
+                free(payload);
                 break;
-        }
-        if (end == 1) {
-
         }
     }
     client_logout(self);
