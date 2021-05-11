@@ -79,9 +79,9 @@ int client_login(CLIENT *client, char *handle) {
         init = 1;
     }
     // check if client is logged in 
+    pthread_mutex_lock(&login_mutex);
     if (client->status == LOGGED_IN)
         return -1;
-    pthread_mutex_lock(&login_mutex);
     USER *user = ureg_register(user_registry, handle);
     if (user == NULL) { // error
         pthread_mutex_unlock(&login_mutex);
