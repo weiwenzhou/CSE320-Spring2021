@@ -22,7 +22,10 @@ void *chla_mailbox_service(void *arg) {
     MAILBOX *mailbox = client_get_mailbox(client, 0);
     MAILBOX_ENTRY *entry;
 
-    // if mailbox is null???? exit
+    if (mailbox == NULL) { // not logged in anymore
+        client_unref(client, "for reference being discarded by terminating mailbox service thread");
+        pthread_exit(NULL);
+    }
 
     mb_set_discard_hook(mailbox, discard_hook);
     while ((entry = mb_next_entry(mailbox)) != NULL) {
