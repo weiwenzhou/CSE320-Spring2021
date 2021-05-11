@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "debug.h"
@@ -60,24 +61,27 @@ int proto_recv_packet(int fd, CHLA_PACKET_HEADER *hdr, void **payload) {
     // get the payload size (convert from network byte order using ntohl)
     payload_size = ntohl(hdr->payload_length);
     // create a buffer of size payload
-    payload_buffer = malloc(payload_size);
-    if (payload_buffer == NULL) { // malloc error
-        return -1;
-    }
-
-    // read the payload (keep track of partial reads)
-    current_buffer = payload_buffer;
-    while (payload_size != 0) {
-        amount_read = read(fd, current_buffer, payload_size);
-        if (amount_read <= 0) { // read error or read EOF
-            free(payload_buffer);
+    if (payload_size != 0) {
+        payload_buffer = malloc(payload_size);
+        if (payload_buffer == NULL) { // malloc error
             return -1;
         }
-        payload_size -= amount_read;
-        current_buffer += amount_read;
+        memset(payload_buffer, 0, payload_size);
+
+        // read the payload (keep track of partial reads)
+        current_buffer = payload_buffer;
+        while (payload_size != 0) {
+            amount_read = read(fd, current_buffer, payload_size);
+            if (amount_read <= 0) { // read error or read EOF
+                free(payload_buffer);
+                return -1;
+            }
+            payload_size -= amount_read;
+            current_buffer += amount_read;
+        }
+        // put payload buffer in payload pointer
+        *payload = payload_buffer;
     }
-    // put payload buffer in payload pointer
-    *payload = payload_buffer;
     info("packet: type=%s, msgid=%d, payload_length=%d, payload=[%s]", packet_names[hdr->type], ntohl(hdr->msgid), payload_size, (char *) *payload);
     return 0;
 }

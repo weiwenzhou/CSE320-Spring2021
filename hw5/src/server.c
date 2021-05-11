@@ -27,6 +27,7 @@ void *chla_mailbox_service(void *arg) {
     mb_set_discard_hook(mailbox, discard_hook);
     while ((entry = mb_next_entry(mailbox)) != NULL) {
         CHLA_PACKET_HEADER packet;
+        memset(&packet, 0, sizeof(CHLA_PACKET_HEADER));
         if (entry->type == MESSAGE_ENTRY_TYPE) {
             packet.msgid = entry->content.message.msgid;
             struct timespec timestamp;
@@ -71,7 +72,7 @@ void *chla_mailbox_service(void *arg) {
 void *chla_client_service(void *arg) {
     CHLA_PACKET_HEADER packet;
     pthread_t mailbox_tid = -1;
-    void *payload;
+    void *payload = NULL;
     int connfd = *((int *)arg);
     free(arg);
 
@@ -95,7 +96,10 @@ void *chla_client_service(void *arg) {
                 } else {
                     client_send_nack(self, packet.msgid);
                 }
-                free(payload);
+                if (payload != NULL) {
+                    free(payload);
+                    payload = NULL;
+                }
                 break;
             
             case CHLA_LOGOUT_PKT:
@@ -107,7 +111,10 @@ void *chla_client_service(void *arg) {
                 } else {
                     client_send_nack(self, packet.msgid);
                 }
-                free(payload);
+                if (payload != NULL) {
+                    free(payload);
+                    payload = NULL;
+                }
                 break;
 
             case CHLA_USERS_PKT:
@@ -124,6 +131,7 @@ void *chla_client_service(void *arg) {
                 }
                 if (payload_length > 0) {
                     send_payload = malloc(payload_length+1);
+                    memset(send_payload, 0, payload_length+1);
                     for (int i = 0; clients[i] != NULL; i++) {
                         // copy handles
                         temp = client_get_user(clients[i], 1);
@@ -139,6 +147,10 @@ void *chla_client_service(void *arg) {
                     client_send_ack(self, packet.msgid, NULL, 0);
                 }
                 free(send_payload);
+                if (payload != NULL) {
+                    free(payload);
+                    payload = NULL;
+                }
                 break;
 
             case CHLA_SEND_PKT:
@@ -170,7 +182,7 @@ void *chla_client_service(void *arg) {
                         int send_message_length = strlen(user_get_handle(client_get_user(self, 1)))+message_length+3;
                         // warn("%d, %d, %d", ntohl(packet.payload_length), message_length, send_message_length);
                         char *send_message = malloc(send_message_length);
-                        memset(send_message, 0, 1); // set first byte to \0
+                        memset(send_message, 0, message_length); // set first byte to \0
                         strcat(send_message, user_get_handle(client_get_user(self, 1)));
                         strcat(send_message, "\r\n");
                         strncat(send_message, body+1, message_length);
@@ -181,7 +193,10 @@ void *chla_client_service(void *arg) {
                 } else {
                     client_send_nack(self, packet.msgid);
                 }
-                free(payload);
+                if (payload != NULL) {
+                    free(payload);
+                    payload = NULL;
+                }
                 break;
         }
     }
