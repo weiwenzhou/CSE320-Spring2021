@@ -78,7 +78,7 @@ int main(int argc, char* argv[]){
     }
 
     // set up server socket
-    int socket_fd, *connfdp;
+    int socket_fd, *connfdp, tempconnfd;
     struct sockaddr_in address;
     pthread_t tid;
 
@@ -108,16 +108,17 @@ int main(int argc, char* argv[]){
     }
 
     while (1) {
+        tempconnfd = accept(socket_fd, NULL, NULL);
+        if (tempconnfd == -1) {
+            perror("Accept failure");
+            terminate(EXIT_FAILURE);
+        }
         connfdp = malloc(sizeof(int));
         if (connfdp == NULL) {
             perror("Malloc failed");
             terminate(EXIT_FAILURE);
         }
-        *connfdp = accept(socket_fd, NULL, NULL);
-        if (*connfdp == -1) {
-            perror("Accept failure");
-            terminate(EXIT_FAILURE);
-        }
+        *connfdp = tempconnfd;
         pthread_create(&tid, NULL, chla_client_service, connfdp);
     }
 
