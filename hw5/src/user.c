@@ -56,12 +56,13 @@ void user_unref(USER *user, char *why) {
     pthread_mutex_lock(user->mutex);
     info("Decrease reference count on user %p [%s] (%d -> %d) %s", user, user->handle, user->referenceCount, user->referenceCount-1, why);
     user->referenceCount--;
-    pthread_mutex_unlock(user->mutex);
     if (user->referenceCount == 0) {
         // this only occurs when user_registry is being freed so it should
         free(user->handle);
         free(user->mutex);
         free(user);
+    } else {
+        pthread_mutex_unlock(user->mutex);
     }
 }
 
