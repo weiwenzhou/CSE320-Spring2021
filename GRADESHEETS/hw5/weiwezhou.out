@@ -1,0 +1,171 @@
+[----] Criterion v2.3.3
+[====] Running 11 tests from client_registry_suite:
+[RUN ] client_registry_suite::all_clients_empty
+[PASS] client_registry_suite::all_clients_empty: (0.00s)
+[RUN ] client_registry_suite::all_clients_nonempty
+[PASS] client_registry_suite::all_clients_nonempty: (0.00s)
+[RUN ] client_registry_suite::basic_one_registry
+[PASS] client_registry_suite::basic_one_registry: (0.00s)
+[RUN ] client_registry_suite::basic_one_registry_premature
+boxfort-worker: ../nptl/pthread_mutex_lock.c:81: __pthread_mutex_lock: Assertion `mutex->__data.__owner == 0' failed.
+[----] tests/client_registry_test.c:305: Unexpected signal caught below this line!
+[FAIL] client_registry_suite::basic_one_registry_premature: CRASH!
+[RUN ] client_registry_suite::basic_two_registries
+[PASS] client_registry_suite::basic_two_registries: (0.72s)
+[RUN ] client_registry_suite::init
+[PASS] client_registry_suite::init: (0.00s)
+[RUN ] client_registry_suite::init_fini
+[PASS] client_registry_suite::init_fini: (0.00s)
+[RUN ] client_registry_suite::init_reg_fini
+[PASS] client_registry_suite::init_reg_fini: (0.00s)
+[RUN ] client_registry_suite::init_reg_unreg_fini
+[PASS] client_registry_suite::init_reg_unreg_fini: (0.00s)
+[RUN ] client_registry_suite::many_threads_one_registry
+[PASS] client_registry_suite::many_threads_one_registry: (2.87s)
+[RUN ] client_registry_suite::many_threads_one_registry_premature
+boxfort-worker: ../nptl/pthread_mutex_lock.c:81: __pthread_mutex_lock: Assertion `mutex->__data.__owner == 0' failed.
+[----] tests/client_registry_test.c:374: Unexpected signal caught below this line!
+[FAIL] client_registry_suite::many_threads_one_registry_premature: CRASH!
+[====] Running 17 tests from client_suite:
+[RUN ] client_suite::concurrent_ref
+[PASS] client_suite::concurrent_ref: (1.62s)
+[RUN ] client_suite::create
+[PASS] client_suite::create: (0.00s)
+[RUN ] client_suite::create_get_mailbox
+[PASS] client_suite::create_get_mailbox: (0.00s)
+[RUN ] client_suite::create_get_user
+[PASS] client_suite::create_get_user: (0.00s)
+[RUN ] client_suite::create_login
+[PASS] client_suite::create_login: (0.00s)
+[RUN ] client_suite::create_login_get_mailbox
+[PASS] client_suite::create_login_get_mailbox: (0.00s)
+[RUN ] client_suite::create_login_get_user
+[PASS] client_suite::create_login_get_user: (0.00s)
+[RUN ] client_suite::create_login_logout
+[PASS] client_suite::create_login_logout: (0.00s)
+[RUN ] client_suite::create_login_logout_get_mailbox
+[PASS] client_suite::create_login_logout_get_mailbox: (0.00s)
+[RUN ] client_suite::create_login_logout_get_user
+[PASS] client_suite::create_login_logout_get_user: (0.00s)
+[RUN ] client_suite::create_send_ack
+[PASS] client_suite::create_send_ack: (0.00s)
+[RUN ] client_suite::create_send_nack
+[PASS] client_suite::create_send_nack: (0.00s)
+[RUN ] client_suite::create_send_packet
+[PASS] client_suite::create_send_packet: (0.01s)
+[RUN ] client_suite::create_unref
+[PASS] client_suite::create_unref: (0.00s)
+[RUN ] client_suite::register_login_many
+[PASS] client_suite::register_login_many: (0.00s)
+[RUN ] client_suite::register_login_twice_diff
+[PASS] client_suite::register_login_twice_diff: (0.00s)
+[RUN ] client_suite::register_login_twice_same
+[PASS] client_suite::register_login_twice_same: (0.00s)
+[====] Running 10 tests from mailbox_suite:
+[RUN ] mailbox_suite::concurrent_add_consume
+[PASS] mailbox_suite::concurrent_add_consume: (0.13s)
+[RUN ] mailbox_suite::concurrent_ref
+[PASS] mailbox_suite::concurrent_ref: (1.48s)
+[RUN ] mailbox_suite::init
+[PASS] mailbox_suite::init: (0.00s)
+[RUN ] mailbox_suite::init_add_msg_next
+[PASS] mailbox_suite::init_add_msg_next: (0.00s)
+[RUN ] mailbox_suite::init_add_msg_unref
+[PASS] mailbox_suite::init_add_msg_unref: (0.00s)
+[RUN ] mailbox_suite::init_add_notice_next
+[PASS] mailbox_suite::init_add_notice_next: (0.00s)
+[RUN ] mailbox_suite::init_shutdown_unref
+[PASS] mailbox_suite::init_shutdown_unref: (0.00s)
+[RUN ] mailbox_suite::init_unref
+[PASS] mailbox_suite::init_unref: (0.00s)
+[RUN ] mailbox_suite::next_entry_empty
+[PASS] mailbox_suite::next_entry_empty: (0.00s)
+[RUN ] mailbox_suite::next_entry_shutdown
+[PASS] mailbox_suite::next_entry_shutdown: (1.00s)
+[====] Running 9 tests from protocol_suite:
+[RUN ] protocol_suite::recv_empty
+[PASS] protocol_suite::recv_empty: (0.00s)
+[RUN ] protocol_suite::recv_error
+[FAIL] protocol_suite::recv_error: Timed out. (5.00s)
+[RUN ] protocol_suite::recv_no_payload
+[PASS] protocol_suite::recv_no_payload: (0.00s)
+[RUN ] protocol_suite::recv_short_header
+[PASS] protocol_suite::recv_short_header: (0.00s)
+[RUN ] protocol_suite::recv_short_payload
+[PASS] protocol_suite::recv_short_payload: (0.00s)
+[RUN ] protocol_suite::recv_with_payload
+[PASS] protocol_suite::recv_with_payload: (0.00s)
+[RUN ] protocol_suite::send_error
+[FAIL] protocol_suite::send_error: Timed out. (5.00s)
+[RUN ] protocol_suite::send_no_payload
+[PASS] protocol_suite::send_no_payload: (0.00s)
+[RUN ] protocol_suite::send_with_payload
+[PASS] protocol_suite::send_with_payload: (0.00s)
+[====] Running 11 tests from server_suite:
+[RUN ] server_suite::login_again_same_user
+[----] tests/server_test.c:77: Assertion failed: ID in packet (16777216) does not match expected (1)
+[FAIL] server_suite::login_again_same_user: (0.00s)
+[RUN ] server_suite::login_logout
+[----] tests/server_test.c:77: Assertion failed: ID in packet (16777216) does not match expected (1)
+[FAIL] server_suite::login_logout: (0.00s)
+[RUN ] server_suite::login_logout_login
+[----] tests/server_test.c:77: Assertion failed: ID in packet (16777216) does not match expected (1)
+[FAIL] server_suite::login_logout_login: (0.00s)
+[RUN ] server_suite::login_many_users
+[----] tests/server_test.c:77: Assertion failed: ID in packet (16777216) does not match expected (1)
+[FAIL] server_suite::login_many_users: (0.00s)
+[RUN ] server_suite::login_send_many_users
+[----] tests/server_test.c:77: Assertion failed: ID in packet (16777216) does not match expected (1)
+[FAIL] server_suite::login_send_many_users: (0.00s)
+[RUN ] server_suite::login_two_conns_diff
+[----] tests/server_test.c:77: Assertion failed: ID in packet (16777216) does not match expected (1)
+[FAIL] server_suite::login_two_conns_diff: (0.00s)
+[RUN ] server_suite::login_two_conns_diff_users
+[----] tests/server_test.c:77: Assertion failed: ID in packet (16777216) does not match expected (1)
+[FAIL] server_suite::login_two_conns_diff_users: (0.00s)
+[RUN ] server_suite::login_two_conns_diff_users_send1
+[----] tests/server_test.c:77: Assertion failed: ID in packet (16777216) does not match expected (1)
+[FAIL] server_suite::login_two_conns_diff_users_send1: (0.00s)
+[RUN ] server_suite::login_two_conns_same
+[----] tests/server_test.c:77: Assertion failed: ID in packet (16777216) does not match expected (1)
+[FAIL] server_suite::login_two_conns_same: (0.00s)
+[RUN ] server_suite::ping
+[----] tests/server_test.c:77: Assertion failed: ID in packet (16777216) does not match expected (1)
+[FAIL] server_suite::ping: (0.00s)
+[RUN ] server_suite::valid_login
+[----] tests/server_test.c:77: Assertion failed: ID in packet (16777216) does not match expected (1)
+[FAIL] server_suite::valid_login: (0.00s)
+[====] Running 10 tests from user_registry_suite:
+[RUN ] user_registry_suite::concurrency
+[PASS] user_registry_suite::concurrency: (6.58s)
+[RUN ] user_registry_suite::init_fini
+[PASS] user_registry_suite::init_fini: (0.00s)
+[RUN ] user_registry_suite::init_reg_fini
+[PASS] user_registry_suite::init_reg_fini: (0.00s)
+[RUN ] user_registry_suite::reg3_one_registry
+[PASS] user_registry_suite::reg3_one_registry: (0.00s)
+[RUN ] user_registry_suite::reg_one_registry
+[PASS] user_registry_suite::reg_one_registry: (0.00s)
+[RUN ] user_registry_suite::reg_release_unreg_one_registry
+[PASS] user_registry_suite::reg_release_unreg_one_registry: (0.00s)
+[RUN ] user_registry_suite::reg_two_registries
+[PASS] user_registry_suite::reg_two_registries: (0.00s)
+[RUN ] user_registry_suite::release_rereg_one_registry
+[PASS] user_registry_suite::release_rereg_one_registry: (0.00s)
+[RUN ] user_registry_suite::rereg_one_registry
+[PASS] user_registry_suite::rereg_one_registry: (0.00s)
+[RUN ] user_registry_suite::unreg_empty_one_registry
+[PASS] user_registry_suite::unreg_empty_one_registry: (0.00s)
+[====] Running 5 tests from user_suite:
+[RUN ] user_suite::concurrent_ref
+[PASS] user_suite::concurrent_ref: (1.52s)
+[RUN ] user_suite::create
+[PASS] user_suite::create: (0.00s)
+[RUN ] user_suite::create_many
+[PASS] user_suite::create_many: (0.00s)
+[RUN ] user_suite::create_modify_handle
+[PASS] user_suite::create_modify_handle: (0.00s)
+[RUN ] user_suite::create_multiple
+[PASS] user_suite::create_multiple: (0.00s)
+[----] Writing xml report in `crit.xml`.
+[====] Synthesis: Tested: 73 | Passing: 58 | Failing: 15 | Crashing: 2 

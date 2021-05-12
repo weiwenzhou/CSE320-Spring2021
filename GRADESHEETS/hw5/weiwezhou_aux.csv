@@ -1,0 +1,9 @@
+Graded Commit:a0f0f1a144a19557c272c766e3ad8ee759484860
+
+TEST NAME, POINTS,OUT OF
+blackbox_suite/00_start_server,0,1,1 assertion(s) failed.: tests/charla_tests.c:68: Valgrind reported errors
+blackbox_suite/01_connect,1,1,
+blackbox_suite/02_connect_alice,1,1,
+blackbox_suite/03_connect_bob,1,1,
+blackbox_suite/04_connect_carol,1,1,
+total,4,5
