@@ -21,14 +21,14 @@ boxfort-worker: ../nptl/pthread_mutex_lock.c:81: __pthread_mutex_lock: Assertion
 [RUN ] client_registry_suite::init_reg_unreg_fini
 [PASS] client_registry_suite::init_reg_unreg_fini: (0.00s)
 [RUN ] client_registry_suite::many_threads_one_registry
-[PASS] client_registry_suite::many_threads_one_registry: (2.87s)
+[PASS] client_registry_suite::many_threads_one_registry: (2.86s)
 [RUN ] client_registry_suite::many_threads_one_registry_premature
 boxfort-worker: ../nptl/pthread_mutex_lock.c:81: __pthread_mutex_lock: Assertion `mutex->__data.__owner == 0' failed.
 [----] tests/client_registry_test.c:374: Unexpected signal caught below this line!
 [FAIL] client_registry_suite::many_threads_one_registry_premature: CRASH!
 [====] Running 17 tests from client_suite:
 [RUN ] client_suite::concurrent_ref
-[PASS] client_suite::concurrent_ref: (1.62s)
+[PASS] client_suite::concurrent_ref: (1.58s)
 [RUN ] client_suite::create
 [PASS] client_suite::create: (0.00s)
 [RUN ] client_suite::create_get_mailbox
@@ -65,7 +65,7 @@ boxfort-worker: ../nptl/pthread_mutex_lock.c:81: __pthread_mutex_lock: Assertion
 [RUN ] mailbox_suite::concurrent_add_consume
 [PASS] mailbox_suite::concurrent_add_consume: (0.13s)
 [RUN ] mailbox_suite::concurrent_ref
-[PASS] mailbox_suite::concurrent_ref: (1.48s)
+[PASS] mailbox_suite::concurrent_ref: (1.56s)
 [RUN ] mailbox_suite::init
 [PASS] mailbox_suite::init: (0.00s)
 [RUN ] mailbox_suite::init_add_msg_next
@@ -137,7 +137,7 @@ boxfort-worker: ../nptl/pthread_mutex_lock.c:81: __pthread_mutex_lock: Assertion
 [FAIL] server_suite::valid_login: (0.00s)
 [====] Running 10 tests from user_registry_suite:
 [RUN ] user_registry_suite::concurrency
-[PASS] user_registry_suite::concurrency: (6.58s)
+[PASS] user_registry_suite::concurrency: (7.42s)
 [RUN ] user_registry_suite::init_fini
 [PASS] user_registry_suite::init_fini: (0.00s)
 [RUN ] user_registry_suite::init_reg_fini
@@ -158,7 +158,7 @@ boxfort-worker: ../nptl/pthread_mutex_lock.c:81: __pthread_mutex_lock: Assertion
 [PASS] user_registry_suite::unreg_empty_one_registry: (0.00s)
 [====] Running 5 tests from user_suite:
 [RUN ] user_suite::concurrent_ref
-[PASS] user_suite::concurrent_ref: (1.52s)
+[PASS] user_suite::concurrent_ref: (1.51s)
 [RUN ] user_suite::create
 [PASS] user_suite::create: (0.00s)
 [RUN ] user_suite::create_many
