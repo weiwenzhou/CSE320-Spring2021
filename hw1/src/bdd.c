@@ -35,6 +35,8 @@ int bdd_min_level(int w, int h) {
  * The function aborts if the arguments passed are out-of-bounds.
  */
 int bdd_lookup(int level, int left, int right) {
+    // A variable keep tracking of the index of the next available node.
+    static int BDD_NODE_INDEX = 256;
     // TO BE IMPLEMENTED
     if (level < 0 || level > BDD_LEVELS_MAX)
         return -1;
@@ -51,14 +53,14 @@ int bdd_lookup(int level, int left, int right) {
     do {
         BDD_NODE *hash_current = *(bdd_hash_map+hash_index);
         if (hash_current == NULL) {
-            for (int index = BDD_NUM_LEAVES; index < BDD_NODES_MAX; index++) {
-                BDD_NODE *current = bdd_nodes+index;
+            if (BDD_NODE_INDEX < BDD_NODES_MAX) {
+                BDD_NODE *current = bdd_nodes+BDD_NODE_INDEX;
                 if (null_node(current)) {
                     current->level = level;
                     current->left = left;
                     current->right = right;
                     *(bdd_hash_map+hash_index) = current;
-                    return index;
+                    return BDD_NODE_INDEX++;
                 }
             }
             exit(EXIT_FAILURE);
