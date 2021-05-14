@@ -106,7 +106,6 @@ void mb_unref(MAILBOX *mb, char *why) {
     pthread_mutex_lock(mb->mutex);
     info("Decrease reference count on mailbox %p (%d -> %d) %s", mb, mb->referenceCount, mb->referenceCount-1, why);
     mb->referenceCount--;
-    pthread_mutex_unlock(mb->mutex);
     if (mb->referenceCount == 0) {
         free(mb->handle);
         free(mb->mutex);
@@ -128,6 +127,8 @@ void mb_unref(MAILBOX *mb, char *why) {
         free(mb->box); 
         free(mb->store);
         free(mb);
+    } else {
+        pthread_mutex_unlock(mb->mutex);
     }
 }
 

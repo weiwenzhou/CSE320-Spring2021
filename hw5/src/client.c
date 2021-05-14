@@ -59,7 +59,6 @@ void client_unref(CLIENT *client, char *why) {
     pthread_mutex_lock(client->mutex);
     info("Decrease reference count on client %p [%d] (%d -> %d) %s", client, client->fd, client->referenceCount, client->referenceCount-1, why);
     client->referenceCount--;
-    pthread_mutex_unlock(client->mutex);
     if (client->referenceCount == 0) {
         if (client->status == LOGGED_IN) {
             user_unref(client->user, "freeing client");
@@ -67,6 +66,8 @@ void client_unref(CLIENT *client, char *why) {
         }
         free(client->mutex);
         free(client);
+    } else {
+        pthread_mutex_unlock(client->mutex);
     }
 }
 
