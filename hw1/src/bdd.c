@@ -106,6 +106,10 @@ int bdd_serialize(BDD_NODE *node, FILE *out) {
     if (node == NULL)
         return -1;
     int counter = 1;
+    // reset bdd_index_map
+    for (int i = 0; i < BDD_NODES_MAX; i++) {
+        *(bdd_index_map+i) = 0;
+    }
     bdd_serialize_helper(node, out, &counter);
     return 0;
 }
