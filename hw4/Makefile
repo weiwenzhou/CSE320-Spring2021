@@ -26,7 +26,7 @@ STD := -std=c99
 POSIX := -D_POSIX_SOURCE
 BSD := -D_DEFAULT_SOURCE
 GNU := -D_GNU_SOURCE
-TEST_LIB := -lcriterion
+TEST_LIB := $(TSTD)/testlib.a -lcriterion
 EXTRA_LIBS := -lm
 
 CFLAGS += $(STD) $(POSIX) $(BSD)
@@ -54,7 +54,7 @@ $(BIND)/$(EXEC): $(ALL_OBJF) $(LIBD)/$(LIB)
 	$(CC) $^ -o $@ $(LIBD)/$(LIB) $(EXTRA_LIBS)
 
 $(BIND)/$(TEST): $(FUNC_FILES) $(TEST_SRC) $(ALL_LIBF)
-	$(CC) $(CFLAGS) $(INC) $(FUNC_FILES) $(TEST_SRC) $(LIBD)/$(LIB) $(TEST_LIB) $(EXTRA_LIBS) -o $@
+	$(CC) $(CFLAGS) $(INC) $(FUNC_FILES) $(TEST_SRC) $(TEST_LIB) $(LIBD)/$(LIB) $(EXTRA_LIBS) -o $@
 
 $(BLDD)/%.o: $(SRCD)/%.c
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
