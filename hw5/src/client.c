@@ -174,7 +174,7 @@ int client_send_ack(CLIENT *client, uint32_t msgid, void *data, size_t datalen) 
         return -1;
     header->type = CHLA_ACK_PKT;
     header->payload_length = htonl(datalen);
-    header->msgid = htonl(msgid);
+    header->msgid = msgid;
     struct timespec timestamp;
     if (clock_gettime(CLOCK_REALTIME, &timestamp) == -1) { // error
         free(header);
@@ -194,7 +194,7 @@ int client_send_nack(CLIENT *client, uint32_t msgid) {
         return -1;
     header->type = CHLA_NACK_PKT;
     header->payload_length = 0;
-    header->msgid = htonl(msgid);
+    header->msgid = msgid;
     struct timespec timestamp;
     if (clock_gettime(CLOCK_REALTIME, &timestamp) == -1) { // error
         free(header);
