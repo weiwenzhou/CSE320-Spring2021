@@ -22,7 +22,7 @@ DFLAGS := -g -DDEBUG -DCOLOR
 PRINT_STAMENTS := -DERROR -DSUCCESS -DWARN -DINFO
 
 STD := -std=gnu11
-TEST_LIB := -lcriterion
+TEST_LIB := -lcriterion tests/test_help/test_help.o
 LIBS := -lm
 
 CFLAGS += $(STD)
