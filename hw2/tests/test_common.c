@@ -32,7 +32,7 @@ int run_using_system(char *name, char *pre_cmd, char *valgrind_cmd)
 {
 	char cmd[1000];
 	setup_test(name);
-	sprintf(cmd, "%s%s bin/notation %s > %s.out 2> %s.err", pre_cmd,
+	sprintf(cmd, "ulimit -t 10; %s%s bin/notation %s > %s.out 2> %s.err < /dev/null", pre_cmd,
 		valgrind_cmd, program_options, test_log_outfile,
 		test_log_outfile);
 	fprintf(stderr, "run(%s)\n", cmd);
@@ -77,6 +77,20 @@ void assert_signaled(int sig, int status)
 		  sig, WTERMSIG(status));
 }
 
+void assert_files_matches(char *nameA, char *nameB) {
+    char cmd[500];
+    sprintf(cmd,
+           "diff --ignore-tab-expansion --ignore-trailing-space "
+           "--ignore-space-change --ignore-blank-lines %s/%s "
+           "%s/%s",
+            TEST_OUTPUT_DIR, nameA, TEST_REF_DIR, nameB);
+    int err = system(cmd);
+    cr_assert_eq(err, 0,
+           "The output was not what was expected (diff exited with "
+           "status %d).\n",
+           WEXITSTATUS(err));
+}
+
 /*
  * Compare the standard output from the program being tested with reference
  * output, after first possibly using "grep" to remove lines that match a filter
@@ -109,6 +123,33 @@ void assert_outfile_matches(char *name, char *filter)
 }
 
 /*
+ * Compare the standard output from the program being tested with reference
+ * output, after first possibly using "grep" to remove lines that match a filter
+ * pattern.
+ */
+int outfile_matches_errcode(char *name, char *filter)
+{
+    char cmd[500];
+    if (filter) {
+        sprintf(cmd,
+                "grep -v '%s' %s.out > %s_A.out; grep -v '%s' "
+                "%s/%s.out > %s_B.out; "
+                "diff --ignore-tab-expansion --ignore-trailing-space "
+                "--ignore-space-change --ignore-blank-lines %s_A.out "
+                "%s_B.out",
+                filter, test_log_outfile, name, filter, TEST_REF_DIR,
+                name, name, name, name);
+    } else {
+        sprintf(cmd,
+                "diff --ignore-tab-expansion --ignore-trailing-space "
+                "--ignore-space-change --ignore-blank-lines %s.out "
+                "%s/%s.out",
+                test_log_outfile, TEST_REF_DIR, name);
+    }
+    return system(cmd);
+}
+
+/*
  * Compare the standard error output from the program being tested with
  * reference output, after first possibly using "grep" to remove lines that
  * match a filter pattern.
@@ -120,7 +161,7 @@ void assert_errfile_matches(char *name, char *filter)
 		sprintf(cmd,
 			"grep -v '%s' %s.err > %s_A.err; grep -v '%s' "
 			"%s/%s.err > %s_B.err; "
-			"diff ---ignore-tab-expansion --ignore-trailing-space "
+			"diff --ignore-tab-expansion --ignore-trailing-space "
 			"--ignore-space-change --ignore-blank-lines %s_A.err "
 			"%s_B.err",
 			filter, test_log_outfile, name, filter, TEST_REF_DIR,

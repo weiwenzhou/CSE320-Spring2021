@@ -1,53 +1,87 @@
- WORLD CHESS CHAMPIONSHIP  GAME 13 Adjourned  November 24, 1990     KARPOV      KASPAROV 
-  1.       d4      Nf6
-  2.       c4       g6
-  3.      Nc3       d5
-  4.     cxd5     Nxd5
-  5.       e4     Nxc3
-  6.     bxc3      Bg7
-  7.      Be3       c5
-  8.      Qd2      O-O
-  9.      Rc1      Qa5
- 10.      Nf3       e6
- 11.       d5     exd5
- 12.     exd5      Re8
- 13.      Be2      Bf5
- 14.      O-O      Nd7
- 15.       h3      Nb6
- 16.       g4      Bd7
- 17.       c4     Qxd2
- 18.     Nxd2      Na4
- 19.      Bf3      Nc3
- 20.     Rxc3     Bxc3
- 21.      Ne4     Rxe4
- 22.     Bxe4      Re8
- 23.      Bd3       b6
- 24.      Kg2       f5
- 25.     gxf5     Bxf5
- 26.     Bxf5     gxf5
- 27.      Rd1      Kf7
- 28.      Rd3      Bf6
- 29.      Ra3       a5
- 30.      Rb3      Bd8
- 31.      Rc3      Bc7
- 32.       a4      Kf6
- 33.      Kf1       f4
- 34.      Bc1      Kf5
- 35.      Rc2      Rg8
- 36.      Re2      Be5
- 37.      Bb2      Bd4
- 38.     Bxd4     cxd4
- 39.      Re7       d3
- 40.      Ke1      Rc8
- 41.      Kd2     Rxc4
 
-| |/| |/| |/| |/|
-|/| |/| |R| |/|p|
-| |p| |/| |/| |/|
-|p| |/|P|/|k|/| |
-|P|/|r|/| |p| |/|
-|/| |/|p|/| |/|P|
-| |/| |K| |P| |/|
-|/| |/| |/| |/| |
+  Boudy vs Szabo, Varna 1979
+    See Informant XXVII game 452
+
+  1.       e4       c5
+  2.      Nf3      Nc6
+  3.       d4     cxd4
+  4.     Nxd4      Nf6
+  5.      Nc3       d6
+  6.       f4       a6
+  7.     Nxc6     bxc6
+  8.       e5      Nd7
+  9.     exd6     exd6
+ 10.      Qf3       d5
+ 11.      Bd2      Bd6
+ 12.    O-O-O      O-O
+ 13.       g4      Bb7  [
+ 13.      ...      Rb8 !?  ~   ]
+ 14.      Rg1      Re8
+ 15.       g5       f5 !?   [
+ 15.      ...      Nc5  ]
+ 16.       g6       h6
+ 17.      Bd3 ?!   [
+ 17.      Bh3 !  +_   ]
+ 17.      ...      Rf8
+ 18.      Qh3      Qf6
+ 19.      Rg5      Nc5
+ 20.     Bxf5      Bc8 ! 
+ 21.     Bxc8    Raxc8
+ 22.      Rg4      Rb8 =~ 
+ 23.      Rf1      Ne4
+ 24.      Be1
+
+| |r| |/| |r|k|/|
+|/| |/| |/| |p| |
+|p|/|p|b| |q|P|p|
+|/| |/|p|/| |/| |
+| |/| |/|n|P|R|/|
+|/| |N| |/| |/|Q|
+|P|P|P|/| |/| |P|
+|/| |K| |B|R|/| |
+
+
+ 24.      ...     Rxb2
+ 25.     Kxb2  [
+ 25.     Nxe4     dxe4
+ 26.      Bc3      Ba3 ! 
+ 27.     Bxf6      Rb3 _+  _|_   ]
+ 25.      ...      Ba3 ! 
+ 26.     Kxa3  [
+ 26.      Ka1      Rb8 -+   ]
+ 26.      ...      Rb8 -+ 
+ 27.     Nxe4      Qe7 ??   [
+ 27.      ...      Qb2
+ 28.      Ka4     Qxa2
+ 29.      Qa3     Qxc2
+ 30.      Ka5      Rb5
+ 31.     Kxa6     Qxe4 /\  De8a8 -+   ]
+ 28.      Nd6 !   [
+ 28.      Ka4     Qxe4 -+   ]
+ 28.      ...     Qxd6
+ 29.      Ka4       c5
+ 30.      Rh4  [ ^_ 
+ 30.      Rg1       c4
+ 31.      Qc3      Qd7
+ 32.      Ka3      Qd6
+ 33.      Qd4 -+   ]
+ 30.      ...       c4
+ 31.      Qc3      Qd7
+ 32.      Ka3      Qe7
+ 33.      Qb4 !  +-      Rxb4
+ 34.     Bxb4     Qxh4
+ 35.      Re1      Qd8 [] 
+ 36.       c3 !        a5
+ 37.      Bc5 ||   White won
+  somewhat luckily in the end at move 75. 
+
+| |/| |q| |/|k|/|
+|/| |/| |/| |p| |
+| |/| |/| |/|P|p|
+|p| |B|p|/| |/| |
+| |/|p|/| |P| |/|
+|K| |P| |/| |/| |
+|P|/| |/| |/| |P|
+|/| |/| |R| |/| |
 
 

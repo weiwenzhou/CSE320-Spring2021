@@ -22,5 +22,7 @@ void assert_expected_status(int expected, int status);
 void assert_expected_status(int expected, int status);
 void assert_signaled(int sig, int status);
 void assert_outfile_matches(char *name, char *filter);
+void assert_files_matches(char *nameA, char *nameB);
 void assert_errfile_matches(char *name, char *filter);
+int outfile_matches_errcode(char *name, char *filter);
 void assert_no_valgrind_errors(int status);
