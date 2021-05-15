@@ -13,7 +13,8 @@ char *packet_names[] = {
 
 int proto_send_packet(int fd, CHLA_PACKET_HEADER *hdr, void *payload) {
     info("SEND packet: type=%s, msgid=%d, payload_length=%d, payload=[%s]", packet_names[hdr->type], ntohl(hdr->msgid), ntohl(hdr->payload_length), (char *) payload);
-    uint32_t header_size, payload_size, amount_written;
+    uint32_t header_size, payload_size;
+    ssize_t amount_written;
     char *current_buffer;
     // get the payload size (convert from network byte order using ntohl)
     payload_size = ntohl(hdr->payload_length);
@@ -43,7 +44,8 @@ int proto_send_packet(int fd, CHLA_PACKET_HEADER *hdr, void *payload) {
 }
 
 int proto_recv_packet(int fd, CHLA_PACKET_HEADER *hdr, void **payload) {
-    uint32_t header_size, payload_size, amount_read;
+    uint32_t header_size, payload_size;
+    ssize_t amount_read;
     void *payload_buffer;
     char *current_buffer;
     // read the header (keep track of partial reads)
