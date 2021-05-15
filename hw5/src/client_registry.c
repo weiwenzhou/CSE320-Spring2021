@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <pthread.h>
+#include <semaphore.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -12,7 +13,7 @@ typedef struct client_registry {
     int count; // number of clients registered
     CLIENT *clients[MAX_CLIENTS]; 
     pthread_mutex_t *mutex; // mutex for thread-safe operations
-    pthread_mutex_t *terminate;  
+    sem_t terminate;  
 } CLIENT_REGISTRY;
 
 CLIENT_REGISTRY *creg_init() {
@@ -30,21 +31,9 @@ CLIENT_REGISTRY *creg_init() {
         free(mutex);
         return NULL;
     }
-    pthread_mutex_t *terminate = malloc(sizeof(pthread_mutex_t));
-    if (mutex == NULL) { // error
-        free(store);
-        free(mutex);
-        return NULL;
-    }
-    if ((errno = pthread_mutex_init(terminate, NULL)) != 0) { // error
-        free(store);
-        free(mutex);
-        free(terminate);
-        return NULL;
-    }
     store->count = 0;
     store->mutex = mutex;
-    store->terminate = terminate;
+    sem_init(&store->terminate, 0, 0);
     info("Initialize client registry");
     return store;
 }
@@ -54,7 +43,7 @@ void creg_fini(CLIENT_REGISTRY *cr) {
     info("Finalize client registry");
     pthread_mutex_unlock(cr->mutex);
     free(cr->mutex);
-    free(cr->terminate);
+    sem_destroy(&cr->terminate);
     free(cr);
 }
 
@@ -85,8 +74,8 @@ int creg_unregister(CLIENT_REGISTRY *cr, CLIENT *client) {
             client_unref(cr->clients[i], "because client is being unregistered");
             cr->clients[i] = NULL;
             cr->count--;
-            pthread_mutex_unlock(cr->terminate);
             pthread_mutex_unlock(cr->mutex);
+            sem_post(&cr->terminate);
             return 0;
         }
     }
@@ -125,6 +114,6 @@ void creg_shutdown_all(CLIENT_REGISTRY *cr) {
     pthread_mutex_unlock(cr->mutex);
     // block until count is 0
     while (cr->count != 0) {
-        pthread_mutex_lock(cr->terminate);
+        sem_wait(&cr->terminate);
     }
 }
