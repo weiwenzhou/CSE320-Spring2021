@@ -77,6 +77,7 @@ void *chla_client_service(void *arg) {
     pthread_t mailbox_tid = -1;
     void *payload = NULL;
     int connfd = *((int *)arg);
+    pthread_detach(pthread_self());
     free(arg);
 
     success("Starting client service for fd: %d", connfd);
